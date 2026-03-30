@@ -1,0 +1,113 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { StoreProvider } from '@/lib/StoreContext';
+import NotificationBell from '@/components/NotificationBell';
+import './protected.css';
+
+interface NavItemProps {
+  href: string;
+  icon: string;
+  label: string;
+  active: boolean;
+  onClick?: () => void;
+}
+
+const NavItem = ({ href, icon, label, active, onClick }: NavItemProps) => (
+  <Link href={href} className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
+    <span className="material-symbols-outlined nav-icon">{icon}</span>
+    <span>{label}</span>
+  </Link>
+);
+
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+  const navItems = [
+    { href: '/dashboard', icon: 'home', label: 'Dashboard' },
+    { href: '/board', icon: 'grid_view', label: 'Co-Creation Board' },
+    { href: '/my-announcements', icon: 'campaign', label: 'My Announcements' },
+    { href: '/my-requests', icon: 'handshake', label: 'My Requests' },
+    { href: '/profile', icon: 'person', label: 'Profile' },
+  ];
+
+  // Placeholder user data
+  const user = {
+    name: 'Dr. Sarah Chen',
+    role: 'Healthcare Professional',
+    initials: 'SC',
+    notifications: 3,
+  };
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  return (
+    <div className={`shell ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div className="mobile-backdrop" onClick={closeMobileMenu} />
+      )}
+
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+        <div className="logo-section">
+          <div className="logo-text">HealthAI</div>
+        </div>
+
+        <nav className="nav-group">
+          {navItems.map((item) => (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              active={pathname.startsWith(item.href)}
+              onClick={closeMobileMenu}
+            />
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-profile">
+            <div className="avatar-placeholder">{user.initials}</div>
+            <div className="user-info">
+              <div className="user-name">{user.name}</div>
+              <div className="user-role-badge">{user.role}</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main className="main-content">
+        <header className="top-bar">
+          <button 
+            className="mobile-menu-btn" 
+            onClick={toggleMobileMenu}
+            aria-label="Toggle Menu"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          
+          <div className="top-bar-right">
+            <StoreProvider>
+              <NotificationBell />
+            </StoreProvider>
+          </div>
+        </header>
+
+        <div className="page-container">
+          <StoreProvider>
+            {children}
+          </StoreProvider>
+        </div>
+      </main>
+    </div>
+  );
+}

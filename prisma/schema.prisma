@@ -1,0 +1,222 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// Core identity
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  role          Role      @default(ENGINEER)
+  name          String?
+  institution   String?   // e.g., "MIT"
+  city          String?
+  country       String?
+  bio           String?   @db.Text
+  expertise     String[]  // tags array
+  isActive      Boolean   @default(true)
+  isSuspended   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // soft delete for GDPR
+
+  announcements    Announcement[]
+  sentRequests     MeetingRequest[] @relation("Requester")
+  receivedRequests MeetingRequest[] @relation("Recipient")
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+}
+
+enum Role {
+  ENGINEER
+  HEALTHCARE_PROFESSIONAL
+  ADMIN
+}
+
+// Announcement (the core entity)
+model Announcement {
+  id                String             @id @default(cuid())
+  authorId          String
+  author            User               @relation(fields: [authorId], references: [id])
+
+  title             String
+  domain            String             // "cardiology imaging", "orthopedics", etc.
+  explanation       String             @db.Text
+  expertiseNeeded   String             // what the OTHER role provides
+  projectStage      ProjectStage
+  commitmentLevel   CommitmentLevel
+  collaborationType CollaborationType? // engineers only
+  confidentiality   Confidentiality
+  publicPitch       String?            @db.Text // shown publicly
+  city              String
+  country           String
+
+  status    AnnouncementStatus @default(DRAFT)
+  expiresAt DateTime?
+  autoClose Boolean            @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+
+  meetingRequests MeetingRequest[]
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  ACTIVE
+  MEETING_SCHEDULED
+  PARTNER_FOUND
+  EXPIRED
+  ARCHIVED
+}
+
+enum ProjectStage {
+  IDEA
+  CONCEPT_VALIDATION
+  PROTOTYPE_DEVELOPED
+  PILOT_TESTING
+  PRE_DEPLOYMENT
+}
+
+enum CommitmentLevel {
+  LOW    // advisory, occasional
+  MEDIUM // part-time research
+  HIGH   // co-founder level
+}
+
+enum CollaborationType {
+  ADVISOR
+  CO_FOUNDER
+  RESEARCH_PARTNER
+}
+
+enum Confidentiality {
+  PUBLIC_PITCH       // full details visible
+  DETAILS_IN_MEETING // only pitch visible, rest disclosed at meeting
+}
+
+// Meeting Request workflow
+model MeetingRequest {
+  id             String               @id @default(cuid())
+  announcementId String
+  announcement   Announcement         @relation(fields: [announcementId], references: [id])
+  requesterId    String
+  requester      User                 @relation("Requester", fields: [requesterId], references: [id])
+  recipientId    String
+  recipient      User                 @relation("Recipient", fields: [recipientId], references: [id])
+
+  message       String               @db.Text // initial interest message
+  ndaAccepted   Boolean              @default(false)
+  ndaAcceptedAt DateTime?
+
+  status        MeetingRequestStatus @default(PENDING)
+  proposedSlots TimeSlot[]
+  agreedSlot    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MeetingRequestStatus {
+  PENDING          // sent, awaiting acknowledgment
+  SLOTS_PROPOSED   // one party has proposed slots (either side)
+  COUNTER_PROPOSED // other party rejected all and proposed new slots
+  CONFIRMED        // a slot was accepted by one party
+  DECLINED
+  CANCELLED
+  COMPLETED
+}
+
+model TimeSlot {
+  id               String         @id @default(cuid())
+  meetingRequestId String
+  meetingRequest   MeetingRequest @relation(fields: [meetingRequestId], references: [id])
+  proposedBy       String         // userId — either party can propose
+  startTime        DateTime
+  endTime          DateTime
+  status           SlotStatus     @default(PENDING)
+  round            Int            @default(1) // negotiation round number
+}
+
+enum SlotStatus {
+  PENDING  // awaiting selection
+  SELECTED // this slot was chosen — meeting confirmed
+  REJECTED // explicitly passed over
+  EXPIRED  // past datetime, never confirmed
+}
+
+// Notifications
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  body      String
+  linkUrl   String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+
+enum NotificationType {
+  NEW_INTEREST           // someone expressed interest in your post
+  MEETING_REQUEST        // meeting request received
+  SLOTS_PROPOSED         // first set of time slots proposed (either party)
+  COUNTER_SLOTS_PROPOSED // other party proposed new slots in a new round
+  SLOT_SELECTED          // the other party selected a slot — meeting confirmed
+  MEETING_DECLINED       // your request was declined
+  MEETING_CANCELLED      // meeting was cancelled
+  PARTNER_FOUND          // announcement owner marked partner found
+  ACCOUNT_SUSPENDED      // admin action
+  SYSTEM                 // broadcast / maintenance messages
+}
+
+// Audit Log (append-only, tamper-resistant)
+model AuditLog {
+  id           String      @id @default(cuid())
+  userId       String?
+  user         User?       @relation(fields: [userId], references: [id])
+  role         Role?
+  actionType   AuditAction
+  targetEntity String?     // e.g., "Announcement:clx123"
+  result       String      // "success" | "failure"
+  ipAddress    String?     // nullable, GDPR-compliant
+  metadata     Json?       // extra context, no PII
+  createdAt    DateTime    @default(now())
+  // No updatedAt — append-only
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  LOGIN_FAILED
+  REGISTER
+  EMAIL_VERIFIED
+  POST_CREATED
+  POST_EDITED
+  POST_CLOSED
+  POST_EXPIRED
+  POST_ARCHIVED
+  POST_REMOVED_BY_ADMIN
+  MEETING_REQUEST_SENT
+  MEETING_REQUEST_ACKNOWLEDGED
+  MEETING_REQUEST_CONFIRMED
+  MEETING_REQUEST_DECLINED
+  MEETING_REQUEST_CANCELLED
+  PARTNER_FOUND_MARKED
+  ADMIN_USER_SUSPENDED
+  ADMIN_USER_REACTIVATED
+  DATA_EXPORT_REQUESTED
+  ACCOUNT_DELETED
+}

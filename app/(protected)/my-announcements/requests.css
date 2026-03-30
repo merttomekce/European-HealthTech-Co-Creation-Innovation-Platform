@@ -1,0 +1,193 @@
+.applicants-inbox {
+  margin-top: 2rem;
+  border-top: 1px solid var(--outline);
+  padding-top: 2rem;
+  background: rgba(var(--surface-rgb), 0.3);
+  margin-left: -2.5rem; /* Full bleed within padded card */
+  margin-right: -2.5rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+}
+
+.inbox-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.applicant-row-container {
+  border-bottom: 1px solid var(--outline);
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.applicant-row-container:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0.5rem;
+}
+
+.applicant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.applicant-profile {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.applicant-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.applicant-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.applicant-name {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--on-background);
+}
+
+.applicant-role {
+  font-size: 0.8125rem;
+  color: var(--on-background-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.2rem;
+}
+
+.applicant-message-box {
+  font-size: 1rem;
+  color: var(--on-background-muted);
+  line-height: 1.6;
+  padding-left: 4.25rem;
+  max-width: 800px;
+  font-style: italic;
+  font-family: var(--font-serif);
+}
+
+/* Slots Review Styling */
+.slots-review-box {
+  margin-left: 4.25rem;
+  padding: 1.5rem;
+  background: rgba(var(--primary-rgb), 0.05);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.slots-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.slots-list {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.slot-confirm-btn {
+  padding: 0.6rem 1.2rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  color: var(--on-background);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slot-confirm-btn:hover {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.1);
+  transform: translateY(-2px);
+}
+
+.slots-hint {
+  font-size: 0.75rem;
+  color: var(--on-background-muted);
+}
+
+/* Status Badges */
+.interest-status-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+}
+
+.status-pending { background: rgba(255, 193, 7, 0.1); color: #FFC107; }
+.status-accepted { background: rgba(5, 150, 105, 0.1); color: #059669; }
+.status-declined { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-accept {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-accept:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-decline {
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-background-muted);
+  padding: 0.6rem 1.4rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+}

@@ -1,0 +1,78 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  color: var(--on-background);
+  padding: 2rem;
+}
+
+.auth-card {
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-icon {
+  font-size: 3rem;
+  color: var(--blue-primary);
+  margin-bottom: 2rem;
+}
+
+.auth-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.auth-description {
+  font-size: 1.125rem;
+  color: var(--on-background-muted);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.auth-email-highlight {
+  color: var(--on-background);
+  font-weight: 600;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.auth-action-btn {
+  background-color: transparent;
+  border: 1px solid var(--outline);
+  color: var(--on-background);
+  padding: 0.875rem 2rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--on-background-muted);
+}
+
+.auth-secondary-info {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: var(--on-background-muted);
+}
+
+.auth-secondary-info a {
+  color: var(--on-background);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--outline);
+  transition: all 0.2s ease;
+}
+
+.auth-secondary-info a:hover {
+  text-decoration-color: var(--on-background-muted);
+  color: var(--on-background-muted);
+}
