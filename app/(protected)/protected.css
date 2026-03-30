@@ -171,6 +171,7 @@
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+  flex: 1;
 }
 
 /* --- Mobile Navigation & Responsiveness --- */
@@ -231,7 +232,7 @@
     top: 0;
     left: -280px;
     bottom: 0;
-    z-index: 100;
+    z-index: 1000;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
   }
@@ -241,7 +242,17 @@
   }
 
   .page-container {
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-section {
+    margin-bottom: 2rem;
+  }
+  
+  .nav-item {
+    padding: 0.875rem 1rem;
   }
 }
 
@@ -257,5 +268,14 @@
   
   .user-name {
     font-size: 0.9375rem;
+  }
+
+  .top-bar {
+    height: 56px;
+  }
+
+  /* Accessibility: Increase touch targets */
+  .nav-item, .mobile-menu-btn, .notification-btn {
+    min-height: 44px;
   }
 }

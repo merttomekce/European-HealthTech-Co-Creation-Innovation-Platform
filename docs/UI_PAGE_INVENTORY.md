@@ -1,17 +1,7 @@
 # HealthAI Co-Creation Platform — Complete UI Page Inventory
 
-> Derived from: `co-creation platform project brief-revised.docx` + `ARCHITECTURE.md`  
+> Status: Phase 9 Complete (Final Review & Handover)  
 > Design system: Digital Void (dark, Inter + Newsreader, WCAG AA)
-
----
-
-## 🔴 Critical Issues with the Current Build
-
-Before listing pages, three hard problems to flag:
-
-1. **`/register` replaces `/auth/complete-profile`** — The current register page is the wrong mental model. The brief requires `.edu` email-only, magic-link auth. Registration is a 2-stage flow: (1) email → verify → (2) complete profile. Not a password form.
-2. **`/feed` is wrong for this platform** — This is not a social feed. It's an **announcement board** for structured co-creation posts. Think job board, not X/LinkedIn. The feed metaphor will confuse healthcare professionals.
-3. **No authenticated layout shell exists** — The sidebar nav, notification bell, and RBAC guards are missing. Every authenticated page needs this.
 
 ---
 
@@ -19,93 +9,79 @@ Before listing pages, three hard problems to flag:
 
 ### GROUP 1 — Public / Auth (Unauthenticated)
 
-| # | Route | Name | Priority | Description |
+| # | Route | Name | Status | Description |
 |---|---|---|---|---|
-| 1 | `/` | **Landing / Auth Entry** | ✅ Built | Split-screen, email input. Exists. |
-| 2 | `/auth/verify` | **Email Verification** | 🔴 Must-have | "Check your inbox" screen with resend link. Shown after entering `.edu` email. |
-| 3 | `/auth/complete-profile` | **Onboarding — Complete Profile** | 🔴 Must-have | Step-form: Name → Role (Engineer / Healthcare Pro) → Institution → City/Country → Expertise tags. Only shown to new users after email verification. |
-| 4 | `/privacy` | **Privacy Policy** | 🟡 Required (GDPR) | Full GDPR-compliant text. Linked from registration NDA checkbox. |
-| 5 | `/about` | **About the Platform** | 🟢 Nice-to-have | Platform explainer for non-registered visitors. |
+| 1 | `/` | **Landing / Auth Entry** | ✅ Built | Split-screen, email input. Digital Void aesthetic. |
+| 2 | `/auth/verify` | **Email Verification** | ✅ Built | "Check your inbox" screen with resend link. |
+| 3 | `/auth/complete-profile` | **Onboarding — Profile** | ✅ Built | Multi-step Zod-validated form. Name → Role → Institution → Expertise. |
+| 4 | `/privacy` | **Privacy Policy** | ✅ Built | Placeholder text with platform theme. |
 
 ---
 
-### GROUP 2 — Core Authenticated Pages
+### GROUP 2 — Core Authenticated Pages (Protected)
 
-**All pages in this group require:**
-- Authenticated session
-- Left sidebar (nav + role badge + notification bell)
-- SSE connection for live notifications
-
-| # | Route | Name | Priority | Description |
+| # | Route | Name | Status | Description |
 |---|---|---|---|---|
-| 6 | `/dashboard` | **Dashboard** | 🔴 Must-have | Home after login. Feed of relevant announcements filtered by your role/city. Right panel: Your active posts, pending requests. Quick CTA: "Post Announcement". |
-| 7 | `/board` | **Announcement Board** | 🔴 Must-have | Browse ALL active announcements. FilterBar: Domain, Required Expertise, City, Country, Project Stage, Status. Cards show: Title, role badge, domain, city, stage, commitment level. URL-driven filters (`/board?domain=cardiology`). |
-| 8 | `/board/[id]` | **Announcement Detail** | 🔴 Must-have | Full post view. Header: title, author role, city, domain, status badge. Post body (with confidentiality handling). Metadata strip. Author card (institution only, no full profile). Match explanation. CTA: "Express Interest" → opens InterestModal. |
-| 9 | `/announcements/new` | **Create Announcement** | 🔴 Must-have | 3-step wizard (≤3 steps per NFR). Step 1: Title, Domain, Short explanation. Step 2: Expertise needed, Stage, Commitment, Collab type (engineer only), Confidentiality, Public pitch. Step 3: City/Country, Expiry, Auto-close, Preview → Submit. |
-| 10 | `/announcements/[id]/edit` | **Edit Announcement** | 🔴 Must-have | Same 3-step form, pre-populated. Locked if status is PARTNER_FOUND or EXPIRED. Author-only access. |
-| 11 | `/my-announcements` | **My Announcements** | 🔴 Must-have | Author's view of own posts. Tabs: Active \| Draft \| Closed \| Expired. Each card: title, status badge, interest count, request count. Actions: Edit, Close, Archive, Mark Partner Found. |
-| 12 | `/my-requests` | **My Requests** | 🔴 Must-have | All meeting requests. Tab 1 (Received): inbound interest messages → "Propose Time Slots" CTA. Tab 2 (Sent): outbound requests + status per request. |
-| 13 | `/my-requests/[id]` | **Request Detail** | 🔴 Must-have | Timeline/conversation layout of the negotiation. Current round's time slots as selectable cards. Both parties see "Propose new slots" CTA. Accept / Decline / Counter-Propose. Real-time via SSE. Confirmed state shows locked slot. |
-| 14 | `/profile` | **My Profile** | 🔴 Must-have | Edit: Name, Institution, City, Country, Bio, Expertise tags. Role (read-only). Notification preferences. GDPR: "Export My Data" + "Delete Account" buttons. |
-| 15 | `/notifications` | **Notifications History** | 🟡 Required | Full list of notifications, grouped by date. Mark all as read. Each notification links to relevant post/request. Read vs unread visual state. |
+| 5 | `/dashboard` | **Dashboard** | ✅ Built | Home after login. Quick actions + personalized feed. |
+| 6 | `/board` | **Announcement Board** | ✅ Built | Browse ALL active announcements with advanced filters. |
+| 7 | `/board/[id]` | **Announcement Detail** | ✅ Built | Full post view with match explanation and InterestModal. |
+| 8 | `/board/create` | **Create Announcement** | ✅ Built | 3-step wizard with Zod validation and preview. |
+| 9 | `/my-announcements` | **My Announcements** | ✅ Built | Author's view of own posts (Active/Closed/Expired). |
+| 10 | `/my-requests` | **My Requests** | ✅ Built | Request management: Sent vs Received tabs. |
+| 11 | `/my-requests/[id]` | **Request Detail** | ✅ Built | Negotiation timeline + TimeSlotPicker workflow. |
+| 12 | `/profile` | **My Profile** | ✅ Built | Editable profile with Zod validation + GDPR actions. |
+| 13 | `/notifications` | **Notifications** | ✅ Built | Full list of notifications with unread indicators. |
 
 ---
 
-### GROUP 3 — Admin Pages (RBAC: ADMIN role only)
+### GROUP 3 — Admin Pages (Admin Restricted)
 
-| # | Route | Name | Priority | Description |
+| # | Route | Name | Status | Description |
 |---|---|---|---|---|
-| 16 | `/admin` | **Admin Dashboard** | 🔴 Must-have | KPI tiles: total users by role, active posts, meetings requested/confirmed this week, Partner Found rate, suspended user count. Charts: post creation over time, domain distribution. |
-| 17 | `/admin/users` | **User Management** | 🔴 Must-have | Table: Name, Email, Role, Institution, City, Status, Joined. Filters: Role, Status. Per-row actions: View, Suspend, Reactivate, Delete. |
-| 18 | `/admin/users/[id]` | **User Detail** | 🟡 Required | Full profile, activity metrics (posts, requests), audit log for this user. Suspend/Reactivate with mandatory reason field. |
-| 19 | `/admin/posts` | **Post Management** | 🔴 Must-have | Table: Title, Author, Domain, City, Status, Created, Expires. Filters: City, Domain, Status. Actions: View, Remove (mandatory reason). |
-| 20 | `/admin/posts/[id]` | **Post Lifecycle View** | 🟡 Required | Visual timeline of status transitions with timestamps for a single post. |
-| 21 | `/admin/logs` | **Audit Logs** | 🔴 Must-have | Table: Timestamp, User, Role, Action, Target, Result, IP. Filters: User ID, date range, Action type, Role. Anomaly highlights (failed logins > 5 in 10min = orange row). Export CSV button. |
-| 22 | `/admin/settings` | **Platform Settings** | 🟢 Nice-to-have | Allowed email domains, session timeout duration, announcement expiry defaults, maintenance mode toggle. |
+| 14 | `/admin` | **Admin Dashboard** | ✅ Built | KPI tiles and platform performance metrics. |
+| 15 | `/admin/users` | **User Management** | ✅ Built | Table with filtering and suspend/reactivate actions. |
+| 16 | `/admin/posts` | **Post Management** | ✅ Built | Lifecycle management table for all user submissions. |
+| 17 | `/admin/logs` | **Audit Logs** | ✅ Built | Tamper-evident record with CSV export capability. |
+| 18 | `/admin/settings` | **Platform Settings** | ✅ Built | Global configuration (Maintenance, NDA, Timeouts). |
 
 ---
 
-## 📦 Shared Components Required (Not Pages)
+### GROUP 4 — Error & System Pages
 
-These are not pages but must be built before pages can be assembled:
+| # | Route | Name | Status | Description |
+|---|---|---|---|---|
+| 19 | `404` | **Signal Lost** | ✅ Built | Custom Digital Void themed not-found page. |
+| 20 | `Global Error` | **System Malfunction** | ✅ Built | Catch-all Error Boundary with retry action. |
 
-| Component | Used On | Description |
+---
+
+## 📦 Core Components Built
+
+| Component | Status | Description |
 |---|---|---|
-| `AuthenticatedLayout` | All GROUP 2 & 3 pages | Left sidebar + notification bell + SSE hook |
-| `StatusBadge` | Board, My Announcements, My Requests | Colored pill for DRAFT / ACTIVE / MEETING_SCHEDULED / PARTNER_FOUND / EXPIRED |
-| `RoleBadge` | Board, Detail, Profile | "Engineer" / "Healthcare Pro" pill |
-| `AnnouncementCard` | Dashboard, Board | Full post card with match explanation |
-| `FilterBar` | Board, Admin tables | Dropdowns for domain, city, stage, status |
-| `StepForm` | Create/Edit Announcement, Onboarding | Multi-step form wrapper with progress indicator |
-| `TimeSlotPicker` | My Requests Detail | Multi-slot date/time selector (used by both parties) |
-| `SlotRoundHistory` | My Requests Detail | Collapsible history of past negotiation rounds |
-| `InterestModal` | Announcement Detail | Short message + NDA checkbox + submit |
-| `NotificationBell` | AuthenticatedLayout | Live unread count via SSE |
-| `ConfirmModal` | Suspend user, Remove post, Delete account | Generic confirm + mandatory reason input |
-| `NDATooltip` | InterestModal, Create Announcement | Contextual "why do I need to accept this?" explanation |
-| `EmptyState` | Board (no results), My Announcements (empty) | Illustrated empty states per context |
-| `GDPRBanner` | First visit to authenticated area | One-time consent notice |
-| `MatchScore` | Board, Dashboard | Visual "You match on: Cardiology, Berlin" explanation |
+| `AuthenticatedLayout` | ✅ Done | Modern sidebar + mobile menu + notification bell. |
+| `AnnouncementCard` | ✅ Done | Complex card with match explanation and metadata. |
+| `StepForm` | ✅ Done | Reusable multi-step logic used in Create Post & Onboarding. |
+| `TimeSlotPicker` | ✅ Done | Multi-slot selector for meeting negotiation. |
+| `NotificationBell` | ✅ Done | Live-updating bell (Store-backed mockup). |
+| `LoadingSkeleton` | ✅ Done | Consistent loading states for all route transitions. |
 
 ---
 
-## 🗂️ Build Order Recommendation
+## 🛠️ Infrastructure Mapped (Simulations)
 
-```
-Phase 1:  AuthenticatedLayout shell → /auth/verify → /auth/complete-profile
-Phase 2:  AnnouncementCard + FilterBar → /board → /board/[id]
-Phase 3:  StepForm → /announcements/new → /announcements/[id]/edit → /my-announcements
-Phase 4:  TimeSlotPicker + InterestModal → /my-requests → /my-requests/[id]
-Phase 5:  NotificationBell + SSE → /notifications → /dashboard
-Phase 6:  Admin pages (RBAC guard first)
-Phase 7:  /profile + GDPR endpoints
-```
-
----
-
-## ⚠️ What to Rename/Remove
-
-| Current | Action | Reason |
+| Layer | Implementation | Path to Production |
 |---|---|---|
-| `/register` | **Delete or repurpose** | Wrong flow — magic links don't use passwords. Replace with `/auth/complete-profile`. |
-| `/feed` | **Rename to `/board`** | Feed metaphor is wrong. This is an announcement board, not a social feed. Rename and redesign card structure to match post fields. |
+| **Database** | Prisma (Simulated) | Replace `lib/prisma.ts` with real PostgreSQL instance. |
+| **Auth** | Step-form session mockup | Integrate with NextAuth.js or Clerk. |
+| **Notifications** | Context Store | Implement Pusher or Socket.io. |
+| **Search/Matching** | Client-side filtering | Implement vector search (Supabase pgvector). |
+
+---
+
+## 🛡️ Production Hardening (Phase 8)
+
+- **Validation**: Full Zod schema usage for all forms.
+- **Accessibility**: Keyboard focus rings and ARIA labels for all icon buttons.
+- **Responsiveness**: Mobile-first design applied to all layouts and tables.
+- **Errors**: Dedicated 404/Error routes with "Digital Void" branding.

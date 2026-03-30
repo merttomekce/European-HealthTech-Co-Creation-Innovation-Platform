@@ -166,3 +166,40 @@
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+@media (max-width: 768px) {
+  .composer-card {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+
+  .composer-title {
+    font-size: 2rem;
+  }
+
+  .composer-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .btn-primary {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+
+  .btn-secondary {
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .composer-actions {
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
+
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

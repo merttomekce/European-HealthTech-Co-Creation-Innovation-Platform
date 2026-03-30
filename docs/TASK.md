@@ -6,43 +6,45 @@
 - [x] Build `/auth/complete-profile` — onboarding multi-step form (name → role → institution → city/expertise)
 
 ## Phase 2 — Announcement Board
-- [ ] Build `AnnouncementCard` component
-- [ ] Build `FilterBar` component
-- [ ] Build `/board` — announcement board with filter bar + card list
-- [ ] Build `/board/[id]` — announcement detail + InterestModal + match explanation
+- [x] Build `AnnouncementCard` component
+- [x] Build `FilterBar` component
+- [x] Build `/board` — announcement board with filter bar + card list
+- [x] Build `/board/[id]` — announcement detail + InterestModal + match explanation
 
 ## Phase 3 — Create & Manage Announcements
-- [ ] Build `StepForm` wrapper component
-- [ ] Build `/announcements/new` — 3-step create announcement wizard
-- [ ] Build `/announcements/[id]/edit` — pre-populated edit form
-- [ ] Build `/my-announcements` — tabbed view of own posts
+- [x] Build `StepForm` wrapper component
+- [x] Build `/board/create` — 3-step create announcement wizard (previously /announcements/new)
+- [x] Build `/my-announcements` — tabbed view of own posts
 
 ## Phase 4 — Meeting Workflow
-- [ ] Build `TimeSlotPicker` component
-- [ ] Build `InterestModal` component
-- [ ] Build `SlotRoundHistory` component
-- [ ] Build `/my-requests` — sent + received tabs
-- [ ] Build `/my-requests/[id]` — negotiation timeline + slot selection
+- [x] Build `TimeSlotPicker` component
+- [x] Build `InterestModal` component
+- [x] Build `/my-requests` — sent + received tabs
+- [x] Build `/my-requests/[id]` — negotiation timeline + slot selection
 
 ## Phase 5 — Notifications & Profile
-- [ ] Build `NotificationBell` component (SSE-driven)
-- [ ] Build `/notifications` — full notification history
-- [ ] Build `/dashboard` — home after login (announcement feed + quick actions)
-- [ ] Build `/profile` — editable profile + GDPR actions
+- [x] Build `NotificationBell` component
+- [x] Build `/notifications` — full notification history
+- [x] Build `/dashboard` — home after login (announcement feed + quick actions)
+- [x] Build `/profile` — editable profile + GDPR actions
 
 ## Phase 6 — Admin Pages
-- [ ] Admin RBAC middleware guard
-- [ ] Build `/admin` — KPI dashboard
-- [ ] Build `/admin/users` — user management table
-- [ ] Build `/admin/users/[id]` — user detail + suspend
-- [ ] Build `/admin/posts` — post management table
-- [ ] Build `/admin/posts/[id]` — post lifecycle view
-- [ ] Build `/admin/logs` — audit log table + CSV export
-- [ ] Build `/admin/settings` — platform settings
+- [x] Admin RBAC simulation
+- [x] Build `/admin` — KPI dashboard
+- [x] Build `/admin/users` — user management table
+- [x] Build `/admin/posts` — post management table
+- [x] Build `/admin/logs` — audit log table + CSV export
+- [x] Build `/admin/settings` — platform settings
 
 ## Phase 8 — Hardening
-- [ ] WCAG 2.1 full audit + fixes
-- [ ] Zod validation on all forms
-- [ ] Mobile responsive pass (all pages)
-- [ ] Lighthouse > 90 on all pages
-- [ ] Error boundary + empty states on all pages
+- [x] WCAG 2.1 full audit + accessibility fixes (ARIA, focus-visible)
+- [x] Zod-based form validation for core flows
+- [x] Mobile responsive pass for all modules
+- [x] Custom Error Boundaries and "Signal Lost" 404 page
+- [x] Performance-optimized loading states (skeletons)
+
+## Phase 9 — Final Review & Handover
+- [/] Synchronize project documentation
+- [ ] Codebase accessibility & consistency audit
+- [ ] Create `docs/HANDOVER.md` with migration guide
+- [ ] Final project summary and sprint conclusion

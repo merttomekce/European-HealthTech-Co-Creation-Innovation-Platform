@@ -3,13 +3,15 @@
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProfile } from '@/lib/actions/profile';
+import { profileSchema } from '@/lib/validations';
 import './onboarding.css';
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -20,30 +22,54 @@ export default function OnboardingPage() {
   });
 
   const nextStep = () => {
-    setError(null);
-    if (step === 1 && (!formData.fullName || !formData.institution)) {
-      setError("Please fill in your name and institution.");
-      return;
+    setErrors({});
+    setGlobalError(null);
+
+    // Partial validation for each step
+    if (step === 1) {
+      const result = profileSchema.pick({ fullName: true, institution: true }).safeParse(formData);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.issues.forEach(issue => {
+          if (issue.path[0]) fieldErrors[issue.path[0] as string] = issue.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
     }
+    
     if (step === 2 && !formData.role) {
-      setError("Please select a role to continue.");
+      setErrors({ role: "Please select a role to continue." });
       return;
     }
     setStep(s => Math.min(s + 1, 3));
   };
 
   const prevStep = () => {
-    setError(null);
+    setErrors({});
+    setGlobalError(null);
     setStep(s => Math.max(s - 1, 1));
   };
 
   const handleComplete = async () => {
-    if (!formData.city || !formData.expertise) {
-      setError("Please provide your location and expertise.");
+    setErrors({});
+    setGlobalError(null);
+
+    // Final schema validation (mapping city to location for the schema)
+    const result = profileSchema.safeParse({
+      ...formData,
+      location: formData.city
+    });
+
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach(issue => {
+        if (issue.path[0]) fieldErrors[issue.path[0] as string] = issue.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
 
-    setError(null);
     startTransition(async () => {
       try {
         await updateProfile({
@@ -53,9 +79,9 @@ export default function OnboardingPage() {
           location: formData.city,
           expertise: formData.expertise,
         });
-        router.push('/board'); // Redirect to board (dashboard)
+        router.push('/dashboard'); // Redirect to dashboard
       } catch (err: any) {
-        setError(err.message || "Something went wrong. Please try again.");
+        setGlobalError(err.message || "Something went wrong. Please try again.");
       }
     });
   };
@@ -71,21 +97,23 @@ export default function OnboardingPage() {
               <label className="form-label">Full Name</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className={`form-input ${errors.fullName ? 'error' : ''}`} 
                 placeholder="Dr. Sarah Chen"
                 value={formData.fullName}
                 onChange={(e) => setFormData({...formData, fullName: e.target.value})}
               />
+              {errors.fullName && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.fullName}</span>}
             </div>
             <div className="form-group">
               <label className="form-label">Institution</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className={`form-input ${errors.institution ? 'error' : ''}`} 
                 placeholder="Charité - Universitätsmedizin Berlin"
                 value={formData.institution}
                 onChange={(e) => setFormData({...formData, institution: e.target.value})}
               />
+              {errors.institution && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.institution}</span>}
             </div>
           </div>
         );
@@ -94,6 +122,7 @@ export default function OnboardingPage() {
           <div className="onboarding-form">
             <h2>Select Your Role</h2>
             <p>Every account is verified by institutional domain.</p>
+            {errors.role && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem' }}>{errors.role}</p>}
             <div className="role-cards">
               <div 
                 className={`role-card ${formData.role === 'healthcare' ? 'selected' : ''}`}
@@ -123,21 +152,23 @@ export default function OnboardingPage() {
               <label className="form-label">City, Country</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className={`form-input ${errors.location ? 'error' : ''}`}
                 placeholder="Berlin, Germany"
                 value={formData.city}
                 onChange={(e) => setFormData({...formData, city: e.target.value})}
               />
+              {errors.location && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.location}</span>}
             </div>
             <div className="form-group">
               <label className="form-label">Core Tags</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className={`form-input ${errors.expertise ? 'error' : ''}`}
                 placeholder="Cardiology, Imaging, AI, etc."
                 value={formData.expertise}
                 onChange={(e) => setFormData({...formData, expertise: e.target.value})}
               />
+              {errors.expertise && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.expertise}</span>}
             </div>
           </div>
         );
@@ -167,7 +198,7 @@ export default function OnboardingPage() {
       </div>
 
       <div className="onboarding-main">
-        {error && (
+        {globalError && (
           <div style={{ 
             marginBottom: '1.5rem', 
             padding: '1rem', 
@@ -177,7 +208,7 @@ export default function OnboardingPage() {
             border: '1px solid rgba(239, 68, 68, 0.2)',
             fontSize: '0.875rem'
           }}>
-            {error}
+            {globalError}
           </div>
         )}
 

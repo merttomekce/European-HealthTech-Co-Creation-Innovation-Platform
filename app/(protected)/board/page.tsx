@@ -161,7 +161,7 @@ export default function BoardPage() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '0.875rem', color: 'var(--on-background-muted)' }}>
-                    {new Date(item.createdAt).toLocaleDateString()}
+                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Just now'}
                   </span>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function BoardPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--on-background-muted)', marginBottom: '0.35rem' }}>Stage</div>
-                  <div style={{ fontSize: '0.9375rem', fontWeight: 600 }}>{item.projectStage.replace(/_/g, ' ')}</div>
+                  <div style={{ fontSize: '0.9375rem', fontWeight: 600 }}>{item.projectStage ? item.projectStage.replace(/_/g, ' ') : 'CONCEPT'}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--on-background-muted)', marginBottom: '0.35rem' }}>Commitment</div>

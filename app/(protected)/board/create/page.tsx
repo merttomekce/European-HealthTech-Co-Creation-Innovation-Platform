@@ -6,13 +6,15 @@ import Link from 'next/link';
 import { createAnnouncement } from '@/lib/actions/announcements';
 import { createClient } from '@/lib/supabase/client';
 import CustomSelect from '@/components/CustomSelect';
+import { announcementSchema } from '@/lib/validations';
 import './composer.css';
 
 export default function ProjectComposerPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [globalError, setGlobalError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<{ city: string, country: string } | null>(null);
   
   const [formData, setFormData] = useState({
@@ -32,8 +34,6 @@ export default function ProjectComposerPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // In a real app, I'd fetch the profile from Prisma here
-        // For now, I'll default to placeholders if not found
         setUserProfile({ city: 'San Francisco', country: 'USA' }); 
       }
     }
@@ -42,6 +42,13 @@ export default function ProjectComposerPage() {
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
   };
 
   const handleRequirementChange = (index: number, value: string) => {
@@ -59,18 +66,43 @@ export default function ProjectComposerPage() {
     updateField('requirements', newReqs.length ? newReqs : ['']);
   };
 
-  const isStepValid = () => {
-    if (step === 1) return formData.title && formData.domain;
-    if (step === 2) return formData.clinicalContext && formData.technicalChallenge;
-    if (step === 3) return formData.requirements.every(r => r.trim());
-    return true;
+  const nextStep = () => {
+    setErrors({});
+    if (step === 1) {
+      const result = announcementSchema.pick({ title: true, domain: true }).safeParse(formData);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.issues.forEach(i => { if (i.path[0]) fieldErrors[i.path[0] as string] = i.message; });
+        setErrors(fieldErrors);
+        return;
+      }
+    }
+    if (step === 2) {
+      const result = announcementSchema.pick({ clinicalContext: true, technicalChallenge: true }).safeParse(formData);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.issues.forEach(i => { if (i.path[0]) fieldErrors[i.path[0] as string] = i.message; });
+        setErrors(fieldErrors);
+        return;
+      }
+    }
+    setStep(s => s + 1);
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setError(null);
+    setErrors({});
+    const result = announcementSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach(i => { if (i.path[0]) fieldErrors[i.path[0] as string] = i.message; });
+      setErrors(fieldErrors);
+      // If errors are on previous steps, we might need to jump back, but for now we validate step-by-step
+      return;
+    }
 
-    // Map UI values to Prisma Enums
+    setIsSubmitting(true);
+    setGlobalError(null);
+
     const stageMap: any = {
       'Ideation': 'IDEA',
       'Prototype': 'PROTOTYPE_DEVELOPED',
@@ -84,7 +116,7 @@ export default function ProjectComposerPage() {
       'Project-based': 'LOW'
     };
 
-    const result = await createAnnouncement({
+    const apiResult = await createAnnouncement({
       title: formData.title,
       domain: formData.domain,
       publicPitch: formData.pitch || `Accelerating ${formData.domain} through co-creation.`,
@@ -97,10 +129,10 @@ export default function ProjectComposerPage() {
       confidentiality: 'PUBLIC_PITCH'
     } as any);
 
-    if (result.success) {
+    if (apiResult.success) {
       router.push('/board');
     } else {
-      setError(result.error || 'Failed to post project');
+      setGlobalError(apiResult.error || 'Failed to post project');
       setIsSubmitting(false);
     }
   };
@@ -133,22 +165,24 @@ export default function ProjectComposerPage() {
               <label className="form-label text-sans">Project Title</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className={`form-input ${errors.title ? 'error' : ''}`} 
                 placeholder="e.g., AI-assisted surgical navigation"
                 value={formData.title}
                 onChange={(e) => updateField('title', e.target.value)}
               />
+              {errors.title && <span className="field-error">{errors.title}</span>}
             </div>
 
             <div className="form-group">
               <label className="form-label text-sans">Medical Domain</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className={`form-input ${errors.domain ? 'error' : ''}`} 
                 placeholder="e.g., Neurosurgery, Cardiology"
                 value={formData.domain}
                 onChange={(e) => updateField('domain', e.target.value)}
               />
+              {errors.domain && <span className="field-error">{errors.domain}</span>}
             </div>
 
             <div className="form-group">
@@ -173,21 +207,23 @@ export default function ProjectComposerPage() {
             <div className="form-group">
               <label className="form-label text-sans">Clinical Impact (Context)</label>
               <textarea 
-                className="form-textarea" 
+                className={`form-textarea ${errors.clinicalContext ? 'error' : ''}`} 
                 placeholder="What medical problem are you solving? Why does this matter for patients?"
                 value={formData.clinicalContext}
                 onChange={(e) => updateField('clinicalContext', e.target.value)}
               />
+              {errors.clinicalContext && <span className="field-error">{errors.clinicalContext}</span>}
             </div>
 
             <div className="form-group">
               <label className="form-label text-sans">Technical Challenge</label>
               <textarea 
-                className="form-textarea" 
+                className={`form-textarea ${errors.technicalChallenge ? 'error' : ''}`} 
                 placeholder="What are the engineering or scientific hurdles? What specific tech stack is involved?"
                 value={formData.technicalChallenge}
                 onChange={(e) => updateField('technicalChallenge', e.target.value)}
               />
+              {errors.technicalChallenge && <span className="field-error">{errors.technicalChallenge}</span>}
             </div>
           </div>
         )}
@@ -225,7 +261,7 @@ export default function ProjectComposerPage() {
               <label className="form-label text-sans">Specific Partner Requirements</label>
               <div className="requirements-list-editor">
                 {formData.requirements.map((req, index) => (
-                  <div key={index} className="requirement-input-row">
+                  <div key={index} className="requirement-input-row" style={{ marginBottom: '1rem' }}>
                     <input 
                       type="text" 
                       className="form-input" 
@@ -236,12 +272,14 @@ export default function ProjectComposerPage() {
                     <button 
                       className="btn-icon" 
                       onClick={() => removeRequirement(index)}
-                      style={{ border: 'none', color: '#EF4444' }}
+                      style={{ border: 'none', color: '#EF4444', cursor: 'pointer', background: 'none' }}
+                      aria-label={`Remove requirement ${index + 1}`}
                     >
                       <span className="material-symbols-outlined">delete</span>
                     </button>
                   </div>
                 ))}
+                {errors.requirements && <span className="field-error" style={{ marginBottom: '1rem' }}>{errors.requirements}</span>}
                 <button className="btn-secondary" onClick={addRequirement} style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
                   + Add Requirement
                 </button>
@@ -250,9 +288,9 @@ export default function ProjectComposerPage() {
           </div>
         )}
 
-        {error && (
+        {globalError && (
           <div style={{ color: '#EF4444', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>
-            {error}
+            {globalError}
           </div>
         )}
 
@@ -263,14 +301,26 @@ export default function ProjectComposerPage() {
           
           <button 
             className="btn-primary" 
-            disabled={!isStepValid() || isSubmitting}
-            onClick={() => step < 3 ? setStep(step + 1) : handleSubmit()}
+            disabled={isSubmitting}
+            onClick={() => step < 3 ? nextStep() : handleSubmit()}
           >
             {isSubmitting ? 'Posting...' : (step < 3 ? 'Continue' : 'Post Project')}
             {!isSubmitting && <span className="material-symbols-outlined">arrow_forward</span>}
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        .field-error {
+          color: #ef4444;
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
+          display: block;
+        }
+        .form-input.error, .form-textarea.error {
+          border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,30 +1,56 @@
 'use client';
 
 import React, { useState } from 'react';
+import { profileSchema } from '@/lib/validations';
 import './profile.css';
 
 export default function ProfilePage() {
   const [formData, setFormData] = useState({
-    name: 'Dr. Sarah Chen',
+    fullName: 'Dr. Sarah Chen',
     institution: 'Berlin Charité',
-    city: 'Berlin',
-    country: 'Germany',
-    bio: 'Cardiologist specializing in electrophysiology. Looking to collaborate on signal processing for wearable ECG devices.',
-    expertise: 'Cardiology, Electrophysiology, ECG'
+    location: 'Berlin, Germany',
+    expertise: 'Cardiology, Electrophysiology, ECG',
+    role: 'healthcare' as 'healthcare' | 'engineer' | 'admin'
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaved, setIsSaved] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setIsSaved(false);
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    
+    const result = profileSchema.safeParse(formData);
+    
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach(issue => {
+        if (issue.path[0]) fieldErrors[issue.path[0] as string] = issue.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsPending(true);
     // Simulate API call
-    setTimeout(() => setIsSaved(true), 500);
+    setTimeout(() => {
+      setIsSaved(true);
+      setIsPending(false);
+    }, 800);
   };
 
   const handeGdprAction = (action: string) => {
@@ -41,8 +67,11 @@ export default function ProfilePage() {
       <div className="avatar-section">
         <div className="large-avatar">SC</div>
         <div className="avatar-info">
-          <h2>{formData.name}</h2>
-          <span className="read-only-role">Healthcare Professional</span>
+          <h2>{formData.fullName}</h2>
+          <span className="read-only-role">
+            {formData.role === 'healthcare' ? 'Healthcare Professional' : 
+             formData.role === 'engineer' ? 'Engineer / Tech Expert' : 'Administrator'}
+          </span>
         </div>
       </div>
 
@@ -54,12 +83,12 @@ export default function ProfilePage() {
               <label className="form-label">Full Name</label>
               <input 
                 type="text" 
-                name="name" 
-                className="form-input" 
-                value={formData.name}
+                name="fullName" 
+                className={`form-input ${errors.fullName ? 'error' : ''}`} 
+                value={formData.fullName}
                 onChange={handleInputChange}
-                required
               />
+              {errors.fullName && <span className="field-error">{errors.fullName}</span>}
             </div>
             
             <div className="form-group full-width">
@@ -67,32 +96,23 @@ export default function ProfilePage() {
               <input 
                 type="text" 
                 name="institution" 
-                className="form-input" 
+                className={`form-input ${errors.institution ? 'error' : ''}`} 
                 value={formData.institution}
                 onChange={handleInputChange}
               />
+              {errors.institution && <span className="field-error">{errors.institution}</span>}
             </div>
 
-            <div className="form-group">
-              <label className="form-label">City</label>
+            <div className="form-group full-width">
+              <label className="form-label">Location (City, Country)</label>
               <input 
                 type="text" 
-                name="city" 
-                className="form-input" 
-                value={formData.city}
+                name="location" 
+                className={`form-input ${errors.location ? 'error' : ''}`} 
+                value={formData.location}
                 onChange={handleInputChange}
               />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Country</label>
-              <input 
-                type="text" 
-                name="country" 
-                className="form-input" 
-                value={formData.country}
-                onChange={handleInputChange}
-              />
+              {errors.location && <span className="field-error">{errors.location}</span>}
             </div>
           </div>
         </div>
@@ -101,33 +121,35 @@ export default function ProfilePage() {
           <h3>Professional Context</h3>
           <div className="form-grid">
             <div className="form-group full-width">
-              <label className="form-label">Short Bio</label>
+              <label className="form-label">Short Bio (Optional)</label>
               <textarea 
                 name="bio" 
                 className="form-textarea" 
-                value={formData.bio}
-                onChange={handleInputChange}
+                defaultValue="Cardiologist specializing in electrophysiology. Looking to collaborate on signal processing for wearable ECG devices."
                 placeholder="Brief description of your background and goals..."
               />
             </div>
             <div className="form-group full-width">
-              <label className="form-label">Expertise Tags (comma separated)</label>
+              <label className="form-label">Expertise Tags</label>
               <input 
                 type="text" 
                 name="expertise" 
-                className="form-input" 
+                className={`form-input ${errors.expertise ? 'error' : ''}`} 
                 value={formData.expertise}
                 onChange={handleInputChange}
               />
+              {errors.expertise && <span className="field-error">{errors.expertise}</span>}
             </div>
           </div>
           
           <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <button type="submit" className="save-btn">
-              <span className="material-symbols-outlined">save</span>
-              Save Changes
+            <button type="submit" className="save-btn" disabled={isPending}>
+              <span className="material-symbols-outlined">
+                {isPending ? 'sync' : 'save'}
+              </span>
+              {isPending ? 'Saving...' : 'Save Changes'}
             </button>
-            {isSaved && <span style={{ color: 'var(--blue-primary)', fontSize: '0.875rem' }}>Changes saved successfully.</span>}
+            {isSaved && <span style={{ color: '#60a5fa', fontSize: '0.875rem' }}>Changes saved successfully.</span>}
           </div>
         </div>
       </form>
@@ -150,6 +172,18 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        .field-error {
+          color: #ef4444;
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
+          display: block;
+        }
+        .form-input.error {
+          border-color: rgba(239, 68, 68, 0.5);
+        }
+      `}</style>
     </div>
   );
 }

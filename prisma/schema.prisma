@@ -70,6 +70,11 @@ model Announcement {
   closedAt  DateTime?
 
   meetingRequests MeetingRequest[]
+
+  @@index([authorId])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([domain, city])
+  @@index([createdAt(sort: Desc)])
 }
 
 enum AnnouncementStatus {
@@ -126,6 +131,12 @@ model MeetingRequest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([announcementId])
+  @@index([requesterId])
+  @@index([recipientId])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
 }
 
 enum MeetingRequestStatus {
@@ -147,6 +158,8 @@ model TimeSlot {
   endTime          DateTime
   status           SlotStatus     @default(PENDING)
   round            Int            @default(1) // negotiation round number
+
+  @@index([meetingRequestId])
 }
 
 enum SlotStatus {
@@ -167,6 +180,9 @@ model Notification {
   linkUrl   String?
   isRead    Boolean          @default(false)
   createdAt DateTime         @default(now())
+
+  @@index([userId, isRead, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
 }
 
 enum NotificationType {
@@ -195,6 +211,10 @@ model AuditLog {
   metadata     Json?       // extra context, no PII
   createdAt    DateTime    @default(now())
   // No updatedAt — append-only
+
+  @@index([userId])
+  @@index([actionType, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
 }
 
 enum AuditAction {

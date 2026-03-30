@@ -198,3 +198,40 @@
 .danger-btn:hover {
   background-color: rgba(239, 68, 68, 0.1);
 }
+
+@media (max-width: 768px) {
+  .avatar-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .form-section {
+    padding: 1.5rem;
+  }
+
+  .danger-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .danger-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-title {
+    font-size: 1.75rem;
+  }
+
+  .save-btn {
+    width: 100%;
+  }
+}
