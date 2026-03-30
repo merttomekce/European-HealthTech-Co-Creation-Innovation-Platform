@@ -1,5 +1,30 @@
 {
-  "node": {},
+  "node": {
+    "3a55f4b6eff3c1457d76182811d241adc864cfb5": {
+      "workers": {
+        "app/(protected)/board/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fmerttomekce%2FDocuments%2FCode%2FSeng384%2FHealthAI%2Flib%2Factions%2Fannouncements.ts%22%2C%5B%22createAnnouncement%22%2C%22getAnnouncements%22%2C%22getAnnouncementById%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(protected)/board/page": "action-browser"
+      }
+    },
+    "5ec77b08368ef7375abc2b0b82d378868ed85dc4": {
+      "workers": {
+        "app/(protected)/board/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fmerttomekce%2FDocuments%2FCode%2FSeng384%2FHealthAI%2Flib%2Factions%2Fannouncements.ts%22%2C%5B%22createAnnouncement%22%2C%22getAnnouncements%22%2C%22getAnnouncementById%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(protected)/board/page": "action-browser"
+      }
+    },
+    "aa9b10e92848502d3d7bd2b2ed386cdf44455f77": {
+      "workers": {
+        "app/(protected)/board/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fmerttomekce%2FDocuments%2FCode%2FSeng384%2FHealthAI%2Flib%2Factions%2Fannouncements.ts%22%2C%5B%22createAnnouncement%22%2C%22getAnnouncements%22%2C%22getAnnouncementById%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(protected)/board/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "e0cOqj+6ovK8gsYRXEwLKp2YmZp6IFVcMXiaVc1HI6I="
+  "encryptionKey": "vCtH6UzTowbq21h0Xrs5iF68qFOGa2Eas5d/M84V+RU="
 }

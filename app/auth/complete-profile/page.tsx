@@ -4,6 +4,9 @@ import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProfile } from '@/lib/actions/profile';
 import { profileSchema } from '@/lib/validations';
+import TagInput from '@/components/TagInput';
+import SearchableSelect from '@/components/SearchableSelect';
+import { COUNTRIES, HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
 import './onboarding.css';
 
 export default function OnboardingPage() {
@@ -12,61 +15,78 @@ export default function OnboardingPage() {
   const [isPending, startTransition] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [animating, setAnimating] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
     institution: '',
     role: '' as 'healthcare' | 'engineer' | '',
+    country: '',
     city: '',
-    expertise: ''
+    expertiseTags: [] as string[],
   });
+
+  const changeStep = (direction: 1 | -1) => {
+    setAnimating(true);
+    setTimeout(() => {
+      setStep((s) => Math.max(1, Math.min(3, s + direction)));
+      setAnimating(false);
+    }, 180);
+  };
 
   const nextStep = () => {
     setErrors({});
     setGlobalError(null);
 
-    // Partial validation for each step
     if (step === 1) {
       const result = profileSchema.pick({ fullName: true, institution: true }).safeParse(formData);
       if (!result.success) {
         const fieldErrors: Record<string, string> = {};
-        result.error.issues.forEach(issue => {
+        result.error.issues.forEach((issue) => {
           if (issue.path[0]) fieldErrors[issue.path[0] as string] = issue.message;
         });
         setErrors(fieldErrors);
         return;
       }
     }
-    
     if (step === 2 && !formData.role) {
-      setErrors({ role: "Please select a role to continue." });
+      setErrors({ role: 'Please select a role to continue.' });
       return;
     }
-    setStep(s => Math.min(s + 1, 3));
+    changeStep(1);
   };
 
   const prevStep = () => {
     setErrors({});
     setGlobalError(null);
-    setStep(s => Math.max(s - 1, 1));
+    changeStep(-1);
   };
 
   const handleComplete = async () => {
     setErrors({});
     setGlobalError(null);
 
-    // Final schema validation (mapping city to location for the schema)
+    const locationString = formData.city
+      ? `${formData.city}, ${formData.country}`
+      : formData.country;
+
     const result = profileSchema.safeParse({
       ...formData,
-      location: formData.city
+      location: locationString,
+      expertise: formData.expertiseTags.join(', '),
     });
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach(issue => {
+      result.error.issues.forEach((issue) => {
         if (issue.path[0]) fieldErrors[issue.path[0] as string] = issue.message;
       });
       setErrors(fieldErrors);
+      return;
+    }
+
+    if (!formData.country) {
+      setErrors({ country: 'Please select your country.' });
       return;
     }
 
@@ -76,18 +96,23 @@ export default function OnboardingPage() {
           fullName: formData.fullName,
           institution: formData.institution,
           role: formData.role as 'healthcare' | 'engineer',
-          location: formData.city,
-          expertise: formData.expertise,
+          location: locationString,
+          expertise: formData.expertiseTags.join(', '),
         });
-        router.push('/dashboard'); // Redirect to dashboard
+        router.push('/dashboard');
       } catch (err: any) {
-        setGlobalError(err.message || "Something went wrong. Please try again.");
+        setGlobalError(err.message || 'Something went wrong. Please try again.');
       }
     });
   };
 
+  const expertisePresets =
+    formData.role === 'engineer'
+      ? ENGINEER_EXPERTISE_PRESETS
+      : HEALTHCARE_EXPERTISE_PRESETS;
+
   const renderStep = () => {
-    switch(step) {
+    switch (step) {
       case 1:
         return (
           <div className="onboarding-form">
@@ -95,46 +120,47 @@ export default function OnboardingPage() {
             <p>Tell us who you are. We focus on interdisciplinary transparency.</p>
             <div className="form-group">
               <label className="form-label">Full Name</label>
-              <input 
-                type="text" 
-                className={`form-input ${errors.fullName ? 'error' : ''}`} 
+              <input
+                type="text"
+                className={`form-input ${errors.fullName ? 'error' : ''}`}
                 placeholder="Dr. Sarah Chen"
                 value={formData.fullName}
-                onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               />
-              {errors.fullName && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.fullName}</span>}
+              {errors.fullName && <span className="field-error">{errors.fullName}</span>}
             </div>
             <div className="form-group">
               <label className="form-label">Institution</label>
-              <input 
-                type="text" 
-                className={`form-input ${errors.institution ? 'error' : ''}`} 
-                placeholder="Charité - Universitätsmedizin Berlin"
+              <input
+                type="text"
+                className={`form-input ${errors.institution ? 'error' : ''}`}
+                placeholder="Charité – Universitätsmedizin Berlin"
                 value={formData.institution}
-                onChange={(e) => setFormData({...formData, institution: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
               />
-              {errors.institution && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.institution}</span>}
+              {errors.institution && <span className="field-error">{errors.institution}</span>}
             </div>
           </div>
         );
+
       case 2:
         return (
           <div className="onboarding-form">
             <h2>Select Your Role</h2>
             <p>Every account is verified by institutional domain.</p>
-            {errors.role && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem' }}>{errors.role}</p>}
+            {errors.role && <p className="field-error">{errors.role}</p>}
             <div className="role-cards">
-              <div 
+              <div
                 className={`role-card ${formData.role === 'healthcare' ? 'selected' : ''}`}
-                onClick={() => setFormData({...formData, role: 'healthcare'})}
+                onClick={() => setFormData({ ...formData, role: 'healthcare' })}
               >
                 <div className="material-symbols-outlined role-icon">stethoscope</div>
                 <div className="role-title">Healthcare Professional</div>
                 <div className="role-desc">Doctor, clinician, or medical researcher looking for technical solutions.</div>
               </div>
-              <div 
+              <div
                 className={`role-card ${formData.role === 'engineer' ? 'selected' : ''}`}
-                onClick={() => setFormData({...formData, role: 'engineer'})}
+                onClick={() => setFormData({ ...formData, role: 'engineer' })}
               >
                 <div className="material-symbols-outlined role-icon">engineering</div>
                 <div className="role-title">Engineer / Tech Expert</div>
@@ -143,35 +169,47 @@ export default function OnboardingPage() {
             </div>
           </div>
         );
+
       case 3:
         return (
           <div className="onboarding-form">
-            <h2>Location & Expertise</h2>
+            <h2>Location &amp; Expertise</h2>
             <p>This allows us to match you with peers in your region.</p>
+
+            {/* Country Select */}
+            <SearchableSelect
+              label="Country"
+              options={COUNTRIES}
+              value={formData.country}
+              onChange={(val) => setFormData({ ...formData, country: val })}
+              placeholder="Select your country…"
+              error={errors.country}
+            />
+
+            {/* City (free text is fine here — too many cities) */}
             <div className="form-group">
-              <label className="form-label">City, Country</label>
-              <input 
-                type="text" 
-                className={`form-input ${errors.location ? 'error' : ''}`}
-                placeholder="Berlin, Germany"
+              <label className="form-label">City <span style={{ color: 'var(--on-background-muted)', fontWeight: 400 }}>(optional)</span></label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Berlin"
                 value={formData.city}
-                onChange={(e) => setFormData({...formData, city: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               />
-              {errors.location && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.location}</span>}
             </div>
-            <div className="form-group">
-              <label className="form-label">Core Tags</label>
-              <input 
-                type="text" 
-                className={`form-input ${errors.expertise ? 'error' : ''}`}
-                placeholder="Cardiology, Imaging, AI, etc."
-                value={formData.expertise}
-                onChange={(e) => setFormData({...formData, expertise: e.target.value})}
-              />
-              {errors.expertise && <span className="field-error" style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.expertise}</span>}
-            </div>
+
+            {/* Expertise Tags */}
+            <TagInput
+              label="Expertise Tags"
+              value={formData.expertiseTags}
+              onChange={(tags) => setFormData({ ...formData, expertiseTags: tags })}
+              presets={expertisePresets}
+              placeholder="Select from above or type your own…"
+              error={errors.expertise}
+            />
           </div>
         );
+
       default:
         return null;
     }
@@ -182,69 +220,104 @@ export default function OnboardingPage() {
       <div className="onboarding-sidebar">
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>HealthAI</h1>
         <div className="onboarding-steps">
-          <div className={`onboarding-step-indicator ${step === 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
-            <div className="step-number">1</div>
-            <div className="step-label">Identity</div>
-          </div>
-          <div className={`onboarding-step-indicator ${step === 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
-            <div className="step-number">2</div>
-            <div className="step-label">Role</div>
-          </div>
-          <div className={`onboarding-step-indicator ${step === 3 ? 'active' : ''}`}>
-            <div className="step-number">3</div>
-            <div className="step-label">Expertise</div>
-          </div>
+          {[
+            { n: 1, label: 'Identity' },
+            { n: 2, label: 'Role' },
+            { n: 3, label: 'Expertise' },
+          ].map(({ n, label }) => (
+            <div
+              key={n}
+              className={`onboarding-step-indicator ${step === n ? 'active' : ''} ${step > n ? 'completed' : ''}`}
+            >
+              <div className="step-number">
+                {step > n ? (
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>check</span>
+                ) : (
+                  n
+                )}
+              </div>
+              <div className="step-label">{label}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       <div className="onboarding-main">
         {globalError && (
-          <div style={{ 
-            marginBottom: '1.5rem', 
-            padding: '1rem', 
-            borderRadius: '8px', 
-            backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-            color: '#ef4444',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            fontSize: '0.875rem'
-          }}>
+          <div className="global-error-banner">
             {globalError}
           </div>
         )}
 
-        {renderStep()}
-        
+        <div className={`step-wrap ${animating ? 'step-exit' : 'step-enter'}`}>
+          {renderStep()}
+        </div>
+
         <div className="action-bar">
           {step > 1 && (
-            <button 
-              className="back-btn" 
-              onClick={prevStep} 
-              disabled={isPending}
-            >
+            <button className="back-btn" onClick={prevStep} disabled={isPending}>
               Back
             </button>
           )}
           {step < 3 ? (
-            <button 
-              className="primary-btn" 
-              onClick={nextStep} 
+            <button
+              className="primary-btn"
+              onClick={nextStep}
               style={{ marginLeft: step === 1 ? 'auto' : '0' }}
               disabled={isPending}
             >
               Continue
             </button>
           ) : (
-            <button 
-              className="primary-btn" 
-              onClick={handleComplete} 
+            <button
+              className="primary-btn"
+              onClick={handleComplete}
               style={{ marginLeft: 'auto' }}
               disabled={isPending}
             >
-              {isPending ? 'Saving Profile...' : 'Complete Profile'}
+              {isPending ? 'Saving Profile…' : 'Complete Profile'}
             </button>
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        .global-error-banner {
+          margin-bottom: 1.5rem;
+          padding: 1rem;
+          border-radius: 8px;
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          font-size: 0.875rem;
+        }
+        .field-error {
+          color: #ef4444;
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
+          display: block;
+        }
+        .form-input.error {
+          border-color: rgba(239, 68, 68, 0.5);
+        }
+        .step-wrap {
+          flex: 1;
+          transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        .step-enter {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .step-exit {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        /* Completed step style */
+        :global(.onboarding-step-indicator.completed .step-number) {
+          background: var(--blue-primary) !important;
+          color: #fff !important;
+        }
+      `}</style>
     </div>
   );
 }

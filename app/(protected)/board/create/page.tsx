@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { createAnnouncement } from '@/lib/actions/announcements';
 import { createClient } from '@/lib/supabase/client';
 import CustomSelect from '@/components/CustomSelect';
+import SearchableSelect from '@/components/SearchableSelect';
+import TagInput from '@/components/TagInput';
+import { MEDICAL_DOMAINS, REQUIREMENT_TAGS } from '@/lib/data/options';
 import { announcementSchema } from '@/lib/validations';
 import './composer.css';
 
@@ -26,7 +29,7 @@ export default function ProjectComposerPage() {
     technicalChallenge: '',
     projectStage: 'Ideation',
     commitment: 'Part-time',
-    requirements: [''],
+    requirementTags: [] as string[],
   });
 
   useEffect(() => {
@@ -51,20 +54,6 @@ export default function ProjectComposerPage() {
     }
   };
 
-  const handleRequirementChange = (index: number, value: string) => {
-    const newReqs = [...formData.requirements];
-    newReqs[index] = value;
-    updateField('requirements', newReqs);
-  };
-
-  const addRequirement = () => {
-    updateField('requirements', [...formData.requirements, '']);
-  };
-
-  const removeRequirement = (index: number) => {
-    const newReqs = formData.requirements.filter((_, i) => i !== index);
-    updateField('requirements', newReqs.length ? newReqs : ['']);
-  };
 
   const nextStep = () => {
     setErrors({});
@@ -121,7 +110,7 @@ export default function ProjectComposerPage() {
       domain: formData.domain,
       publicPitch: formData.pitch || `Accelerating ${formData.domain} through co-creation.`,
       explanation: `Clinical Context: ${formData.clinicalContext}\n\nTechnical Challenge: ${formData.technicalChallenge}`,
-      expertiseNeeded: formData.requirements.filter(r => r.trim()).join(', '),
+      expertiseNeeded: formData.requirementTags.join(', '),
       projectStage: stageMap[formData.projectStage] || 'IDEA',
       commitmentLevel: commitmentMap[formData.commitment] || 'MEDIUM',
       city: userProfile?.city || 'Unknown',
@@ -173,17 +162,14 @@ export default function ProjectComposerPage() {
               {errors.title && <span className="field-error">{errors.title}</span>}
             </div>
 
-            <div className="form-group">
-              <label className="form-label text-sans">Medical Domain</label>
-              <input 
-                type="text" 
-                className={`form-input ${errors.domain ? 'error' : ''}`} 
-                placeholder="e.g., Neurosurgery, Cardiology"
-                value={formData.domain}
-                onChange={(e) => updateField('domain', e.target.value)}
-              />
-              {errors.domain && <span className="field-error">{errors.domain}</span>}
-            </div>
+            <SearchableSelect
+              label="Medical Domain"
+              options={MEDICAL_DOMAINS}
+              value={formData.domain}
+              onChange={(val) => updateField('domain', val)}
+              placeholder="e.g., Neurosurgery, Cardiology…"
+              error={errors.domain}
+            />
 
             <div className="form-group">
               <CustomSelect 
@@ -257,34 +243,14 @@ export default function ProjectComposerPage() {
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label text-sans">Specific Partner Requirements</label>
-              <div className="requirements-list-editor">
-                {formData.requirements.map((req, index) => (
-                  <div key={index} className="requirement-input-row" style={{ marginBottom: '1rem' }}>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      placeholder="e.g., Deep understanding of DICOM standards"
-                      value={req}
-                      onChange={(e) => handleRequirementChange(index, e.target.value)}
-                    />
-                    <button 
-                      className="btn-icon" 
-                      onClick={() => removeRequirement(index)}
-                      style={{ border: 'none', color: '#EF4444', cursor: 'pointer', background: 'none' }}
-                      aria-label={`Remove requirement ${index + 1}`}
-                    >
-                      <span className="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                ))}
-                {errors.requirements && <span className="field-error" style={{ marginBottom: '1rem' }}>{errors.requirements}</span>}
-                <button className="btn-secondary" onClick={addRequirement} style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
-                  + Add Requirement
-                </button>
-              </div>
-            </div>
+            <TagInput
+              label="Partner Requirements"
+              value={formData.requirementTags}
+              onChange={(tags) => updateField('requirementTags', tags)}
+              presets={REQUIREMENT_TAGS}
+              placeholder="Select from above or add custom skills…"
+              error={errors.requirements}
+            />
           </div>
         )}
 

@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const prismaClientSingleton = () => {
-  try {
-    return new PrismaClient()
-  } catch (error) {
-    console.warn('PrismaClient failed to initialize. Using mock proxy.')
-    return new Proxy({} as any, {
+const createPrismaClient = () => {
+  const connectionString = process.env.DATABASE_URL
+  if (!connectionString) {
+    console.warn('DATABASE_URL is not set. Prisma will use a mock proxy.')
+    return new Proxy({} as PrismaClient, {
       get(target, prop) {
         if (prop === '$connect' || prop === '$disconnect') return async () => {}
         return new Proxy({} as any, {
@@ -20,13 +20,16 @@ const prismaClientSingleton = () => {
       }
     })
   }
+
+  const adapter = new PrismaPg({ connectionString })
+  return new PrismaClient({ adapter })
 }
 
 declare const globalThis: {
-  prismaGlobal: any;
-} & typeof global;
+  prismaGlobal: ReturnType<typeof createPrismaClient>
+} & typeof global
 
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+const prisma = globalThis.prismaGlobal ?? createPrismaClient()
 
 export default prisma
 

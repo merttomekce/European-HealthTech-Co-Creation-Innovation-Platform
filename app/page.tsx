@@ -110,7 +110,7 @@ export default function HealthAILandingPage(): React.JSX.Element {
   }, []);
 
   return (
-    <div className="landing-grid">
+    <div className="landing-grid landing-page">
       
       {/* 1. STICKY LEFT: Hero & Auth */}
       <div className="sticky-left bg-health-grid">

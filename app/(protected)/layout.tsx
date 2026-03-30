@@ -2,7 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import { StoreProvider } from '@/lib/StoreContext';
 import NotificationBell from '@/components/NotificationBell';
 import './protected.css';
@@ -49,6 +51,13 @@ export default function ProtectedLayout({
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  const router = useRouter();
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
     <div className={`shell ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
       {/* Mobile Backdrop */}
@@ -82,6 +91,10 @@ export default function ProtectedLayout({
               <div className="user-role-badge">{user.role}</div>
             </div>
           </div>
+          <button className="sign-out-btn" onClick={handleSignOut} aria-label="Sign out">
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>logout</span>
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 
