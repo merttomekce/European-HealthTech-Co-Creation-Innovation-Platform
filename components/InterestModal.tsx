@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import CustomCheckbox from './CustomCheckbox';
 import { requestMeeting } from '@/lib/actions/meetings';
+import { CheckCircle } from 'lucide-animated';
 
 interface InterestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  projectId: string; // Added projectId
+  projectId: string;
   projectTitle: string;
 }
 
@@ -39,15 +40,19 @@ export default function InterestModal({ isOpen, onClose, projectId, projectTitle
   if (isSuccess) {
     return (
       <Modal isOpen={isOpen} onClose={onClose}>
-        <div className="modal-header" style={{ textAlign: 'center' }}>
-          <div className="material-symbols-outlined" style={{ 
-            fontSize: '4rem', 
+        <div className="modal-header" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ 
             color: '#059669', 
             marginBottom: '1rem',
             background: 'rgba(5, 150, 105, 0.1)',
             padding: '1.5rem',
-            borderRadius: '50%'
-          }}>check_circle</div>
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <CheckCircle size={64} animate={true} />
+          </div>
           <h2 style={{ fontSize: '2.5rem' }}>Interest Expressed</h2>
           <p style={{ marginBottom: '2rem' }}>
             We've notified the project lead. You can now view this project in 

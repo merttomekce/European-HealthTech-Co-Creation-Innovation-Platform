@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { Search, ChevronDown, ChevronUp, Check, X } from 'lucide-animated';
 
 interface Option {
   value: string;
@@ -36,7 +37,6 @@ export default function SearchableSelect({
     o.label.toLowerCase().includes(query.toLowerCase())
   );
 
-  // Group options by `group` field
   const groups = filtered.reduce<Record<string, Option[]>>((acc, opt) => {
     const g = opt.group || '';
     if (!acc[g]) acc[g] = [];
@@ -75,7 +75,6 @@ export default function SearchableSelect({
     <div className="ss-container" ref={containerRef}>
       <label className="form-label">{label}</label>
 
-      {/* Trigger */}
       <div
         className={`ss-trigger ${isOpen ? 'open' : ''} ${error ? 'error' : ''}`}
         onClick={open}
@@ -90,18 +89,21 @@ export default function SearchableSelect({
         <div className="ss-actions">
           {value && (
             <button type="button" className="ss-clear" onClick={clear} aria-label="Clear selection">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+              <X size={16} animate="hover" />
             </button>
           )}
-          <span className="material-symbols-outlined ss-arrow">{isOpen ? 'expand_less' : 'expand_more'}</span>
+          <div className="ss-arrow">
+            {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
         </div>
       </div>
 
-      {/* Dropdown */}
       {isOpen && (
         <div className="ss-dropdown">
           <div className="ss-search-wrap">
-            <span className="material-symbols-outlined ss-search-icon">search</span>
+            <div className="ss-search-icon">
+              <Search size={18} />
+            </div>
             <input
               ref={inputRef}
               type="text"
@@ -127,7 +129,9 @@ export default function SearchableSelect({
                     >
                       {opt.label}
                       {value === opt.value && (
-                        <span className="material-symbols-outlined ss-check">check</span>
+                        <div className="ss-check">
+                          <Check size={16} />
+                        </div>
                       )}
                     </div>
                   ))}
@@ -202,7 +206,8 @@ export default function SearchableSelect({
         .ss-clear:hover { color: var(--on-background); }
         .ss-arrow {
           color: var(--on-background-muted);
-          font-size: 20px !important;
+          display: flex;
+          align-items: center;
         }
         .ss-dropdown {
           position: absolute;
@@ -230,7 +235,8 @@ export default function SearchableSelect({
         }
         .ss-search-icon {
           color: var(--on-background-muted);
-          font-size: 18px !important;
+          display: flex;
+          align-items: center;
           flex-shrink: 0;
         }
         .ss-search {
@@ -277,7 +283,8 @@ export default function SearchableSelect({
           background: rgba(63,171,252,0.06);
         }
         .ss-check {
-          font-size: 16px !important;
+          display: flex;
+          align-items: center;
           color: var(--blue-folder-top);
         }
         .ss-empty {

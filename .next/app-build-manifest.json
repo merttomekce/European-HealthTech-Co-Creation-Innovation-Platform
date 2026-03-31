@@ -37,29 +37,6 @@
       "static/chunks/main-app.js",
       "static/css/app/(protected)/layout.css",
       "static/chunks/app/(protected)/layout.js"
-    ],
-    "/(protected)/board/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(protected)/board/page.js"
-    ],
-    "/(protected)/notifications/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(protected)/notifications/page.css",
-      "static/chunks/app/(protected)/notifications/page.js"
-    ],
-    "/(protected)/my-requests/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(protected)/my-requests/page.css",
-      "static/chunks/app/(protected)/my-requests/page.js"
-    ],
-    "/(protected)/my-announcements/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(protected)/my-announcements/page.css",
-      "static/chunks/app/(protected)/my-announcements/page.js"
     ]
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Calendar, Clock } from 'lucide-animated';
 import styles from './MeetingStatusPill.module.css';
 
 interface MeetingStatusPillProps {
@@ -27,9 +28,13 @@ export default function MeetingStatusPill({ status, confirmedTime }: MeetingStat
       className={styles.pill} 
       style={{ background: config.background, color: config.color }}
     >
-      <span className={`material-symbols-outlined ${styles.icon}`}>
-        {status === 'Scheduled' ? 'event_available' : 'schedule'}
-      </span>
+      <div className={styles.icon}>
+        {status === 'Scheduled' ? (
+          <Calendar size={14} animate="hover" />
+        ) : (
+          <Clock size={14} animate="hover" />
+        )}
+      </div>
       {config.label}
     </div>
   );

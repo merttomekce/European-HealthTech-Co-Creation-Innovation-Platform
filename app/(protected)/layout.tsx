@@ -2,8 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { 
+  Home, 
+  LayoutGrid, 
+  Megaphone, 
+  Handshake, 
+  User, 
+  LogOut, 
+  Menu 
+} from 'lucide-animated';
 import { createClient } from '@/lib/supabase/client';
 import { StoreProvider } from '@/lib/StoreContext';
 import NotificationBell from '@/components/NotificationBell';
@@ -11,15 +19,17 @@ import './protected.css';
 
 interface NavItemProps {
   href: string;
-  icon: string;
+  icon: any;
   label: string;
   active: boolean;
   onClick?: () => void;
 }
 
-const NavItem = ({ href, icon, label, active, onClick }: NavItemProps) => (
+const NavItem = ({ href, icon: Icon, label, active, onClick }: NavItemProps) => (
   <Link href={href} className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
-    <span className="material-symbols-outlined nav-icon">{icon}</span>
+    <div className="nav-icon">
+      <Icon size={20} animate="hover" />
+    </div>
     <span>{label}</span>
   </Link>
 );
@@ -33,11 +43,11 @@ export default function ProtectedLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   const navItems = [
-    { href: '/dashboard', icon: 'home', label: 'Dashboard' },
-    { href: '/board', icon: 'grid_view', label: 'Co-Creation Board' },
-    { href: '/my-announcements', icon: 'campaign', label: 'My Announcements' },
-    { href: '/my-requests', icon: 'handshake', label: 'My Requests' },
-    { href: '/profile', icon: 'person', label: 'Profile' },
+    { href: '/dashboard', icon: Home, label: 'Dashboard' },
+    { href: '/board', icon: LayoutGrid, label: 'Co-Creation Board' },
+    { href: '/my-announcements', icon: Megaphone, label: 'My Announcements' },
+    { href: '/my-requests', icon: Handshake, label: 'My Requests' },
+    { href: '/profile', icon: User, label: 'Profile' },
   ];
 
   // Placeholder user data
@@ -92,7 +102,7 @@ export default function ProtectedLayout({
             </div>
           </div>
           <button className="sign-out-btn" onClick={handleSignOut} aria-label="Sign out">
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>logout</span>
+            <LogOut size={18} animate="hover" />
             <span>Sign Out</span>
           </button>
         </div>
@@ -105,7 +115,7 @@ export default function ProtectedLayout({
             onClick={toggleMobileMenu}
             aria-label="Toggle Menu"
           >
-            <span className="material-symbols-outlined">menu</span>
+            <Menu size={24} animate="hover" />
           </button>
           
           <div className="top-bar-right">

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown, ChevronUp, Check } from 'lucide-animated';
 
 interface Option {
   value: string;
@@ -48,9 +49,9 @@ export default function CustomSelect({ label, options, value, onChange, placehol
         <span className={selectedOption ? 'selected-text' : 'placeholder-text'}>
           {selectedOption ? selectedOption.label : placeholder || 'Select an option'}
         </span>
-        <span className="material-symbols-outlined arrow">
-          {isOpen ? 'expand_less' : 'expand_more'}
-        </span>
+        <div className="arrow">
+          {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        </div>
       </div>
 
       {isOpen && (
@@ -66,7 +67,9 @@ export default function CustomSelect({ label, options, value, onChange, placehol
             >
               {option.label}
               {value === option.value && (
-                <span className="material-symbols-outlined check">check</span>
+                <div className="check">
+                  <Check size={18} />
+                </div>
               )}
             </div>
           ))}
@@ -97,8 +100,8 @@ export default function CustomSelect({ label, options, value, onChange, placehol
 
         .custom-select-trigger:hover,
         .custom-select-trigger.open {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 1px var(--primary);
+          border-color: var(--blue-primary);
+          box-shadow: 0 0 0 1px var(--blue-primary);
         }
 
         .placeholder-text {
@@ -108,7 +111,8 @@ export default function CustomSelect({ label, options, value, onChange, placehol
 
         .arrow {
           color: var(--on-background-muted);
-          transition: transform 0.2s ease;
+          display: flex;
+          align-items: center;
         }
 
         .custom-select-options {
@@ -116,7 +120,7 @@ export default function CustomSelect({ label, options, value, onChange, placehol
           top: calc(100% + 8px);
           left: 0;
           right: 0;
-          background: var(--surface-overlay);
+          background: var(--surface);
           border: 1px solid var(--outline);
           border-radius: 12px;
           z-index: 1000;
@@ -133,6 +137,7 @@ export default function CustomSelect({ label, options, value, onChange, placehol
           align-items: center;
           transition: background 0.2s;
           font-size: 0.9375rem;
+          color: var(--on-background);
         }
 
         .custom-option:hover {
@@ -140,12 +145,13 @@ export default function CustomSelect({ label, options, value, onChange, placehol
         }
 
         .custom-option.active {
-          background: rgba(var(--primary-rgb), 0.1);
-          color: var(--primary);
+          background: rgba(30, 96, 242, 0.1);
+          color: var(--blue-primary);
         }
 
         .check {
-          font-size: 1.125rem;
+          display: flex;
+          align-items: center;
         }
 
         @keyframes slideUp {
