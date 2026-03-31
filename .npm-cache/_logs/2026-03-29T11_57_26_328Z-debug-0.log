@@ -1,0 +1,402 @@
+0 verbose cli /opt/homebrew/Cellar/node/25.8.1_1/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.11.0
+2 info using node@v25.8.1
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/merttomekce/Documents/Code/Seng384/HealthAI/.npmrc
+5 silly config load:file:/Users/merttomekce/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm install @supabase/supabase-js @supabase/ssr zod @prisma/client
+8 verbose argv "install" "@supabase/supabase-js" "@supabase/ssr" "zod" "@prisma/client" "--cache" "./.npm-cache"
+9 verbose logfile logs-max:10 dir:/Users/merttomekce/Documents/Code/Seng384/HealthAI/.npm-cache/_logs/2026-03-29T11_57_26_328Z-
+10 verbose logfile /Users/merttomekce/Documents/Code/Seng384/HealthAI/.npm-cache/_logs/2026-03-29T11_57_26_328Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly logfile done cleaning log files
+14 silly idealTree buildDeps
+15 silly fetch manifest @supabase/supabase-js@*
+16 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js cache-miss
+17 http fetch GET 200 https://registry.npmjs.org/@supabase%2fsupabase-js 213ms (cache miss)
+18 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js set size:undefined disposed:false
+19 silly fetch manifest @supabase/ssr@*
+20 silly packumentCache full:https://registry.npmjs.org/@supabase%2fssr cache-miss
+21 http fetch GET 200 https://registry.npmjs.org/@supabase%2fssr 52ms (cache miss)
+22 silly packumentCache full:https://registry.npmjs.org/@supabase%2fssr set size:undefined disposed:false
+23 silly fetch manifest zod@*
+24 silly packumentCache full:https://registry.npmjs.org/zod cache-miss
+25 http fetch GET 200 https://registry.npmjs.org/zod 57ms (cache miss)
+26 silly packumentCache full:https://registry.npmjs.org/zod set size:undefined disposed:false
+27 silly fetch manifest @prisma/client@*
+28 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient cache-miss
+29 http fetch GET 200 https://registry.npmjs.org/@prisma%2fclient 711ms (cache miss)
+30 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient set size:undefined disposed:false
+31 silly fetch manifest prisma@*
+32 silly packumentCache full:https://registry.npmjs.org/prisma cache-miss
+33 http fetch GET 200 https://registry.npmjs.org/prisma 584ms (cache miss)
+34 silly packumentCache full:https://registry.npmjs.org/prisma set size:undefined disposed:false
+35 silly fetch manifest better-sqlite3@>=9.0.0
+36 silly packumentCache full:https://registry.npmjs.org/better-sqlite3 cache-miss
+37 http fetch GET 200 https://registry.npmjs.org/better-sqlite3 47ms (cache miss)
+38 silly packumentCache full:https://registry.npmjs.org/better-sqlite3 set size:undefined disposed:false
+39 silly fetch manifest typescript@^6.0.2
+40 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+41 http fetch GET 200 https://registry.npmjs.org/typescript 59ms (cache revalidated)
+42 silly packumentCache full:https://registry.npmjs.org/typescript set size:15395755 disposed:false
+43 silly placeDep ROOT @prisma/client@7.6.0 OK for: healthai@0.1.0 want: *
+44 silly placeDep ROOT @supabase/ssr@0.9.0 OK for: healthai@0.1.0 want: *
+45 silly placeDep ROOT @supabase/supabase-js@2.100.1 OK for: @supabase/ssr@0.9.0 want: ^2.97.0
+46 silly placeDep ROOT @supabase/supabase-js@2.100.1 REPLACE for: healthai@0.1.0 want: *
+47 silly placeDep ROOT zod@4.3.6 OK for: healthai@0.1.0 want: *
+48 silly fetch manifest @prisma/client-runtime-utils@7.6.0
+49 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient-runtime-utils cache-miss
+50 silly fetch manifest cookie@^1.0.2
+51 silly packumentCache full:https://registry.npmjs.org/cookie cache-miss
+52 silly fetch manifest @supabase/auth-js@2.100.1
+53 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js cache-miss
+54 silly fetch manifest @supabase/functions-js@2.100.1
+55 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js cache-miss
+56 silly fetch manifest @supabase/postgrest-js@2.100.1
+57 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js cache-miss
+58 silly fetch manifest @supabase/realtime-js@2.100.1
+59 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js cache-miss
+60 silly fetch manifest @supabase/storage-js@2.100.1
+61 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js cache-miss
+62 silly fetch manifest @supabase/auth-js@2.100.1
+63 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js cache-miss
+64 silly fetch manifest @supabase/functions-js@2.100.1
+65 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js cache-miss
+66 silly fetch manifest @supabase/postgrest-js@2.100.1
+67 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js cache-miss
+68 silly fetch manifest @supabase/realtime-js@2.100.1
+69 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js cache-miss
+70 silly fetch manifest @supabase/storage-js@2.100.1
+71 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js cache-miss
+72 http fetch GET 200 https://registry.npmjs.org/@prisma%2fclient-runtime-utils 57ms (cache miss)
+73 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient-runtime-utils set size:undefined disposed:false
+74 http fetch GET 200 https://registry.npmjs.org/cookie 98ms (cache miss)
+75 silly packumentCache full:https://registry.npmjs.org/cookie set size:undefined disposed:false
+76 http fetch GET 200 https://registry.npmjs.org/@supabase%2ffunctions-js 114ms (cache miss)
+77 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js set size:undefined disposed:false
+78 http fetch GET 200 https://registry.npmjs.org/@supabase%2ffunctions-js 223ms (cache miss)
+79 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js set size:undefined disposed:false
+80 http fetch GET 200 https://registry.npmjs.org/@supabase%2fauth-js 225ms (cache miss)
+81 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js set size:undefined disposed:false
+82 http fetch GET 200 https://registry.npmjs.org/@supabase%2fauth-js 228ms (cache miss)
+83 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js set size:undefined disposed:false
+84 http fetch GET 200 https://registry.npmjs.org/@supabase%2fstorage-js 231ms (cache miss)
+85 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js set size:undefined disposed:false
+86 http fetch GET 200 https://registry.npmjs.org/@supabase%2fpostgrest-js 254ms (cache miss)
+87 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js set size:undefined disposed:false
+88 http fetch GET 200 https://registry.npmjs.org/@supabase%2fpostgrest-js 257ms (cache miss)
+89 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js set size:undefined disposed:false
+90 http fetch GET 200 https://registry.npmjs.org/@supabase%2frealtime-js 263ms (cache miss)
+91 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js set size:undefined disposed:false
+92 http fetch GET 200 https://registry.npmjs.org/@supabase%2fstorage-js 266ms (cache miss)
+93 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js set size:undefined disposed:false
+94 http fetch GET 200 https://registry.npmjs.org/@supabase%2frealtime-js 268ms (cache miss)
+95 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js set size:undefined disposed:false
+96 silly placeDep ROOT @prisma/client-runtime-utils@7.6.0 OK for: @prisma/client@7.6.0 want: 7.6.0
+97 silly placeDep ROOT cookie@1.1.1 OK for: @supabase/ssr@0.9.0 want: ^1.0.2
+98 silly placeDep ROOT @supabase/auth-js@2.100.1 OK for: @supabase/supabase-js@2.100.1 want: 2.100.1
+99 silly placeDep ROOT @supabase/functions-js@2.100.1 OK for: @supabase/supabase-js@2.100.1 want: 2.100.1
+100 silly placeDep ROOT @supabase/postgrest-js@2.100.1 OK for: @supabase/supabase-js@2.100.1 want: 2.100.1
+101 silly placeDep ROOT @supabase/realtime-js@2.100.1 OK for: @supabase/supabase-js@2.100.1 want: 2.100.1
+102 silly placeDep ROOT @supabase/storage-js@2.100.1 OK for: @supabase/supabase-js@2.100.1 want: 2.100.1
+103 silly fetch manifest @supabase/phoenix@^0.4.0
+104 silly packumentCache full:https://registry.npmjs.org/@supabase%2fphoenix cache-miss
+105 silly fetch manifest @types/ws@^8.18.1
+106 silly packumentCache full:https://registry.npmjs.org/@types%2fws cache-miss
+107 silly fetch manifest ws@^8.18.2
+108 silly packumentCache full:https://registry.npmjs.org/ws cache-miss
+109 silly fetch manifest iceberg-js@^0.8.1
+110 silly packumentCache full:https://registry.npmjs.org/iceberg-js cache-miss
+111 http fetch GET 200 https://registry.npmjs.org/iceberg-js 38ms (cache miss)
+112 silly packumentCache full:https://registry.npmjs.org/iceberg-js set size:undefined disposed:false
+113 http fetch GET 200 https://registry.npmjs.org/@types%2fws 44ms (cache miss)
+114 silly packumentCache full:https://registry.npmjs.org/@types%2fws set size:undefined disposed:false
+115 http fetch GET 200 https://registry.npmjs.org/ws 56ms (cache miss)
+116 silly packumentCache full:https://registry.npmjs.org/ws set size:undefined disposed:false
+117 http fetch GET 200 https://registry.npmjs.org/@supabase%2fphoenix 96ms (cache miss)
+118 silly packumentCache full:https://registry.npmjs.org/@supabase%2fphoenix set size:undefined disposed:false
+119 silly fetch manifest bufferutil@^4.0.1
+120 silly packumentCache full:https://registry.npmjs.org/bufferutil cache-miss
+121 http fetch GET 200 https://registry.npmjs.org/bufferutil 85ms (cache miss)
+122 silly packumentCache full:https://registry.npmjs.org/bufferutil set size:undefined disposed:false
+123 silly fetch manifest utf-8-validate@>=5.0.2
+124 silly packumentCache full:https://registry.npmjs.org/utf-8-validate cache-miss
+125 http fetch GET 200 https://registry.npmjs.org/utf-8-validate 642ms (cache miss)
+126 silly packumentCache full:https://registry.npmjs.org/utf-8-validate set size:undefined disposed:false
+127 silly placeDep ROOT @supabase/phoenix@0.4.0 OK for: @supabase/realtime-js@2.100.1 want: ^0.4.0
+128 silly placeDep ROOT @types/ws@8.18.1 OK for: @supabase/realtime-js@2.100.1 want: ^8.18.1
+129 silly placeDep ROOT ws@8.20.0 OK for: @supabase/realtime-js@2.100.1 want: ^8.18.2
+130 silly placeDep ROOT iceberg-js@0.8.1 OK for: @supabase/storage-js@2.100.1 want: ^0.8.1
+131 silly reify moves {}
+132 silly audit bulk request {
+132 silly audit   '@next/env': [ '14.2.3' ],
+132 silly audit   '@next/swc-darwin-arm64': [ '14.2.3' ],
+132 silly audit   '@next/swc-darwin-x64': [ '14.2.3' ],
+132 silly audit   '@next/swc-linux-arm64-gnu': [ '14.2.3' ],
+132 silly audit   '@next/swc-linux-arm64-musl': [ '14.2.3' ],
+132 silly audit   '@next/swc-linux-x64-gnu': [ '14.2.3' ],
+132 silly audit   '@next/swc-linux-x64-musl': [ '14.2.3' ],
+132 silly audit   '@next/swc-win32-arm64-msvc': [ '14.2.3' ],
+132 silly audit   '@next/swc-win32-ia32-msvc': [ '14.2.3' ],
+132 silly audit   '@next/swc-win32-x64-msvc': [ '14.2.3' ],
+132 silly audit   '@swc/counter': [ '0.1.3' ],
+132 silly audit   '@swc/helpers': [ '0.5.5' ],
+132 silly audit   '@types/node': [ '25.5.0' ],
+132 silly audit   '@types/react': [ '19.2.14' ],
+132 silly audit   '@types/react-dom': [ '19.2.3' ],
+132 silly audit   busboy: [ '1.6.0' ],
+132 silly audit   'caniuse-lite': [ '1.0.30001781' ],
+132 silly audit   'client-only': [ '0.0.1' ],
+132 silly audit   csstype: [ '3.2.3' ],
+132 silly audit   'graceful-fs': [ '4.2.11' ],
+132 silly audit   'js-tokens': [ '4.0.0' ],
+132 silly audit   'loose-envify': [ '1.4.0' ],
+132 silly audit   nanoid: [ '3.3.11' ],
+132 silly audit   next: [ '14.2.3' ],
+132 silly audit   picocolors: [ '1.1.1' ],
+132 silly audit   postcss: [ '8.4.31' ],
+132 silly audit   react: [ '18.3.1' ],
+132 silly audit   'react-dom': [ '18.3.1' ],
+132 silly audit   scheduler: [ '0.23.2' ],
+132 silly audit   'source-map-js': [ '1.2.1' ],
+132 silly audit   streamsearch: [ '1.1.0' ],
+132 silly audit   'styled-jsx': [ '5.1.1' ],
+132 silly audit   tslib: [ '2.8.1' ],
+132 silly audit   typescript: [ '6.0.2' ],
+132 silly audit   'undici-types': [ '7.18.2' ],
+132 silly audit   '@prisma/client': [ '7.6.0' ],
+132 silly audit   '@supabase/ssr': [ '0.9.0' ],
+132 silly audit   '@supabase/supabase-js': [ '2.100.1' ],
+132 silly audit   zod: [ '4.3.6' ],
+132 silly audit   '@prisma/client-runtime-utils': [ '7.6.0' ],
+132 silly audit   cookie: [ '1.1.1' ],
+132 silly audit   '@supabase/auth-js': [ '2.100.1' ],
+132 silly audit   '@supabase/functions-js': [ '2.100.1' ],
+132 silly audit   '@supabase/postgrest-js': [ '2.100.1' ],
+132 silly audit   '@supabase/realtime-js': [ '2.100.1' ],
+132 silly audit   '@supabase/storage-js': [ '2.100.1' ],
+132 silly audit   '@supabase/phoenix': [ '0.4.0' ],
+132 silly audit   '@types/ws': [ '8.18.1' ],
+132 silly audit   ws: [ '8.20.0' ],
+132 silly audit   'iceberg-js': [ '0.8.1' ]
+132 silly audit }
+133 http cache iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 0ms (cache hit)
+134 http cache ws@https://registry.npmjs.org/ws/-/ws-8.20.0.tgz 0ms (cache hit)
+135 http cache @types/ws@https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz 0ms (cache hit)
+136 http cache @supabase/phoenix@https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.0.tgz 0ms (cache hit)
+137 http cache @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.100.1.tgz 0ms (cache hit)
+138 http cache @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.100.1.tgz 0ms (cache hit)
+139 http cache @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.100.1.tgz 0ms (cache hit)
+140 http cache @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.100.1.tgz 0ms (cache hit)
+141 http cache cookie@https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz 0ms (cache hit)
+142 http cache @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.100.1.tgz 0ms (cache hit)
+143 http cache @prisma/client-runtime-utils@https://registry.npmjs.org/@prisma/client-runtime-utils/-/client-runtime-utils-7.6.0.tgz 0ms (cache hit)
+144 http cache zod@https://registry.npmjs.org/zod/-/zod-4.3.6.tgz 0ms (cache hit)
+145 http cache @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.100.1.tgz 0ms (cache hit)
+146 http cache @supabase/ssr@https://registry.npmjs.org/@supabase/ssr/-/ssr-0.9.0.tgz 0ms (cache hit)
+147 http cache @prisma/client@https://registry.npmjs.org/@prisma/client/-/client-7.6.0.tgz 0ms (cache hit)
+148 silly tarball no local data for iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz. Extracting by manifest.
+149 silly tarball no local data for ws@https://registry.npmjs.org/ws/-/ws-8.20.0.tgz. Extracting by manifest.
+150 silly tarball no local data for @types/ws@https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz. Extracting by manifest.
+151 silly tarball no local data for @supabase/phoenix@https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.0.tgz. Extracting by manifest.
+152 silly tarball no local data for @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.100.1.tgz. Extracting by manifest.
+153 silly tarball no local data for @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.100.1.tgz. Extracting by manifest.
+154 silly tarball no local data for @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.100.1.tgz. Extracting by manifest.
+155 silly tarball no local data for @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.100.1.tgz. Extracting by manifest.
+156 silly tarball no local data for @prisma/client-runtime-utils@https://registry.npmjs.org/@prisma/client-runtime-utils/-/client-runtime-utils-7.6.0.tgz. Extracting by manifest.
+157 silly tarball no local data for zod@https://registry.npmjs.org/zod/-/zod-4.3.6.tgz. Extracting by manifest.
+158 silly tarball no local data for cookie@https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz. Extracting by manifest.
+159 silly tarball no local data for @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.100.1.tgz. Extracting by manifest.
+160 silly tarball no local data for @supabase/ssr@https://registry.npmjs.org/@supabase/ssr/-/ssr-0.9.0.tgz. Extracting by manifest.
+161 silly tarball no local data for @prisma/client@https://registry.npmjs.org/@prisma/client/-/client-7.6.0.tgz. Extracting by manifest.
+162 silly tarball no local data for @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.100.1.tgz. Extracting by manifest.
+163 http fetch GET 200 https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz 53ms (cache miss)
+164 http fetch GET 200 https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 55ms (cache miss)
+165 http fetch GET 200 https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz 68ms (cache miss)
+166 http fetch GET 200 https://registry.npmjs.org/ws/-/ws-8.20.0.tgz 71ms (cache miss)
+167 http fetch GET 200 https://registry.npmjs.org/@prisma/client-runtime-utils/-/client-runtime-utils-7.6.0.tgz 91ms (cache miss)
+168 http fetch GET 200 https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.100.1.tgz 128ms (cache miss)
+169 http fetch GET 200 https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.0.tgz 179ms (cache miss)
+170 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 274ms
+171 silly audit report {
+171 silly audit report   next: [
+171 silly audit report     {
+171 silly audit report       id: 1099638,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-gp8f-8m3g-qvj9',
+171 silly audit report       title: 'Next.js Cache Poisoning',
+171 silly audit report       severity: 'high',
+171 silly audit report       vulnerable_versions: '>=14.0.0 <14.2.10',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1100421,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-g77x-44xx-532m',
+171 silly audit report       title: 'Denial of Service condition in Next.js image optimization',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=10.0.0 <14.2.7',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1101438,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-7m27-7ghc-44w9',
+171 silly audit report       title: 'Next.js Allows a Denial of Service (DoS) with Server Actions',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=14.0.0 <14.2.21',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1105461,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-3h52-269p-cp9r',
+171 silly audit report       title: 'Information exposure in Next.js dev server due to lack of origin verification',
+171 silly audit report       severity: 'low',
+171 silly audit report       vulnerable_versions: '>=13.0 <14.2.30',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1111391,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-mwv6-3258-q52c',
+171 silly audit report       title: 'Next Vulnerable to Denial of Service with Server Components',
+171 silly audit report       severity: 'high',
+171 silly audit report       vulnerable_versions: '>=13.3.0 <14.2.34',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1107226,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-g5qg-72qw-gw5v',
+171 silly audit report       title: 'Next.js Affected by Cache Key Confusion for Image Optimization API Routes',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=0.9.9 <14.2.31',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1107420,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-7gfc-8cq8-jh5f',
+171 silly audit report       title: 'Next.js authorization bypass vulnerability',
+171 silly audit report       severity: 'high',
+171 silly audit report       vulnerable_versions: '>=9.5.5 <14.2.15',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1107512,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-4342-x723-ch2f',
+171 silly audit report       title: 'Next.js Improper Middleware Redirect Handling Leads to SSRF',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=0.9.9 <14.2.32',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1107513,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-xv57-4mr9-wg8v',
+171 silly audit report       title: 'Next.js Content Injection Vulnerability for Image Optimization',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=0.9.9 <14.2.31',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1112182,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-5j59-xgg2-r9c4',
+171 silly audit report       title: 'Next has a Denial of Service with Server Components - Incomplete Fix Follow-Up',
+171 silly audit report       severity: 'high',
+171 silly audit report       vulnerable_versions: '>=13.3.1-canary.0 <14.2.35',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1108291,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-qpjv-v59x-3qc4',
+171 silly audit report       title: 'Next.js Race Condition to Cache Poisoning',
+171 silly audit report       severity: 'low',
+171 silly audit report       vulnerable_versions: '>=0.9.9 <14.2.24',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1112593,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-9g9p-9gw9-jx7f',
+171 silly audit report       title: 'Next.js self-hosted applications vulnerable to DoS via Image Optimizer remotePatterns configuration',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=10.0.0 <15.5.10',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1112653,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-h25m-26qc-wcjf',
+171 silly audit report       title: 'Next.js HTTP request deserialization can lead to DoS when using insecure React Server Components',
+171 silly audit report       severity: 'high',
+171 silly audit report       vulnerable_versions: '>=13.0.0 <15.0.8',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1113689,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-f82v-jwr5-mffw',
+171 silly audit report       title: 'Authorization Bypass in Next.js Middleware',
+171 silly audit report       severity: 'critical',
+171 silly audit report       vulnerable_versions: '>=14.0.0 <14.2.25',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1114897,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-ggv3-7p47-pfv8',
+171 silly audit report       title: 'Next.js: HTTP request smuggling in rewrites',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=9.5.0 <15.5.13',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     },
+171 silly audit report     {
+171 silly audit report       id: 1114940,
+171 silly audit report       url: 'https://github.com/advisories/GHSA-3x4c-7xq6-9pq8',
+171 silly audit report       title: 'Next.js: Unbounded next/image disk cache growth can exhaust storage',
+171 silly audit report       severity: 'moderate',
+171 silly audit report       vulnerable_versions: '>=10.0.0 <15.5.14',
+171 silly audit report       cwe: [Array],
+171 silly audit report       cvss: [Object]
+171 silly audit report     }
+171 silly audit report   ]
+171 silly audit report }
+172 silly packumentCache corgi:https://registry.npmjs.org/next cache-miss
+173 http fetch GET 200 https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.100.1.tgz 301ms (cache miss)
+174 http fetch GET 200 https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.100.1.tgz 336ms (cache miss)
+175 http fetch GET 200 https://registry.npmjs.org/next 80ms (cache revalidated)
+176 silly packumentCache corgi:https://registry.npmjs.org/next set size:24466845 disposed:false
+177 http fetch GET 200 https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.100.1.tgz 850ms (cache miss)
+178 http fetch GET 200 https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.100.1.tgz 928ms (cache miss)
+179 http fetch GET 200 https://registry.npmjs.org/@supabase/ssr/-/ssr-0.9.0.tgz 944ms (cache miss)
+180 http fetch GET 200 https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.100.1.tgz 962ms (cache miss)
+181 http fetch GET 200 https://registry.npmjs.org/zod/-/zod-4.3.6.tgz 995ms (cache miss)
+182 http fetch GET 200 https://registry.npmjs.org/@prisma/client/-/client-7.6.0.tgz 2454ms (cache miss)
+183 silly ADD node_modules/iceberg-js
+184 silly ADD node_modules/ws
+185 silly ADD node_modules/@types/ws
+186 silly ADD node_modules/@supabase/phoenix
+187 silly ADD node_modules/@supabase/storage-js
+188 silly ADD node_modules/@supabase/realtime-js
+189 silly ADD node_modules/@supabase/postgrest-js
+190 silly ADD node_modules/@supabase/functions-js
+191 silly ADD node_modules/@supabase/auth-js
+192 silly ADD node_modules/cookie
+193 silly ADD node_modules/@prisma/client-runtime-utils
+194 silly ADD node_modules/zod
+195 silly ADD node_modules/@supabase/supabase-js
+196 silly ADD node_modules/@supabase/ssr
+197 silly ADD node_modules/@prisma/client
+198 verbose cwd /Users/merttomekce/Documents/Code/Seng384/HealthAI
+199 verbose os Darwin 24.4.0
+200 verbose node v25.8.1
+201 verbose npm  v11.11.0
+202 verbose exit 0
+203 info ok

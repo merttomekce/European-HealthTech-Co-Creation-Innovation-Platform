@@ -1,0 +1,199 @@
+.onboarding-container {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--background);
+  color: var(--on-background);
+}
+
+.onboarding-sidebar {
+  width: 320px;
+  background-color: var(--surface);
+  border-right: 1px solid var(--outline);
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding-main {
+  flex: 1;
+  padding: 6rem 8rem;
+  overflow-y: auto;
+}
+
+.onboarding-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.onboarding-step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.onboarding-step-indicator.active {
+  opacity: 1;
+}
+
+.onboarding-step-indicator.completed {
+  opacity: 0.6;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--on-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.onboarding-step-indicator.completed .step-number {
+  background-color: var(--on-background);
+  color: var(--background);
+}
+
+.step-label {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.onboarding-form {
+  max-width: 520px;
+}
+
+.onboarding-form h2 {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.onboarding-form p {
+  font-size: 1.125rem;
+  color: var(--on-background-muted);
+  line-height: 1.6;
+  margin-bottom: 3rem;
+}
+
+.form-group {
+  margin-bottom: 2.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--on-background-muted);
+  margin-bottom: 0.75rem;
+}
+
+.form-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--outline);
+  padding: 0.75rem 0;
+  font-size: 1.5rem;
+  color: var(--on-background);
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--on-background);
+}
+
+.role-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.role-card {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--outline);
+  border-radius: 16px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.role-card:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: var(--on-background-muted);
+}
+
+.role-card.selected {
+  border-color: var(--blue-primary);
+  background-color: rgba(30, 96, 242, 0.05);
+}
+
+.role-icon {
+  font-size: 2rem;
+  color: var(--on-background-muted);
+  margin-bottom: 1.5rem;
+}
+
+.role-card.selected .role-icon {
+  color: var(--blue-primary);
+}
+
+.role-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.role-desc {
+  font-size: 0.875rem;
+  color: var(--on-background-muted);
+  line-height: 1.4;
+}
+
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.primary-btn {
+  background-color: var(--on-background);
+  color: var(--background);
+  padding: 1rem 2.5rem;
+  border-radius: 999px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.primary-btn:hover {
+  opacity: 0.9;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--on-background-muted);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  color: var(--on-background);
+}

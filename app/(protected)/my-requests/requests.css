@@ -1,0 +1,103 @@
+.requests-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.requests-header {
+  margin-bottom: 3rem;
+}
+
+.requests-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.requests-subtitle {
+  color: var(--on-background-muted);
+}
+
+.request-card {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--outline);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.request-info {
+  flex: 1;
+}
+
+.project-ref {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.project-title-link {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--on-background);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.project-title-link:hover {
+  opacity: 0.7;
+}
+
+.request-meta {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--on-background-muted);
+}
+
+.request-status-section {
+  text-align: right;
+  min-width: 200px;
+}
+
+.status-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--on-background-muted);
+  margin-bottom: 0.5rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.status-badge.pending { background: rgba(255, 193, 7, 0.1); color: #FFC107; }
+.status-badge.accepted { background: rgba(5, 150, 105, 0.1); color: #059669; }
+.status-badge.declined { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+.negotiate-btn {
+  margin-top: 1rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}

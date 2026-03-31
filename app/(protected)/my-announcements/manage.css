@@ -1,0 +1,158 @@
+.manage-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.manage-header {
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manage-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.manage-subtitle {
+  color: var(--on-background-muted);
+}
+
+.create-btn {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s;
+}
+
+.create-btn:hover {
+  opacity: 0.8;
+}
+
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Card Refactor */
+.manage-card {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--outline);
+  border-radius: 32px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column; /* Stack vertically to avoid horizontal cramping */
+  gap: 2rem;
+  transition: transform 0.2s ease;
+}
+
+.manage-card-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.manage-card-info {
+  flex: 1; /* Allow info to take available space */
+}
+
+.manage-card-meta {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.manage-card-domain {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  background: rgba(var(--primary-rgb), 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.status-pill.active { background: rgba(5, 150, 105, 0.1); color: #059669; }
+.status-pill.partner-found { background: rgba(63, 171, 252, 0.1); color: #3FABFC; }
+
+.manage-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.manage-card-stats {
+  display: flex;
+  gap: 2rem;
+  color: var(--on-background-muted);
+  font-size: 0.875rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-item .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+/* Actions Group */
+.manage-card-actions {
+  display: flex;
+  gap: 0.75rem; /* Explicit gap between buttons */
+  flex-shrink: 0;
+}
+
+.action-btn {
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn.secondary {
+  background-color: var(--outline);
+  color: var(--on-background);
+  border: 1px solid transparent;
+}
+
+.action-btn.secondary:hover {
+  background-color: var(--surface-overlay);
+}
+
+.action-btn.outline {
+  background: transparent;
+  border: 1px solid var(--outline);
+  color: var(--on-background);
+}
+
+.action-btn.outline:hover {
+  border-color: var(--on-background);
+}

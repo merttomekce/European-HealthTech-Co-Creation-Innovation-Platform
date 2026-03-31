@@ -1,0 +1,583 @@
+/* ─────────────────────────────────────────────
+   Feed Page  —  Claude-inspired minimal redesign
+   No border decoration. Surface shifts only.
+   LinkedIn-sized posts with generous breathing room.
+───────────────────────────────────────────── */
+
+/* Shell: 3-col grid, fluid center */
+.feed-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr 260px;
+  min-height: 100vh;
+  background: var(--background);
+  font-family: var(--font-sans);
+  color: var(--on-background);
+}
+
+/* ── Left Nav ── */
+.feed-nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem 2rem 1.5rem;
+  /* No border — let the surface color define the edge */
+}
+
+.nav-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.75rem 1.5rem;
+}
+
+.nav-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1E60F2, #7C3AED);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+
+.nav-identity-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  overflow: hidden;
+}
+
+.nav-identity-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-background);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-identity-role {
+  font-size: 0.75rem;
+  color: var(--on-background-muted);
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.6875rem 0.875rem;
+  border-radius: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--on-background-muted);
+  font-size: 0.9375rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  transition: background 0.12s, color 0.12s;
+  text-align: left;
+  width: 100%;
+}
+
+.nav-link:hover {
+  background: var(--surface);
+  color: var(--on-background);
+}
+
+.nav-link.active {
+  background: var(--surface);
+  color: var(--on-background);
+}
+
+.nav-link-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.nav-post-btn {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.8125rem 1rem;
+  background: var(--on-background);
+  color: var(--background);
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: opacity 0.15s;
+  letter-spacing: -0.01em;
+}
+
+.nav-post-btn:hover {
+  opacity: 0.85;
+}
+
+/* ── Center Feed ── */
+.feed-center {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  /* Right surface shift to separate from right aside */
+  border-right: 1px solid var(--surface);
+}
+
+/* Tabs — typography-driven, no coloured underline decor */
+.feed-tabs {
+  display: flex;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--surface);
+  position: sticky;
+  top: 0;
+  background: var(--background);
+  z-index: 10;
+}
+
+.feed-tab {
+  padding: 1.25rem 1.25rem 1.125rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--on-background-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.feed-tab:hover {
+  color: var(--on-background);
+}
+
+.feed-tab.active {
+  color: var(--on-background);
+  border-bottom-color: var(--on-background);
+}
+
+/* Composer — flat, Claude-style */
+.composer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.composer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1E60F2, #7C3AED);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+  margin-top: 0.125rem;
+}
+
+.composer-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.composer-textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--on-background);
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  border-bottom: 1px solid var(--surface);
+  padding-bottom: 0.625rem;
+  transition: border-color 0.15s;
+}
+
+.composer-textarea:focus {
+  border-bottom-color: var(--outline);
+}
+
+.composer-textarea::placeholder {
+  color: var(--outline);
+}
+
+.composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: fade-in 0.15s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.composer-tools {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.composer-tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--on-background-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.composer-tool:hover {
+  background: var(--surface);
+  color: var(--on-background);
+}
+
+.composer-submit {
+  padding: 0.5rem 1.25rem;
+  background: var(--on-background);
+  color: var(--background);
+  border: none;
+  border-radius: 99px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.composer-submit:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.composer-submit:not(:disabled):hover {
+  opacity: 0.85;
+}
+
+.feed-divider {
+  height: 8px;
+  background: var(--surface);
+}
+
+/* ── Post — LinkedIn-scale ── */
+.post {
+  padding: 1.5rem 1.5rem 0;
+  transition: background 0.12s;
+}
+
+.post:hover {
+  background: var(--surface);
+}
+
+.post-author-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.post-av {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+
+.post-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-top: 0.125rem;
+}
+
+.post-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--on-background);
+  line-height: 1.3;
+}
+
+.post-role {
+  font-size: 0.8125rem;
+  color: var(--on-background-muted);
+  line-height: 1.3;
+}
+
+.post-time {
+  font-size: 0.75rem;
+  color: var(--on-background-muted);
+  line-height: 1.3;
+  margin-top: 0.0625rem;
+}
+
+.post-more {
+  background: none;
+  border: none;
+  color: var(--on-background-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+  border-radius: 8px;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+
+.post-more:hover {
+  background: var(--surface);
+  color: var(--on-background);
+}
+
+/* Post content — LinkedIn-scale: generous, readable */
+.post-content {
+  margin-left: calc(46px + 0.875rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.post-content p {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--on-background);
+}
+
+/* Social proof row — muted, above the action buttons */
+.post-counts {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-left: calc(46px + 0.875rem);
+  margin-bottom: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--on-background-muted);
+}
+
+.post-counts-dot {
+  opacity: 0.4;
+}
+
+.post-action-divider {
+  height: 1px;
+  background: var(--surface);
+  margin: 0 0;
+}
+
+/* Action bar — matches LinkedIn's layout */
+.post-actions {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0;
+  margin-left: calc(46px + 0.875rem - 0.5rem);
+}
+
+.post-action {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--on-background-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.post-action:hover {
+  background: var(--surface);
+  color: var(--on-background);
+}
+
+.post-action--liked {
+  color: #EF4444;
+}
+
+.post-action--liked:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Push save to the right end */
+.post-action--right {
+  margin-left: auto;
+}
+
+/* Post separator — breathing room + visual division */
+.post + .post {
+  border-top: 1px solid var(--surface);
+  margin-top: 0.5rem;
+  padding-top: 1.75rem;
+}
+
+/* ── Right Aside ── */
+.feed-aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 2rem 1.5rem 2rem 1.5rem;
+  scrollbar-width: none;
+}
+.feed-aside::-webkit-scrollbar { display: none; }
+
+.aside-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-background-muted);
+  margin-bottom: 1.125rem;
+}
+
+.aside-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  margin-bottom: 1.5rem;
+}
+
+.aside-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.aside-av {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+
+.aside-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+  min-width: 0;
+}
+
+.aside-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-background);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aside-role {
+  font-size: 0.75rem;
+  color: var(--on-background-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aside-follow {
+  flex-shrink: 0;
+  padding: 0.375rem 0.875rem;
+  background: none;
+  border: 1px solid var(--outline);
+  border-radius: 99px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--on-background);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.aside-follow:hover {
+  background: var(--on-background);
+  color: var(--background);
+  border-color: var(--on-background);
+}
+
+.aside-divider {
+  height: 1px;
+  background: var(--surface);
+  margin: 1.5rem 0;
+}
+
+.aside-trends {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.aside-trend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.5rem;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  width: 100%;
+  font-family: var(--font-sans);
+}
+
+.aside-trend:hover {
+  background: var(--surface);
+}
+
+.aside-trend-tag {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-background);
+}
+
+.aside-trend-count {
+  font-size: 0.75rem;
+  color: var(--on-background-muted);
+}

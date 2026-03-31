@@ -1,0 +1,237 @@
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--outline);
+}
+
+.profile-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--on-background);
+  margin-bottom: 0.5rem;
+}
+
+.profile-subtitle {
+  color: var(--on-background-muted);
+  font-size: 0.9375rem;
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background-color: var(--surface-container-low);
+  border-radius: 16px;
+  border: 1px solid var(--outline);
+}
+
+.large-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--on-background);
+}
+
+.avatar-info h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.read-only-role {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: rgba(30, 96, 242, 0.1);
+  color: var(--blue-primary);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-section {
+  background-color: var(--surface-container-low);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--outline);
+}
+
+.form-section h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--outline);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--on-background);
+}
+
+.form-input, .form-textarea {
+  background-color: var(--surface-container-highest);
+  border: 1px solid var(--outline);
+  color: var(--on-background);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: rgba(187, 184, 180, 0.4);
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.save-btn {
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dim) 100%);
+  color: var(--on-primary);
+  border: 1px solid rgba(118, 117, 117, 0.2);
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+}
+
+.save-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Danger Zone */
+.danger-section {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background-color: rgba(239, 68, 68, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.danger-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.danger-header .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+.danger-header h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.danger-desc {
+  color: var(--on-background-muted);
+  font-size: 0.9375rem;
+  margin-bottom: 1.5rem;
+}
+
+.danger-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.danger-btn {
+  background-color: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.danger-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+  .avatar-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .form-section {
+    padding: 1.5rem;
+  }
+
+  .danger-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .danger-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-title {
+    font-size: 1.75rem;
+  }
+
+  .save-btn {
+    width: 100%;
+  }
+}
