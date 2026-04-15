@@ -1,5 +1,30 @@
 {
-  "node": {},
+  "node": {
+    "bce33dbcdff7e4a0c0f74f995f00c201487f405a": {
+      "workers": {
+        "app/(protected)/board/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cuser%5C%5CEuropean-HealthTech-Co-Creation-Innovation-Platform%5C%5Clib%5C%5Cactions%5C%5Cannouncements.ts%22%2C%5B%22getAnnouncements%22%2C%22createAnnouncement%22%2C%22getAnnouncementById%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(protected)/board/page": "action-browser"
+      }
+    },
+    "c773d71c81d3de4246cdb936e9ad9cb5bbdc103e": {
+      "workers": {
+        "app/(protected)/board/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cuser%5C%5CEuropean-HealthTech-Co-Creation-Innovation-Platform%5C%5Clib%5C%5Cactions%5C%5Cannouncements.ts%22%2C%5B%22getAnnouncements%22%2C%22createAnnouncement%22%2C%22getAnnouncementById%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(protected)/board/page": "action-browser"
+      }
+    },
+    "f6fc1d8389c544c00dd31c482561cd9ae693dcee": {
+      "workers": {
+        "app/(protected)/board/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cuser%5C%5CEuropean-HealthTech-Co-Creation-Innovation-Platform%5C%5Clib%5C%5Cactions%5C%5Cannouncements.ts%22%2C%5B%22getAnnouncements%22%2C%22createAnnouncement%22%2C%22getAnnouncementById%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(protected)/board/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "ZBG9MWa+xuE+5UyVHS4ByEwfkXKOh+mK+Z1795q+XUE="
+  "encryptionKey": "KyuS7hFPQyKFbvHUA7YwkXdS7dNdqk4ZROhDmEEzWA8="
 }

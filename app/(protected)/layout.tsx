@@ -11,7 +11,7 @@ import {
   User, 
   LogOut, 
   Menu 
-} from 'lucide-animated';
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { StoreProvider } from '@/lib/StoreContext';
 import NotificationBell from '@/components/NotificationBell';
@@ -28,7 +28,7 @@ interface NavItemProps {
 const NavItem = ({ href, icon: Icon, label, active, onClick }: NavItemProps) => (
   <Link href={href} className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
     <div className="nav-icon">
-      <Icon size={20} animate="hover" />
+      <Icon size={20} />
     </div>
     <span>{label}</span>
   </Link>
@@ -102,7 +102,7 @@ export default function ProtectedLayout({
             </div>
           </div>
           <button className="sign-out-btn" onClick={handleSignOut} aria-label="Sign out">
-            <LogOut size={18} animate="hover" />
+            <LogOut size={18} />
             <span>Sign Out</span>
           </button>
         </div>
@@ -115,7 +115,7 @@ export default function ProtectedLayout({
             onClick={toggleMobileMenu}
             aria-label="Toggle Menu"
           >
-            <Menu size={24} animate="hover" />
+            <Menu size={24} />
           </button>
           
           <div className="top-bar-right">

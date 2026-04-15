@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Bell } from 'lucide-animated';
+import { Bell } from 'lucide-react';
 import { useStore } from '@/lib/StoreContext';
 
 const DEMO_USER_ID = 'user-current';
@@ -13,7 +13,7 @@ export default function NotificationBell() {
 
   return (
     <Link href="/notifications" className="notification-btn" aria-label="Notifications">
-      <Bell size={20} animate="hover" />
+      <Bell size={20} />
       {unreadCount > 0 && (
         <span className="notification-badge"></span>
       )}

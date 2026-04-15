@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, ChevronUp, Check, X } from 'lucide-animated';
+import { Search, ChevronDown, ChevronUp, Check, X } from 'lucide-react';
 
 interface Option {
   value: string;
@@ -89,7 +89,7 @@ export default function SearchableSelect({
         <div className="ss-actions">
           {value && (
             <button type="button" className="ss-clear" onClick={clear} aria-label="Clear selection">
-              <X size={16} animate="hover" />
+              <X size={16} />
             </button>
           )}
           <div className="ss-arrow">

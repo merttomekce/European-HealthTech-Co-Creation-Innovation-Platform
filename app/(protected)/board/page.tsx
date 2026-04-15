@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Search, SearchX } from 'lucide-animated';
+import { Plus, Search, SearchX } from 'lucide-react';
 import { getAnnouncements } from '@/lib/actions/announcements';
 import { useRealtime } from '@/lib/hooks/useRealtime';
 import { createClient } from '@/lib/supabase/client';
@@ -54,7 +54,7 @@ export default function BoardPage() {
           <p className="subtext">Connect with interdisciplinary peers to co-create the future of healthcare.</p>
         </div>
         <Link href="/board/create" className="btn-primary" style={{ textDecoration: 'none', background: 'var(--on-background)', color: 'var(--background)', padding: '0.75rem 1.5rem', borderRadius: '999px', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Plus size={18} animate="hover" />
+          <Plus size={18} />
           Post a Project
         </Link>
       </header>
@@ -71,7 +71,7 @@ export default function BoardPage() {
             display: 'flex',
             alignItems: 'center'
           }}>
-            <Search size={20} animate="hover" />
+            <Search size={20} />
           </div>
           <input 
             type="text" 
@@ -215,7 +215,7 @@ export default function BoardPage() {
           ))
         ) : (
           <div style={{ textAlign: 'center', padding: '6rem 2rem', color: 'var(--on-background-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <SearchX size={48} style={{ marginBottom: '1rem' }} animate={true} />
+            <SearchX size={48} style={{ marginBottom: '1rem' }} />
             <p style={{ fontSize: '1.25rem' }}>No projects match your current filters.</p>
           </div>
         )}

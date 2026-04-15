@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { X } from 'lucide-animated';
+import { X } from 'lucide-react';
 import './modal.css';
 
 interface ModalProps {
@@ -31,7 +31,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose} aria-label="Close modal">
-          <X size={20} animate="hover" />
+          <X size={20} />
         </button>
         <div className="modal-body">
           {children}
