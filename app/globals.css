@@ -1,30 +1,55 @@
 :root {
-  /* Core Tones */
-  --background: #121111;
-  --surface: #1E1D1D;
-  --surface-raised: #282828;
-  --on-background: #F4F4F4;
-  --on-background-muted: #A1A1AA;
+  /* Core Tones - Light Blue Theme */
+  --background: #F4F7FA;
+  --surface: #FFFFFF;
+  --surface-raised: #F8FAFC;
+  --on-background: #0F172A;
+  --on-background-muted: #64748B;
   
   /* Outline & Grids */
-  --outline: #333333;
-  --grid-line: #262626;
+  --outline: #E2E8F0;
+  --grid-line: #F1F5F9;
 
   /* Accents */
-  --blue-primary: #1E60F2;
-  --blue-folder-top: #A4D9FD;
-  --blue-folder-bottom: #3FABFC;
+  --blue-primary: #2563EB;
+  --blue-folder-top: #DBEAFE;
+  --blue-folder-bottom: #93C5FD;
 
   /* Surface Containers (varied elevation levels) */
-  --surface-container-lowest: #0e0e0e;
-  --surface-container-low: #1a1919;
-  --surface-container: #1e1d1d;
-  --surface-container-high: #232222;
-  --surface-container-highest: #2a2929;
+  --surface-container-lowest: #FFFFFF;
+  --surface-container-low: #F8FAFC;
+  --surface-container: #F1F5F9;
+  --surface-container-high: #E2E8F0;
+  --surface-container-highest: #CBD5E1;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+  --font-sans: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-sans), 'Newsreader', ui-serif, Georgia, serif;
+}
+
+.dark {
+  /* Core Tones - Dark Theme (Slate / Eye Friendly) */
+  --background: #0F172A; /* slate-900 */
+  --surface: #1E293B; /* slate-800 */
+  --surface-raised: #334155; /* slate-700 */
+  --on-background: #F8FAFC; /* slate-50 */
+  --on-background-muted: #94A3B8; /* slate-400 */
+  
+  /* Outline & Grids */
+  --outline: #334155;
+  --grid-line: #1E293B;
+
+  /* Accents */
+  --blue-primary: #3B82F6; /* Eye-friendly blue */
+  --blue-folder-top: #60A5FA;
+  --blue-folder-bottom: #2563EB;
+
+  /* Surface Containers */
+  --surface-container-lowest: #020617; /* slate-950 */
+  --surface-container-low: #0F172A;
+  --surface-container: #1E293B;
+  --surface-container-high: #334155;
+  --surface-container-highest: #475569; /* slate-600 */
 }
 
 
@@ -38,6 +63,7 @@ body {
   background-color: var(--background);
   color: var(--on-background);
   font-family: var(--font-sans);
+  font-size: 1.0625rem; /* 17px */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -89,6 +115,8 @@ a {
 
 /* Scroll Snap for Landing Page only — scoped to .landing-page wrapper */
 .landing-page {
+  height: 100vh;
+  overflow-y: scroll;
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
 }
@@ -171,7 +199,8 @@ h1 {
   border-radius: 20px;
   padding: 2rem;
   margin: 0 auto;
-  background: rgba(30, 29, 29, 0.4);
+  background: var(--surface-raised);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(10px);
 }
 
@@ -326,12 +355,11 @@ h1 {
 }
 
 .mockup-section {
-  min-height: 100vh;
+  height: 100vh;
   padding: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Removed background and border-bottom for seamless blend */
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }

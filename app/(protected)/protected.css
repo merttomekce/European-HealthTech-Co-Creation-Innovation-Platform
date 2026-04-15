@@ -14,6 +14,12 @@
   flex-direction: column;
   padding: 2rem 1.5rem;
   flex-shrink: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.collapsed {
+  width: 80px;
+  padding: 2rem 0.5rem;
 }
 
 .logo-section {
@@ -29,6 +35,35 @@
   font-size: 1.5rem;
   font-weight: 500;
   letter-spacing: -0.02em;
+  flex: 1;
+}
+
+.logo-text-collapsed {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--blue-primary);
+  text-align: center;
+  flex: 1;
+}
+
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: var(--on-background-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--on-background);
 }
 
 .nav-group {
@@ -59,6 +94,11 @@
 .nav-item.active {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--on-background);
+}
+
+.nav-item.collapsed {
+  justify-content: center;
+  padding: 0.75rem 0;
 }
 
 .nav-icon {
@@ -94,6 +134,10 @@
   background: rgba(239, 68, 68, 0.08);
   color: #ef4444;
 }
+.sidebar.collapsed .sign-out-btn {
+  justify-content: center;
+  padding: 0.625rem 0;
+}
 
 .user-profile {
   display: flex;
@@ -112,6 +156,11 @@
   justify-content: center;
   font-weight: 600;
   color: var(--on-background-muted);
+}
+
+.sidebar.collapsed .user-profile {
+  justify-content: center;
+  padding: 0.5rem 0;
 }
 
 .user-info {

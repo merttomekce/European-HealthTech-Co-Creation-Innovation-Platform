@@ -147,15 +147,15 @@ export default function HealthAILandingPage(): React.JSX.Element {
                 type="button" 
                 onClick={() => {
                   document.cookie = "dev_bypass=true; path=/;";
-                  window.location.href = "/board";
+                  window.location.href = "/dashboard";
                 }} 
                 style={{ 
                   marginTop: '0.75rem', 
                   width: '100%', 
                   padding: '0.75rem',
                   background: 'transparent', 
-                  border: '1px dashed rgba(255,255,255,0.3)', 
-                  color: 'rgba(255,255,255,0.7)',
+                  border: '1px dashed var(--on-background-muted)', 
+                  color: 'var(--on-background)',
                   borderRadius: '999px',
                   cursor: 'pointer',
                   fontSize: '0.875rem'
@@ -205,7 +205,7 @@ export default function HealthAILandingPage(): React.JSX.Element {
             <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>The Registry Board</h2>
             
             <div className="app-mockup-scrollable">
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--outline)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--outline)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-container-high)' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }}></div>
                   <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#fbbf24' }}></div>
@@ -215,18 +215,18 @@ export default function HealthAILandingPage(): React.JSX.Element {
               </div>
               <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '2rem' }}>
                 <div style={{ borderRight: '1px solid var(--outline)', paddingRight: '1rem' }}>
-                  <div style={{ height: '0.75rem', width: '80%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginBottom: '2rem' }}></div>
+                  <div style={{ height: '0.75rem', width: '80%', background: 'var(--outline)', borderRadius: '2px', marginBottom: '2rem' }}></div>
                   {[1,2,3,4].map(i => (
-                    <div key={i} style={{ height: '0.5rem', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', marginBottom: '1rem' }}></div>
+                    <div key={i} style={{ height: '0.5rem', width: '100%', background: 'var(--surface-container-highest)', borderRadius: '2px', marginBottom: '1rem' }}></div>
                   ))}
                 </div>
                 <div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
                     {[1, 2, 3, 4].map(i => (
-                      <div key={i} style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--outline)', borderRadius: '12px' }}>
+                      <div key={i} style={{ padding: '1.5rem', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '12px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                           <div style={{ width: '40px', height: '10px', background: i % 2 === 0 ? '#3b82f6' : '#10b981', borderRadius: '2px', opacity: 0.3 }}></div>
-                          <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
+                          <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'var(--outline)' }}></div>
                         </div>
                         <div style={{ height: '0.8rem', width: '70%', background: 'var(--on-background)', opacity: 0.1, borderRadius: '2px', marginBottom: '0.5rem' }}></div>
                         <div style={{ height: '0.5rem', width: '90%', background: 'var(--on-background)', opacity: 0.05, borderRadius: '2px' }}></div>
@@ -245,7 +245,7 @@ export default function HealthAILandingPage(): React.JSX.Element {
             <div className="mockup-header-tag">02. Insights</div>
             <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Contextual Deep Dive</h2>
             
-            <div className="app-mockup-scrollable" style={{ background: '#0a0a0a' }}>
+            <div className="app-mockup-scrollable" style={{ background: 'var(--surface)' }}>
               <div style={{ display: 'flex', height: '100%' }}>
                 <div style={{ flex: 1, padding: '3rem', borderRight: '1px solid var(--grid-line)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
@@ -258,13 +258,13 @@ export default function HealthAILandingPage(): React.JSX.Element {
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ height: '1rem', width: '100%', background: 'rgba(255,255,255,0.03)', borderRadius: '2px' }}></div>
-                    <div style={{ height: '1rem', width: '90%', background: 'rgba(255,255,255,0.03)', borderRadius: '2px' }}></div>
-                    <div style={{ height: '1rem', width: '95%', background: 'rgba(255,255,255,0.03)', borderRadius: '2px' }}></div>
-                    <div style={{ height: '1rem', width: '40%', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', marginTop: '1rem' }}></div>
+                    <div style={{ height: '1rem', width: '100%', background: 'var(--surface-container-high)', borderRadius: '2px' }}></div>
+                    <div style={{ height: '1rem', width: '90%', background: 'var(--surface-container-high)', borderRadius: '2px' }}></div>
+                    <div style={{ height: '1rem', width: '95%', background: 'var(--surface-container-high)', borderRadius: '2px' }}></div>
+                    <div style={{ height: '1rem', width: '40%', background: 'var(--surface-container-high)', borderRadius: '2px', marginTop: '1rem' }}></div>
                   </div>
                 </div>
-                <div style={{ width: '280px', padding: '2rem', background: 'rgba(255,255,255,0.01)' }}>
+                <div style={{ width: '280px', padding: '2rem', background: 'var(--surface-raised)' }}>
                   <div style={{ marginBottom: '2rem' }}>
                     <div style={{ fontSize: '0.65rem', fontWeight: 800, opacity: 0.3, marginBottom: '0.75rem', letterSpacing: '0.1em' }}>PRECISION METRICS</div>
                     <div style={{ padding: '1rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
@@ -273,8 +273,8 @@ export default function HealthAILandingPage(): React.JSX.Element {
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ height: '40px', width: '100%', background: 'rgba(255,255,255,0.02)', borderRadius: '6px' }}></div>
-                    <div style={{ height: '40px', width: '100%', background: 'rgba(255,255,255,0.02)', borderRadius: '6px' }}></div>
+                    <div style={{ height: '40px', width: '100%', background: 'var(--surface-container-high)', borderRadius: '6px' }}></div>
+                    <div style={{ height: '40px', width: '100%', background: 'var(--surface-container-high)', borderRadius: '6px' }}></div>
                   </div>
                 </div>
               </div>
@@ -291,19 +291,19 @@ export default function HealthAILandingPage(): React.JSX.Element {
             <div className="app-mockup-scrollable" style={{ padding: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                <div style={{ width: '100%', maxWidth: '500px' }}>
                   <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ flex: 1, padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--outline)', borderRadius: '12px', textAlign: 'center' }}>
+                    <div style={{ flex: 1, padding: '1.5rem', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '12px', textAlign: 'center' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '32px', opacity: 0.2 }}>architecture</span>
                       <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>System Arch</div>
                     </div>
-                    <div style={{ flex: 1, padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--outline)', borderRadius: '12px', textAlign: 'center' }}>
+                    <div style={{ flex: 1, padding: '1.5rem', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '12px', textAlign: 'center' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '32px', opacity: 0.2 }}>inventory_2</span>
                       <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Resource Bid</div>
                     </div>
                   </div>
                   <div style={{ padding: '2rem', background: 'var(--background)', border: '1px solid var(--outline)', borderRadius: '16px' }}>
-                    <div style={{ height: '0.75rem', width: '40%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginBottom: '1.5rem' }}></div>
-                    <div style={{ height: '3rem', width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--outline)', borderRadius: '8px', marginBottom: '1rem' }}></div>
-                    <div style={{ height: '3rem', width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--outline)', borderRadius: '8px', marginBottom: '2rem' }}></div>
+                    <div style={{ height: '0.75rem', width: '40%', background: 'var(--outline)', borderRadius: '2px', marginBottom: '1.5rem' }}></div>
+                    <div style={{ height: '3rem', width: '100%', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '8px', marginBottom: '1rem' }}></div>
+                    <div style={{ height: '3rem', width: '100%', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '8px', marginBottom: '2rem' }}></div>
                     <button className="btn btn-blue" style={{ width: '100%', height: '3.5rem' }}>Submit Technical Bid</button>
                   </div>
                </div>
@@ -325,10 +325,10 @@ export default function HealthAILandingPage(): React.JSX.Element {
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>HIPAA & IRB Ready</h3>
                 <p style={{ opacity: 0.5, maxWidth: '300px', margin: '0 auto 2rem' }}>End-to-end encrypted protocol sharing with integrated NDA management.</p>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                  <div style={{ padding: '0.75rem 1.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ padding: '0.75rem 1.5rem', background: 'var(--surface-container-highest)', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span> Verified
                   </div>
-                  <div style={{ padding: '0.75rem 1.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ padding: '0.75rem 1.5rem', background: 'var(--surface-container-highest)', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>history</span> Audit Log
                   </div>
                 </div>
@@ -346,12 +346,12 @@ export default function HealthAILandingPage(): React.JSX.Element {
             <div className="app-mockup-scrollable" style={{ padding: '0' }}>
                <div style={{ display: 'flex', height: '100%' }}>
                   <div style={{ width: '300px', borderRight: '1px solid var(--outline)', padding: '2rem' }}>
-                    <div style={{ height: '0.75rem', width: '60%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginBottom: '2rem' }}></div>
+                    <div style={{ height: '0.75rem', width: '60%', background: 'var(--outline)', borderRadius: '2px', marginBottom: '2rem' }}></div>
                     {[1,2,3].map(i => (
                       <div key={i} style={{ padding: '1rem', background: i === 1 ? 'rgba(59, 130, 246, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}></div>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--surface-container-highest)' }}></div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ height: '0.5rem', width: '80%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}></div>
+                          <div style={{ height: '0.5rem', width: '80%', background: 'var(--outline)', borderRadius: '2px' }}></div>
                         </div>
                       </div>
                     ))}
@@ -361,12 +361,12 @@ export default function HealthAILandingPage(): React.JSX.Element {
                       <div style={{ alignSelf: 'flex-end', padding: '1rem', background: '#3b82f6', borderRadius: '12px 12px 0 12px', fontSize: '0.85rem', maxWidth: '70%', color: 'white' }}>
                         Ready for the clinical walkthrough on Friday?
                       </div>
-                      <div style={{ alignSelf: 'flex-start', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px 12px 12px 0', fontSize: '0.85rem', maxWidth: '70%' }}>
+                      <div style={{ alignSelf: 'flex-start', padding: '1rem', background: 'var(--surface-container-highest)', borderRadius: '12px 12px 12px 0', fontSize: '0.85rem', maxWidth: '70%' }}>
                         Yes, I'll have the technical specs for the HIPAA storage ready by then.
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                      <div style={{ flex: 1, height: '3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--outline)', borderRadius: '8px', padding: '0 1rem', display: 'flex', alignItems: 'center', opacity: 0.3, fontSize: '0.85rem' }}>Type a message...</div>
+                      <div style={{ flex: 1, height: '3rem', background: 'var(--surface-container-highest)', border: '1px solid var(--outline)', borderRadius: '8px', padding: '0 1rem', display: 'flex', alignItems: 'center', opacity: 0.3, fontSize: '0.85rem' }}>Type a message...</div>
                       <div style={{ width: '3rem', height: '3rem', borderRadius: '8px', background: 'var(--on-background)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--background)' }}>
                         <span className="material-symbols-outlined">send</span>
                       </div>
