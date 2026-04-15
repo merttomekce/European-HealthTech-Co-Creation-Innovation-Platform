@@ -1,9 +1,9 @@
 {
   "/page": "app/page.js",
-  "/(protected)/board/page": "app/(protected)/board/page.js",
-  "/(protected)/notifications/page": "app/(protected)/notifications/page.js",
-  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js",
   "/(protected)/my-announcements/page": "app/(protected)/my-announcements/page.js",
+  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js",
   "/(protected)/my-requests/page": "app/(protected)/my-requests/page.js",
-  "/(protected)/profile/page": "app/(protected)/profile/page.js"
+  "/(protected)/profile/page": "app/(protected)/profile/page.js",
+  "/(protected)/board/page": "app/(protected)/board/page.js",
+  "/(protected)/notifications/page": "app/(protected)/notifications/page.js"
 }

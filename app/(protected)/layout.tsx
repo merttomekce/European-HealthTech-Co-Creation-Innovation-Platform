@@ -10,11 +10,14 @@ import {
   Handshake, 
   User, 
   LogOut, 
-  Menu 
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { StoreProvider } from '@/lib/StoreContext';
 import NotificationBell from '@/components/NotificationBell';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import './protected.css';
 
 interface NavItemProps {
@@ -22,15 +25,16 @@ interface NavItemProps {
   icon: any;
   label: string;
   active: boolean;
+  isCollapsed?: boolean;
   onClick?: () => void;
 }
 
-const NavItem = ({ href, icon: Icon, label, active, onClick }: NavItemProps) => (
-  <Link href={href} className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
+const NavItem = ({ href, icon: Icon, label, active, isCollapsed, onClick }: NavItemProps) => (
+  <Link href={href} className={`nav-item ${active ? 'active' : ''} ${isCollapsed ? 'collapsed' : ''}`} onClick={onClick} title={label}>
     <div className="nav-icon">
       <Icon size={20} />
     </div>
-    <span>{label}</span>
+    {!isCollapsed && <span>{label}</span>}
   </Link>
 );
 
@@ -41,6 +45,7 @@ export default function ProtectedLayout({
 }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -60,6 +65,7 @@ export default function ProtectedLayout({
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   const router = useRouter();
   const handleSignOut = async () => {
@@ -75,9 +81,17 @@ export default function ProtectedLayout({
         <div className="mobile-backdrop" onClick={closeMobileMenu} />
       )}
 
-      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="logo-section">
-          <div className="logo-text">HealthAI</div>
+          {!isCollapsed && <div className="logo-text">HealthAI</div>}
+          {isCollapsed && <div className="logo-text-collapsed">H</div>}
+          <button 
+            className="collapse-btn" 
+            onClick={toggleCollapse} 
+            aria-label="Toggle Sidebar"
+          >
+            {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
         </div>
 
         <nav className="nav-group">
@@ -88,6 +102,7 @@ export default function ProtectedLayout({
               icon={item.icon}
               label={item.label}
               active={pathname.startsWith(item.href)}
+              isCollapsed={isCollapsed}
               onClick={closeMobileMenu}
             />
           ))}
@@ -96,14 +111,16 @@ export default function ProtectedLayout({
         <div className="sidebar-footer">
           <div className="user-profile">
             <div className="avatar-placeholder">{user.initials}</div>
-            <div className="user-info">
-              <div className="user-name">{user.name}</div>
-              <div className="user-role-badge">{user.role}</div>
-            </div>
+            {!isCollapsed && (
+              <div className="user-info">
+                <div className="user-name">{user.name}</div>
+                <div className="user-role-badge">{user.role}</div>
+              </div>
+            )}
           </div>
-          <button className="sign-out-btn" onClick={handleSignOut} aria-label="Sign out">
+          <button className="sign-out-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign Out">
             <LogOut size={18} />
-            <span>Sign Out</span>
+            {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </aside>
@@ -120,6 +137,7 @@ export default function ProtectedLayout({
           
           <div className="top-bar-right">
             <StoreProvider>
+              <ThemeToggle />
               <NotificationBell />
             </StoreProvider>
           </div>
