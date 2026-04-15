@@ -143,6 +143,26 @@ export default function HealthAILandingPage(): React.JSX.Element {
                 />
               </div>
               <button type="submit" className="btn btn-white">Continue with email</button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  document.cookie = "dev_bypass=true; path=/;";
+                  window.location.href = "/board";
+                }} 
+                style={{ 
+                  marginTop: '0.75rem', 
+                  width: '100%', 
+                  padding: '0.75rem',
+                  background: 'transparent', 
+                  border: '1px dashed rgba(255,255,255,0.3)', 
+                  color: 'rgba(255,255,255,0.7)',
+                  borderRadius: '999px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+              >
+                [DEV] Force Bypass Login
+              </button>
             </form>
             {message && (
               <div style={{ marginTop: '1rem', color: message.type === 'error' ? '#ef4444' : '#22c55e', fontSize: '0.875rem' }}>

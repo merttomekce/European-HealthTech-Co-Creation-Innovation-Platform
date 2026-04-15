@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import CustomCheckbox from './CustomCheckbox';
 import { requestMeeting } from '@/lib/actions/meetings';
-import { CheckCircle } from 'lucide-animated';
+import { CheckCircle } from 'lucide-react';
 
 interface InterestModalProps {
   isOpen: boolean;
@@ -51,7 +51,7 @@ export default function InterestModal({ isOpen, onClose, projectId, projectTitle
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <CheckCircle size={64} animate={true} />
+            <CheckCircle size={64} />
           </div>
           <h2 style={{ fontSize: '2.5rem' }}>Interest Expressed</h2>
           <p style={{ marginBottom: '2rem' }}>

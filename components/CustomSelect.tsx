@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Check } from 'lucide-animated';
+import { ChevronDown, ChevronUp, Check } from 'lucide-react';
 
 interface Option {
   value: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock } from 'lucide-animated';
+import { Calendar, Clock } from 'lucide-react';
 import styles from './MeetingStatusPill.module.css';
 
 interface MeetingStatusPillProps {
@@ -30,9 +30,9 @@ export default function MeetingStatusPill({ status, confirmedTime }: MeetingStat
     >
       <div className={styles.icon}>
         {status === 'Scheduled' ? (
-          <Calendar size={14} animate="hover" />
+          <Calendar size={14} />
         ) : (
-          <Clock size={14} animate="hover" />
+          <Clock size={14} />
         )}
       </div>
       {config.label}

@@ -1,0 +1,683 @@
+﻿  Ôû▓ Next.js 14.2.3
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+node.exe :  ÔÜá Compiled w
+ith warnings
+At line:1 char:1
++ & "C:\Program Files\node
+js/node.exe" "C:\Program F
+iles\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (   
+  ÔÜá Compiled with war   
+ nings:String) [], Rem    
+oteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+./app/(protected)/board/pa
+ge.tsx
+Attempted import error: 'P
+lus' is not exported from 
+'lucide-animated' (importe
+d as 'Plus').
+
+Import trace for requested
+ module:
+./app/(protected)/board/pa
+ge.tsx
+
+./app/(protected)/board/pa
+ge.tsx
+Attempted import error: 'S
+earch' is not exported fro
+m 'lucide-animated' (impor
+ted as 'Search').
+
+Import trace for requested
+ module:
+./app/(protected)/board/pa
+ge.tsx
+
+./app/(protected)/board/pa
+ge.tsx
+Attempted import error: 'S
+earchX' is not exported fr
+om 'lucide-animated' (impo
+rted as 'SearchX').
+
+Import trace for requested
+ module:
+./app/(protected)/board/pa
+ge.tsx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'H
+ome' is not exported from 
+'lucide-animated' (importe
+d as 'Home').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'L
+ayoutGrid' is not exported
+ from 'lucide-animated' (i
+mported as 'LayoutGrid').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'M
+egaphone' is not exported 
+from 'lucide-animated' (im
+ported as 'Megaphone').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'H
+andshake' is not exported 
+from 'lucide-animated' (im
+ported as 'Handshake').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'U
+ser' is not exported from 
+'lucide-animated' (importe
+d as 'User').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'L
+ogOut' is not exported fro
+m 'lucide-animated' (impor
+ted as 'LogOut').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'M
+enu' is not exported from 
+'lucide-animated' (importe
+d as 'Menu').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./components/CustomSelect.
+tsx
+Attempted import error: 'C
+hevronUp' is not exported 
+from 'lucide-animated' (im
+ported as 'ChevronUp').
+
+Import trace for requested
+ module:
+./components/CustomSelect.
+tsx
+./app/(protected)/board/cr
+eate/page.tsx
+
+./components/CustomSelect.
+tsx
+Attempted import error: 'C
+hevronDown' is not exporte
+d from 'lucide-animated' (
+imported as 'ChevronDown')
+.
+
+Import trace for requested
+ module:
+./components/CustomSelect.
+tsx
+./app/(protected)/board/cr
+eate/page.tsx
+
+./components/CustomSelect.
+tsx
+Attempted import error: 'C
+heck' is not exported from
+ 'lucide-animated' (import
+ed as 'Check').
+
+Import trace for requested
+ module:
+./components/CustomSelect.
+tsx
+./app/(protected)/board/cr
+eate/page.tsx
+
+./components/InterestModal
+.tsx
+Attempted import error: 'C
+heckCircle' is not exporte
+d from 'lucide-animated' (
+imported as 'CheckCircle')
+.
+
+Import trace for requested
+ module:
+./components/InterestModal
+.tsx
+./app/(protected)/board/[i
+d]/page.tsx
+
+./components/MeetingStatus
+Pill.tsx
+Attempted import error: 'C
+alendar' is not exported f
+rom 'lucide-animated' (imp
+orted as 'Calendar').
+
+Import trace for requested
+ module:
+./components/MeetingStatus
+Pill.tsx
+./app/(protected)/my-reque
+sts/page.tsx
+
+./components/MeetingStatus
+Pill.tsx
+Attempted import error: 'C
+lock' is not exported from
+ 'lucide-animated' (import
+ed as 'Clock').
+
+Import trace for requested
+ module:
+./components/MeetingStatus
+Pill.tsx
+./app/(protected)/my-reque
+sts/page.tsx
+
+./components/Modal.tsx
+Attempted import error: 'X
+' is not exported from 'lu
+cide-animated' (imported a
+s 'X').
+
+Import trace for requested
+ module:
+./components/Modal.tsx
+./components/InterestModal
+.tsx
+./app/(protected)/board/[i
+d]/page.tsx
+
+./components/NotificationB
+ell.tsx
+Attempted import error: 'B
+ell' is not exported from 
+'lucide-animated' (importe
+d as 'Bell').
+
+Import trace for requested
+ module:
+./components/NotificationB
+ell.tsx
+./app/(protected)/layout.t
+sx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'X
+' is not exported from 'lu
+cide-animated' (imported a
+s 'X').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'C
+hevronUp' is not exported 
+from 'lucide-animated' (im
+ported as 'ChevronUp').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'C
+hevronDown' is not exporte
+d from 'lucide-animated' (
+imported as 'ChevronDown')
+.
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'S
+earch' is not exported fro
+m 'lucide-animated' (impor
+ted as 'Search').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'C
+heck' is not exported from
+ 'lucide-animated' (import
+ed as 'Check').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+ ÔÜá Compiled with warning
+s
+
+./app/(protected)/board/pa
+ge.tsx
+Attempted import error: 'P
+lus' is not exported from 
+'lucide-animated' (importe
+d as 'Plus').
+
+Import trace for requested
+ module:
+./app/(protected)/board/pa
+ge.tsx
+
+./app/(protected)/board/pa
+ge.tsx
+Attempted import error: 'S
+earch' is not exported fro
+m 'lucide-animated' (impor
+ted as 'Search').
+
+Import trace for requested
+ module:
+./app/(protected)/board/pa
+ge.tsx
+
+./app/(protected)/board/pa
+ge.tsx
+Attempted import error: 'S
+earchX' is not exported fr
+om 'lucide-animated' (impo
+rted as 'SearchX').
+
+Import trace for requested
+ module:
+./app/(protected)/board/pa
+ge.tsx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'H
+ome' is not exported from 
+'lucide-animated' (importe
+d as 'Home').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'L
+ayoutGrid' is not exported
+ from 'lucide-animated' (i
+mported as 'LayoutGrid').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'M
+egaphone' is not exported 
+from 'lucide-animated' (im
+ported as 'Megaphone').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'H
+andshake' is not exported 
+from 'lucide-animated' (im
+ported as 'Handshake').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'U
+ser' is not exported from 
+'lucide-animated' (importe
+d as 'User').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'L
+ogOut' is not exported fro
+m 'lucide-animated' (impor
+ted as 'LogOut').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./app/(protected)/layout.t
+sx
+Attempted import error: 'M
+enu' is not exported from 
+'lucide-animated' (importe
+d as 'Menu').
+
+Import trace for requested
+ module:
+./app/(protected)/layout.t
+sx
+
+./components/CustomSelect.
+tsx
+Attempted import error: 'C
+hevronUp' is not exported 
+from 'lucide-animated' (im
+ported as 'ChevronUp').
+
+Import trace for requested
+ module:
+./components/CustomSelect.
+tsx
+./app/(protected)/board/cr
+eate/page.tsx
+
+./components/CustomSelect.
+tsx
+Attempted import error: 'C
+hevronDown' is not exporte
+d from 'lucide-animated' (
+imported as 'ChevronDown')
+.
+
+Import trace for requested
+ module:
+./components/CustomSelect.
+tsx
+./app/(protected)/board/cr
+eate/page.tsx
+
+./components/CustomSelect.
+tsx
+Attempted import error: 'C
+heck' is not exported from
+ 'lucide-animated' (import
+ed as 'Check').
+
+Import trace for requested
+ module:
+./components/CustomSelect.
+tsx
+./app/(protected)/board/cr
+eate/page.tsx
+
+./components/InterestModal
+.tsx
+Attempted import error: 'C
+heckCircle' is not exporte
+d from 'lucide-animated' (
+imported as 'CheckCircle')
+.
+
+Import trace for requested
+ module:
+./components/InterestModal
+.tsx
+./app/(protected)/board/[i
+d]/page.tsx
+
+./components/MeetingStatus
+Pill.tsx
+Attempted import error: 'C
+alendar' is not exported f
+rom 'lucide-animated' (imp
+orted as 'Calendar').
+
+Import trace for requested
+ module:
+./components/MeetingStatus
+Pill.tsx
+./app/(protected)/my-reque
+sts/page.tsx
+
+./components/MeetingStatus
+Pill.tsx
+Attempted import error: 'C
+lock' is not exported from
+ 'lucide-animated' (import
+ed as 'Clock').
+
+Import trace for requested
+ module:
+./components/MeetingStatus
+Pill.tsx
+./app/(protected)/my-reque
+sts/page.tsx
+
+./components/Modal.tsx
+Attempted import error: 'X
+' is not exported from 'lu
+cide-animated' (imported a
+s 'X').
+
+Import trace for requested
+ module:
+./components/Modal.tsx
+./components/InterestModal
+.tsx
+./app/(protected)/board/[i
+d]/page.tsx
+
+./components/NotificationB
+ell.tsx
+Attempted import error: 'B
+ell' is not exported from 
+'lucide-animated' (importe
+d as 'Bell').
+
+Import trace for requested
+ module:
+./components/NotificationB
+ell.tsx
+./app/(protected)/layout.t
+sx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'X
+' is not exported from 'lu
+cide-animated' (imported a
+s 'X').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'C
+hevronUp' is not exported 
+from 'lucide-animated' (im
+ported as 'ChevronUp').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'C
+hevronDown' is not exporte
+d from 'lucide-animated' (
+imported as 'ChevronDown')
+.
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'S
+earch' is not exported fro
+m 'lucide-animated' (impor
+ted as 'Search').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+./components/SearchableSel
+ect.tsx
+Attempted import error: 'C
+heck' is not exported from
+ 'lucide-animated' (import
+ed as 'Check').
+
+Import trace for requested
+ module:
+./components/SearchableSel
+ect.tsx
+./app/auth/complete-profil
+e/page.tsx
+
+ Ô£ô Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./app/(protected)/board/pa
+ge.tsx:5:10
+Type error: Module '"lucid
+e-animated"' has no export
+ed member 'Plus'.
+
+[0m [90m 3 |[39m [36mi
+mport[39m [33mReact[39m
+[33m,[39m { useState[33
+m,[39m useMemo[33m,[39m
+ useEffect } [36mfrom[39
+m [32m'react'[39m[33m;
+[39m[0m
+[0m [90m 4 |[39m [36mi
+mport[39m [33mLink[39m 
+[36mfrom[39m [32m'next/
+link'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[
+90m 5 |[39m [36mimport[
+39m { [33mPlus[39m[33m,
+[39m [33mSearch[39m[33
+m,[39m [33mSearchX[39m 
+} [36mfrom[39m [32m'luc
+ide-animated'[39m[33m;[
+39m[0m
+[0m [90m   |[39m       
+   [31m[1m^[22m[39m[0
+m
+[0m [90m 6 |[39m [36mi
+mport[39m { getAnnounceme
+nts } [36mfrom[39m [32m
+'@/lib/actions/announcemen
+ts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mi
+mport[39m { useRealtime }
+ [36mfrom[39m [32m'@/li
+b/hooks/useRealtime'[39m
+[33m;[39m[0m
+[0m [90m 8 |[39m [36mi
+mport[39m { createClient 
+} [36mfrom[39m [32m'@/l
+ib/supabase/client'[39m[
+33m;[39m[0m

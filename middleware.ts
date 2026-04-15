@@ -6,6 +6,11 @@ export async function middleware(request: NextRequest) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.next();
   }
+
+  // Developer Bypass
+  if (request.cookies.has('dev_bypass')) {
+    return NextResponse.next();
+  }
   return await updateSession(request)
 }
 
