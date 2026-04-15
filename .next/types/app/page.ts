@@ -1,4 +1,4 @@
-// File: /Users/merttomekce/Documents/Code/Seng384/HealthAI/app/page.tsx
+// File: C:\Users\user\European-HealthTech-Co-Creation-Innovation-Platform\app\page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
