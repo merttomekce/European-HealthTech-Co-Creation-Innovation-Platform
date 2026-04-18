@@ -1,27 +1,16 @@
 import { PrismaClient } from '@prisma/client'
+import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 
-const createPrismaClient = () => {
-  const connectionString = process.env.DATABASE_URL
-  if (!connectionString) {
-    console.warn('DATABASE_URL is not set. Prisma will use a mock proxy.')
-    return new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (prop === '$connect' || prop === '$disconnect') return async () => {}
-        return new Proxy({} as any, {
-          get(target, p) {
-            return async () => {
-              console.warn(`Mock Prisma: Call to ${String(p)} on ${String(prop)}`)
-              if (String(p).startsWith('findMany')) return []
-              return null
-            }
-          }
-        })
-      }
-    })
-  }
+// Supabase'in 5432 portlu doğrudan bağlantı linkini kullanıyoruz
+const connectionString = process.env.DIRECT_URL
 
-  const adapter = new PrismaPg({ connectionString })
+// pg sürücüsü ile yeni bir bağlantı havuzu oluşturuyoruz
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
+
+const createPrismaClient = () => {
+  // Hatanın çözüldüğü nokta: adaptörü PrismaClient'a parametre olarak veriyoruz
   return new PrismaClient({ adapter })
 }
 

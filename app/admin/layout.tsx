@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { StoreProvider } from '@/lib/StoreContext';
 import './admin.css';
 
 const AdminNavItem = ({ href, icon, label, active, onClick }: { href: string; icon: string; label: string; active: boolean; onClick?: () => void }) => (
@@ -123,9 +122,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         <div className="admin-page-content">
-          <StoreProvider>
-            {children}
-          </StoreProvider>
+          {children}
         </div>
       </main>
 
