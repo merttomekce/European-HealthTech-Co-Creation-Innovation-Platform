@@ -5,14 +5,27 @@ import { createClient } from '@/lib/supabase/client';
 
 export default function HealthAILandingPage(): React.JSX.Element {
   const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [isLogin, setIsLogin] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [message, setMessage] = React.useState<{ type: 'error' | 'success', text: string } | null>(null);
   
   // Environment Check
   const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const supabase = createClient();
+  
+  React.useEffect(() => {
+    // Check if user is already logged in to "remember" them
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        window.location.href = '/dashboard';
+      }
+    };
+    checkUser();
+  }, [supabase]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!isSupabaseConfigured) {
@@ -23,25 +36,53 @@ export default function HealthAILandingPage(): React.JSX.Element {
     setIsLoading(true);
     setMessage(null);
 
-    // Basic EDU validation
-    if (!email.toLowerCase().endsWith('.edu')) {
-      setMessage({ type: 'error', text: 'Please use a valid .edu email address.' });
+    // Basic validation
+    if (!email.includes('@')) {
+      setMessage({ type: 'error', text: 'Please use a valid email address.' });
+      setIsLoading(false);
+      return;
+    }
+
+    // Enforce institutional restriction for sign-ups (.edu anywhere in domain, or .ac.uk etc)
+    const domainPart = email.toLowerCase().split('@')[1] || '';
+    const isInstitutional = domainPart.includes('.edu') || domainPart.includes('.ac.');
+    
+    if (!isLogin && !isInstitutional) {
+      setMessage({ type: 'error', text: 'Registration is restricted to institutional (.edu, .ac, etc.) email addresses only.' });
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage({ type: 'error', text: 'Password must be at least 6 characters.' });
       setIsLoading(false);
       return;
     }
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setMessage({ type: 'error', text: error.message });
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (error) {
+          setMessage({ type: 'error', text: error.message });
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
-        setMessage({ type: 'success', text: 'Check your inbox for the magic link!' });
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+        if (error) {
+          setMessage({ type: 'error', text: error.message });
+        } else {
+          setMessage({ type: 'success', text: 'Check your inbox for the confirmation link to activate your account!' });
+        }
       }
     } catch (err: any) {
       setMessage({ type: 'error', text: 'Auth service is unavailable. Please check your Supabase setup.' });
@@ -129,20 +170,44 @@ export default function HealthAILandingPage(): React.JSX.Element {
           </div>
 
           <div className="auth-box">
-            <form onSubmit={handleSignIn}>
+            <form onSubmit={handleAuth}>
               <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.5, marginBottom: '0.5rem', display: 'block' }}> Get Started </label>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.5, marginBottom: '0.5rem', display: 'block' }}> 
+                  {isLogin ? 'Welcome Back' : 'Create Account'} 
+                </label>
                 <input 
                   type="email" 
-                  placeholder="Enter your .edu email" 
+                  placeholder={isLogin ? "Enter your email" : "Enter your .edu email"} 
                   className="input-field" 
                   style={{ marginBottom: '0.75rem' }}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                <input 
+                  type="password" 
+                  placeholder="Enter your password" 
+                  className="input-field" 
+                  style={{ marginBottom: '0.75rem' }}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
-              <button type="submit" className="btn btn-white">Continue with email</button>
+              <button disabled={isLoading} type="submit" className="btn btn-white" style={{ opacity: isLoading ? 0.7 : 1 }}>
+                {isLoading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
+              </button>
+              
+              <div style={{ marginTop: '1rem', fontSize: '0.85rem' }}>
+                <button 
+                  type="button" 
+                  onClick={() => { setIsLogin(!isLogin); setMessage(null); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--on-background)', textDecoration: 'underline', cursor: 'pointer', opacity: 0.7 }}
+                >
+                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                </button>
+              </div>
+
               <button 
                 type="button" 
                 onClick={() => {
@@ -150,18 +215,19 @@ export default function HealthAILandingPage(): React.JSX.Element {
                   window.location.href = "/dashboard";
                 }} 
                 style={{ 
-                  marginTop: '0.75rem', 
+                  marginTop: '1.5rem', 
                   width: '100%', 
-                  padding: '0.75rem',
+                  padding: '0.6rem',
                   background: 'transparent', 
                   border: '1px dashed var(--on-background-muted)', 
                   color: 'var(--on-background)',
                   borderRadius: '999px',
                   cursor: 'pointer',
-                  fontSize: '0.875rem'
+                  fontSize: '0.75rem',
+                  opacity: 0.5
                 }}
               >
-                [DEV] Force Bypass Login
+                [DEV] Force Bypass
               </button>
             </form>
             {message && (

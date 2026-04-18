@@ -15,7 +15,6 @@ import {
   PanelLeftOpen
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { StoreProvider } from '@/lib/StoreContext';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import './protected.css';
@@ -136,17 +135,13 @@ export default function ProtectedLayout({
           </button>
           
           <div className="top-bar-right">
-            <StoreProvider>
               <ThemeToggle />
               <NotificationBell />
-            </StoreProvider>
           </div>
         </header>
 
         <div className="page-container">
-          <StoreProvider>
-            {children}
-          </StoreProvider>
+          {children}
         </div>
       </main>
     </div>

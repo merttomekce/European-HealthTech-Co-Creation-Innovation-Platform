@@ -3,13 +3,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { Bell } from 'lucide-react';
-import { useStore } from '@/lib/StoreContext';
-
-const DEMO_USER_ID = 'user-current';
+import { getUnreadCount } from '@/lib/actions/notifications';
 
 export default function NotificationBell() {
-  const { notifications } = useStore();
-  const unreadCount = notifications.filter(n => n.userId === DEMO_USER_ID && !n.isRead).length;
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  React.useEffect(() => {
+    async function load() {
+      const count = await getUnreadCount();
+      setUnreadCount(count);
+    }
+    load();
+  }, []);
 
   return (
     <Link href="/notifications" className="notification-btn" aria-label="Notifications">

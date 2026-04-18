@@ -114,3 +114,94 @@ export async function proposeSlots(meetingRequestId: string, slots: { startTime:
     return { success: false, error: 'Failed' };
   }
 }
+
+export async function getMySentRequests() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    const requests = await prisma.meetingRequest.findMany({
+      where: { requesterId: user.id },
+      include: {
+        announcement: true,
+        proposedSlots: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return { success: true, data: requests };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: 'Failed to fetch sent requests' };
+  }
+}
+
+export async function getMyReceivedRequests() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    const requests = await prisma.meetingRequest.findMany({
+      where: { recipientId: user.id },
+      include: {
+        announcement: true,
+        requester: { select: { name: true, institution: true, role: true } },
+        proposedSlots: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return { success: true, data: requests };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: 'Failed to fetch received requests' };
+  }
+}
+
+export async function updateMeetingRequestStatus(requestId: string, status: string) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    const updated = await prisma.meetingRequest.update({
+      where: { id: requestId },
+      data: { status: status as any }
+    });
+    revalidatePath('/my-announcements');
+    return { success: true, data: updated };
+  } catch(e) {
+    return { success: false, error: 'Failed' };
+  }
+}
+
+export async function confirmMeetingSlot(meetingRequestId: string, slotId: string) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    await prisma.timeSlot.updateMany({
+      where: { meetingRequestId, id: { not: slotId } },
+      data: { status: 'CANCELLED' as any }
+    });
+
+    await prisma.timeSlot.update({
+      where: { id: slotId },
+      data: { status: 'CONFIRMED' as any }
+    });
+
+    await prisma.meetingRequest.update({
+      where: { id: meetingRequestId },
+      data: { status: 'CONFIRMED' as any }
+    });
+    
+    revalidatePath('/my-announcements');
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Failed' };
+  }
+}
+

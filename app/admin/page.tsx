@@ -2,17 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useStore } from '@/lib/StoreContext';
 
 export default function AdminDashboardPage() {
-  const { announcements, interests, meetings } = useStore();
-
   const kpis = [
     { label: 'Total Users', value: 142, delta: '+12', type: 'positive', icon: 'group' },
-    { label: 'Active Announcements', value: announcements.filter(a => a.status === 'Active').length, delta: '+3', type: 'positive', icon: 'campaign' },
-    { label: 'Meetings This Week', value: meetings.length + 4, delta: '+6', type: 'positive', icon: 'event' },
+    { label: 'Active Announcements', value: 18, delta: '+3', type: 'positive', icon: 'campaign' },
+    { label: 'Meetings This Week', value: 24, delta: '+6', type: 'positive', icon: 'event' },
     { label: 'Partner Found Rate', value: '34%', delta: '+2%', type: 'positive', icon: 'handshake' },
-    { label: 'Pending Requests', value: interests.filter(i => i.status === 'Pending').length, delta: '-1', type: 'neutral', icon: 'pending' },
+    { label: 'Pending Requests', value: 12, delta: '-1', type: 'neutral', icon: 'pending' },
     { label: 'Suspended Users', value: 2, delta: '0', type: 'neutral', icon: 'block' },
   ];
 

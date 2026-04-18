@@ -44,6 +44,24 @@ export async function markAsRead(id: string) {
   }
 }
 
+export async function markAllAsRead() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    await prisma.notification.updateMany({
+      where: { userId: user.id, isRead: false },
+      data: { isRead: true },
+    });
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Failed' };
+  }
+}
+
 export async function getUnreadCount() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

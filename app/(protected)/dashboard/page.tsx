@@ -1,43 +1,53 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { useStore } from '@/lib/StoreContext';
+import { createClient } from '@/lib/supabase/server';
+import { getMyAnnouncements, getAnnouncements } from '@/lib/actions/announcements';
+import { getMySentRequests } from '@/lib/actions/meetings';
+import { getUnreadCount } from '@/lib/actions/notifications';
+import prisma from '@/lib/prisma';
 import './dashboard.css';
 
-const DEMO_USER_ID = 'user-current';
+export default async function DashboardPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-// Mock name - will be replaced by real session in Phase 3
-const DEMO_USER_NAME = 'Dr. Sarah Chen';
+  if (!user) return null;
 
-export default function DashboardPage() {
-  const { announcements, interests, meetings, notifications } = useStore();
+  // Real user data fetching
+  const userData = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { name: true }
+  });
 
-  // Dynamically calculated KPIs from the store
-  const myInterests = interests.filter(
-    (i) => i.userId === DEMO_USER_ID || i.userId === 'user-eng-2'
-  );
-  const myAnnouncements = announcements.filter(
-    (a) => a.author === DEMO_USER_NAME
-  );
-  const activeApplications = myInterests.length;
-  const pendingMeetings = meetings.filter(
-    (m) => m.status === 'Negotiation' || m.status === 'Scheduled'
+  const firstName = userData?.name ? userData.name.split(' ')[0] : 'Innovator';
+
+  const [
+    myAnnouncementsRes, 
+    mySentRequestsRes, 
+    unreadNotifsCount, 
+    allAnnouncementsRes
+  ] = await Promise.all([
+    getMyAnnouncements(),
+    getMySentRequests(),
+    getUnreadCount(),
+    getAnnouncements()
+  ]);
+
+  const activeApplications = mySentRequestsRes.success ? mySentRequestsRes.data!.length : 0;
+  
+  const pendingMeetings = (mySentRequestsRes.success ? mySentRequestsRes.data! : []).filter(
+    (m: any) => m.status === 'SLOTS_PROPOSED' || m.status === 'CONFIRMED'
   ).length;
-  const unreadNotifs = notifications.filter(
-    (n) => n.userId === DEMO_USER_ID && !n.isRead
-  ).length;
 
-  // Opportunities - exclude user's own announcements
-  const opportunityFeed = announcements
-    .filter((a) => a.author !== DEMO_USER_NAME)
-    .slice(0, 4);
+  const myAnnouncementsCount = myAnnouncementsRes.success ? myAnnouncementsRes.data!.length : 0;
 
-  // Greeting suffix e.g. "Good morning"
+  const opportunityFeed = allAnnouncementsRes.success 
+    ? allAnnouncementsRes.data!.filter((a: any) => a.authorId !== user.id).slice(0, 4)
+    : [];
+
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-  const firstName = DEMO_USER_NAME.split(' ')[1] || DEMO_USER_NAME;
 
   return (
     <div className="dashboard-container">
@@ -62,12 +72,12 @@ export default function DashboardPage() {
         </div>
         <div className="kpi-card">
           <span className="material-symbols-outlined kpi-icon">campaign</span>
-          <div className="kpi-value">{myAnnouncements.length}</div>
+          <div className="kpi-value">{myAnnouncementsCount}</div>
           <div className="kpi-label">My Announcements</div>
         </div>
         <div className="kpi-card">
           <span className="material-symbols-outlined kpi-icon">notifications</span>
-          <div className="kpi-value">{unreadNotifs}</div>
+          <div className="kpi-value">{unreadNotifsCount}</div>
           <div className="kpi-label">Unread Notifications</div>
         </div>
       </div>
@@ -88,9 +98,8 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="recent-feed">
-              {opportunityFeed.map((ann, idx) => {
-                const date = new Date();
-                date.setDate(date.getDate() - idx);
+              {opportunityFeed.map((ann: any, idx: number) => {
+                const date = new Date(ann.createdAt);
                 return (
                   <Link key={ann.id} href={`/board/${ann.id}`} className="feed-item">
                     <div className="feed-date">
@@ -102,7 +111,7 @@ export default function DashboardPage() {
                     <div className="feed-content">
                       <div className="feed-meta">
                         {ann.domain}
-                        {ann.location && ` • ${ann.location}`}
+                        {ann.city && ` • ${ann.city}`}
                       </div>
                       <div className="feed-title">{ann.title}</div>
                     </div>

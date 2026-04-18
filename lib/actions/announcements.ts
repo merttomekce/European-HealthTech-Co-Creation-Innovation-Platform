@@ -18,38 +18,7 @@ const announcementSchema = z.object({
   confidentiality: z.string().default('PUBLIC_PITCH'),
 });
 
-const MOCK_ANNOUNCEMENTS = [
-  {
-    id: 'ann-001',
-    title: 'AI-Driven Cardiology Diagnostics in Rural Areas',
-    domain: 'Cardiology',
-    explanation: 'We are developing a low-cost, AI-powered diagnostic tool for rural clinics to detect early-stage heart conditions.',
-    projectStage: 'PILOT_TESTING',
-    commitmentLevel: 'MODERATE',
-    publicPitch: 'Bringing cardiology expertise to every village via AI-assisted edge computing.',
-    createdAt: new Date().toISOString(),
-    author: {
-      name: 'Dr. Sarah Chen',
-      role: 'HEALTHCARE_PRO',
-      institution: 'Berlin Charité',
-    }
-  },
-  {
-    id: 'ann-002',
-    title: 'Neuro-feedback Loop for Chronic Pain Management',
-    domain: 'Neurology',
-    explanation: 'Seeking firmware engineers to help build a closed-loop neuro-stimulation wearable for non-invasive pain relief.',
-    projectStage: 'PROTOTYPING',
-    commitmentLevel: 'INTENSIVE',
-    publicPitch: 'Help us redefine chronic pain treatment with adaptive bio-electronic wearables.',
-    createdAt: new Date().toISOString(),
-    author: {
-      name: 'Marcus Thorne',
-      role: 'ENGINEER',
-      institution: 'ETH Zurich',
-    }
-  }
-];
+
 
 export async function getAnnouncements() {
   try {
@@ -73,10 +42,31 @@ export async function getAnnouncements() {
       },
     });
 
-    return { success: true, data: announcements.length > 0 ? announcements : MOCK_ANNOUNCEMENTS };
+    return { success: true, data: announcements };
   } catch (error) {
-    console.warn('Database connection failed, falling back to mock announcements.');
-    return { success: true, data: MOCK_ANNOUNCEMENTS };
+    console.error('Database query failed:', error);
+    return { success: false, error: 'Database connection failed' };
+  }
+}
+
+export async function getMyAnnouncements() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    const announcements = await prisma.announcement.findMany({
+      where: { authorId: user.id },
+      include: {
+        meetingRequests: { include: { requester: true, proposedSlots: true } }
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { success: true, data: announcements };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: 'Failed to fetch your announcements' };
   }
 }
 
@@ -94,8 +84,8 @@ export async function createAnnouncement(formData: z.infer<typeof announcementSc
     revalidatePath('/board');
     return { success: true, data: announcement };
   } catch (error) {
-    if (error instanceof z.ZodError) return { success: false, error: error.issues[0].message };
-    return { success: true, data: { id: 'mock-new-post', ...formData } }; // Mock success for demo
+    console.error(error);
+    return { success: false, error: 'Failed to create announcement' };
   }
 }
 
@@ -106,14 +96,30 @@ export async function getAnnouncementById(id: string) {
       include: { author: true },
     });
     if (!announcement) {
-      const mock = MOCK_ANNOUNCEMENTS.find(m => m.id === id);
-      if (mock) return { success: true, data: mock };
       return { success: false, error: 'Project not found' };
     }
     return { success: true, data: announcement };
   } catch (error) {
-    const mock = MOCK_ANNOUNCEMENTS.find(m => m.id === id);
-    if (mock) return { success: true, data: mock };
+    console.error(error);
     return { success: false, error: 'Failed to fetch project details' };
   }
 }
+
+export async function toggleAnnouncementStatus(id: string, newStatus: string) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    const updated = await prisma.announcement.update({
+      where: { id, authorId: user.id },
+      data: { status: newStatus as any }
+    });
+    revalidatePath('/my-announcements');
+    return { success: true, data: updated };
+  } catch (error) {
+    return { success: false, error: 'Failed to update status' };
+  }
+}
+
