@@ -19,7 +19,6 @@
     "/(protected)/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(protected)/dashboard/page.css",
       "static/chunks/app/(protected)/dashboard/page.js"
     ],
     "/(protected)/layout": [
@@ -33,17 +32,46 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(protected)/template.js"
     ],
+    "/(protected)/engineer/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/engineer/dashboard/page.css",
+      "static/chunks/app/(protected)/engineer/dashboard/page.js"
+    ],
+    "/(protected)/my-announcements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/my-announcements/page.css",
+      "static/chunks/app/(protected)/my-announcements/page.js"
+    ],
+    "/(protected)/my-requests/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/my-requests/page.css",
+      "static/chunks/app/(protected)/my-requests/page.js"
+    ],
+    "/(protected)/board/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/board/[id]/page.css",
+      "static/chunks/app/(protected)/board/[id]/page.js"
+    ],
+    "/(protected)/board/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(protected)/board/page.js"
+    ],
+    "/(protected)/board/create/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/board/create/page.css",
+      "static/chunks/app/(protected)/board/create/page.js"
+    ],
     "/(protected)/profile/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/(protected)/profile/page.css",
       "static/chunks/app/(protected)/profile/page.js"
-    ],
-    "/(protected)/notifications/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(protected)/notifications/page.css",
-      "static/chunks/app/(protected)/notifications/page.js"
     ]
   }
 }

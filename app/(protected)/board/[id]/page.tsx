@@ -43,10 +43,10 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       <div className="detail-header">
         <div className="detail-badge-row">
           <span className="detail-badge" style={{ 
-            color: project.author?.role === 'ENGINEER' ? '#3FABFC' : '#059669',
-            background: project.author?.role === 'ENGINEER' ? 'rgba(63, 171, 252, 0.1)' : 'rgba(5, 150, 105, 0.1)'
+            color: project.author?.role === 'ENGINEER' ? '#059669' : '#3FABFC',
+            background: project.author?.role === 'ENGINEER' ? 'rgba(5, 150, 105, 0.1)' : 'rgba(63, 171, 252, 0.1)'
           }}>
-            {project.author?.role === 'ENGINEER' ? 'Engineer' : 'Healthcare'}
+            Looking for {project.author?.role === 'ENGINEER' ? 'Healthcare' : 'Engineer'}
           </span>
           <span className="detail-badge" style={{ background: 'var(--surface-raised)', color: 'var(--on-background-muted)' }}>
             {project.domain}

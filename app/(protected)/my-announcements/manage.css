@@ -138,9 +138,9 @@
 }
 
 .action-btn.secondary {
-  background-color: var(--outline);
+  background-color: var(--surface-container-highest);
   color: var(--on-background);
-  border: 1px solid transparent;
+  border: 1px solid var(--outline);
 }
 
 .action-btn.secondary:hover {

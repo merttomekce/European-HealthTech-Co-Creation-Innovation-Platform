@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { getAuthRedirect } from '@/lib/actions/authRedirect';
 
 export default function HealthAILandingPage(): React.JSX.Element {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [isLogin, setIsLogin] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [role, setRole] = React.useState('healthcare');
   const [message, setMessage] = React.useState<{ type: 'error' | 'success', text: string } | null>(null);
   
   // Environment Check
@@ -15,8 +17,13 @@ export default function HealthAILandingPage(): React.JSX.Element {
   const supabase = createClient();
   
   React.useEffect(() => {
-    // Check if user is already logged in to "remember" them
     const checkUser = async () => {
+      if (window.location.search.includes('error=auth_failed')) {
+        await supabase.auth.signOut();
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setMessage({ type: 'error', text: 'Your session expired. Please sign in again.' });
+        return;
+      }
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         window.location.href = '/dashboard';
@@ -68,13 +75,21 @@ export default function HealthAILandingPage(): React.JSX.Element {
         if (error) {
           setMessage({ type: 'error', text: error.message });
         } else {
-          window.location.href = '/dashboard';
+          try {
+            const redirectUrl = await getAuthRedirect();
+            window.location.href = redirectUrl;
+          } catch (e) {
+             window.location.href = '/dashboard';
+          }
         }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
+            data: {
+              role: role
+            },
             emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
@@ -194,6 +209,23 @@ export default function HealthAILandingPage(): React.JSX.Element {
                   required
                 />
               </div>
+              
+              {!isLogin && (
+                <div style={{ marginBottom: '1.25rem', textAlign: 'left' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.5, marginBottom: '0.5rem', display: 'block' }}> 
+                    Select Your Role 
+                  </label>
+                  <select 
+                    className="input-field" 
+                    value={role} 
+                    onChange={(e) => setRole(e.target.value)} 
+                    style={{ marginBottom: '0.75rem', width: '100%', appearance: 'auto', background: 'var(--surface-container-highest)', color: 'var(--on-background)' }}
+                  >
+                    <option value="healthcare">Healthcare Professional</option>
+                    <option value="engineer">Engineer / Tech Expert</option>
+                  </select>
+                </div>
+              )}
               <button disabled={isLoading} type="submit" className="btn btn-white" style={{ opacity: isLoading ? 0.7 : 1 }}>
                 {isLoading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
               </button>

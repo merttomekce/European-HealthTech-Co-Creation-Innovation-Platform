@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createAnnouncement } from '@/lib/actions/announcements';
-import { createClient } from '@/lib/supabase/client';
 import CustomSelect from '@/components/CustomSelect';
 import SearchableSelect from '@/components/SearchableSelect';
 import TagInput from '@/components/TagInput';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import { MEDICAL_DOMAINS, REQUIREMENT_TAGS } from '@/lib/data/options';
 import { announcementSchema } from '@/lib/validations';
 import './composer.css';
@@ -18,29 +18,41 @@ export default function ProjectComposerPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  
+  const [userRole, setUserRole] = useState<'ENGINEER' | 'HEALTHCARE' | null>(null);
   const [userProfile, setUserProfile] = useState<{ city: string, country: string } | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
     domain: '',
-    role: 'Engineer',
     pitch: '',
-    clinicalContext: '',
-    technicalChallenge: '',
+    context: '',
+    expertiseNeededText: '',
     projectStage: 'Ideation',
     commitment: 'Part-time',
-    requirementTags: [] as string[],
+    collaborationType: 'ADVISOR',
+    requirements: [] as string[],
+    confidentiality: 'PUBLIC_PITCH',
+    expiresInDays: 30,
+    autoClose: false,
+    city: '',
+    country: '',
   });
 
   useEffect(() => {
-    async function loadUser() {
+    async function init() {
+      const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const { getNavProfile } = await import('@/lib/actions/profile');
+        const profile = await getNavProfile();
+        setUserRole(profile.role.includes('Engineer') ? 'ENGINEER' : 'HEALTHCARE');
+        // Fallback profile
         setUserProfile({ city: 'San Francisco', country: 'USA' }); 
       }
     }
-    loadUser();
+    init();
   }, []);
 
   const updateField = (field: string, value: any) => {
@@ -54,11 +66,14 @@ export default function ProjectComposerPage() {
     }
   };
 
-
   const nextStep = () => {
     setErrors({});
     if (step === 1) {
-      const result = announcementSchema.pick({ title: true, domain: true }).safeParse(formData);
+      const result = announcementSchema.pick({ title: true, domain: true }).safeParse({
+        ...formData,
+        clinicalContext: 'temp',
+        technicalChallenge: 'temp',
+      });
       if (!result.success) {
         const fieldErrors: Record<string, string> = {};
         result.error.issues.forEach(i => { if (i.path[0]) fieldErrors[i.path[0] as string] = i.message; });
@@ -67,26 +82,24 @@ export default function ProjectComposerPage() {
       }
     }
     if (step === 2) {
-      const result = announcementSchema.pick({ clinicalContext: true, technicalChallenge: true }).safeParse(formData);
-      if (!result.success) {
-        const fieldErrors: Record<string, string> = {};
-        result.error.issues.forEach(i => { if (i.path[0]) fieldErrors[i.path[0] as string] = i.message; });
-        setErrors(fieldErrors);
+      if (formData.context.length < 10) {
+        setErrors({ context: 'Context must be at least 10 characters.'});
+        return;
+      }
+      if (formData.expertiseNeededText.length < 10) {
+        setErrors({ expertiseNeededText: 'Challenge explanation must be at least 10 characters.'});
         return;
       }
     }
     setStep(s => s + 1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (saveAsDraft: boolean = false) => {
     setErrors({});
-    const result = announcementSchema.safeParse(formData);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach(i => { if (i.path[0]) fieldErrors[i.path[0] as string] = i.message; });
-      setErrors(fieldErrors);
-      // If errors are on previous steps, we might need to jump back, but for now we validate step-by-step
-      return;
+    
+    if (formData.requirements.length === 0) {
+        setErrors({ requirements: 'At least one requirement is needed.' });
+        return;
     }
 
     setIsSubmitting(true);
@@ -105,26 +118,36 @@ export default function ProjectComposerPage() {
       'Project-based': 'LOW'
     };
 
+    const explanationText = userRole === 'HEALTHCARE' 
+      ? `Clinical Context: ${formData.context}\n\nTechnical Challenge: ${formData.expertiseNeededText}`
+      : `High-Level Idea: ${formData.context}\n\nHealthcare Expertise Needed: ${formData.expertiseNeededText}`;
+
     const apiResult = await createAnnouncement({
       title: formData.title,
       domain: formData.domain,
       publicPitch: formData.pitch || `Accelerating ${formData.domain} through co-creation.`,
-      explanation: `Clinical Context: ${formData.clinicalContext}\n\nTechnical Challenge: ${formData.technicalChallenge}`,
-      expertiseNeeded: formData.requirementTags.join(', '),
+      explanation: explanationText,
+      expertiseNeeded: formData.requirements.join(', '),
       projectStage: stageMap[formData.projectStage] || 'IDEA',
       commitmentLevel: commitmentMap[formData.commitment] || 'MEDIUM',
-      city: userProfile?.city || 'Unknown',
-      country: userProfile?.country || 'Unknown',
-      confidentiality: 'PUBLIC_PITCH'
+      collaborationType: formData.collaborationType,
+      city: formData.city || userProfile?.city || 'Unknown',
+      country: formData.country || userProfile?.country || 'Unknown',
+      confidentiality: formData.confidentiality,
+      expiresInDays: Number(formData.expiresInDays),
+      autoClose: formData.autoClose,
+      saveAsDraft
     } as any);
 
     if (apiResult.success) {
-      router.push('/board');
+      router.push('/my-announcements');
     } else {
       setGlobalError(apiResult.error || 'Failed to post project');
       setIsSubmitting(false);
     }
   };
+
+  if (!userRole) return <div className="composer-container"><p>Loading form...</p></div>;
 
   return (
     <div className="composer-container">
@@ -135,7 +158,9 @@ export default function ProjectComposerPage() {
 
       <header className="composer-header">
         <h1 className="text-serif" style={{ fontSize: '3rem', marginBottom: '1rem' }}>Post a Project</h1>
-        <p className="subtext">Clearly define your vision to attract the right interdisciplinary partner.</p>
+        <p className="subtext">
+          {userRole === 'ENGINEER' ? 'Attract medical domain experts for your tech solution.' : 'Find the engineers needed to solve your clinical challenge.'}
+        </p>
       </header>
 
       <div className="composer-step-indicator">
@@ -148,7 +173,6 @@ export default function ProjectComposerPage() {
         {step === 1 && (
           <div className="step-content">
             <h2 className="composer-title">The Basics</h2>
-            <p className="composer-subtitle">Define the core identity of your co-creation request.</p>
             
             <div className="form-group">
               <label className="form-label text-sans">Project Title</label>
@@ -163,53 +187,90 @@ export default function ProjectComposerPage() {
             </div>
 
             <SearchableSelect
-              label="Medical Domain"
+              label="Working Domain"
               options={MEDICAL_DOMAINS}
               value={formData.domain}
               onChange={(val) => updateField('domain', val)}
-              placeholder="e.g., Neurosurgery, Cardiology…"
+              placeholder="e.g., Cardiology Imaging…"
               error={errors.domain}
             />
 
             <div className="form-group">
-              <CustomSelect 
-                label="Seeking Collaborator (Role)"
-                options={[
-                  { value: 'Engineer', label: 'Engineer / Tech Specialist' },
-                  { value: 'Healthcare Professional', label: 'Healthcare Professional' }
-                ]}
-                value={formData.role}
-                onChange={(val) => updateField('role', val)}
+              <label className="form-label text-sans">Public Pitch (Short Idea)</label>
+              <input 
+                type="text" 
+                className={`form-input`} 
+                placeholder="A one-sentence hook for the public board."
+                value={formData.pitch}
+                onChange={(e) => updateField('pitch', e.target.value)}
               />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+              <div className="form-group">
+                <label className="form-label text-sans">City</label>
+                <input 
+                  type="text" 
+                  className={`form-input`} 
+                  placeholder={userProfile?.city || 'e.g. London'}
+                  value={formData.city}
+                  onChange={(e) => updateField('city', e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label text-sans">Country</label>
+                <input 
+                  type="text" 
+                  className={`form-input`} 
+                  placeholder={userProfile?.country || 'e.g. UK'}
+                  value={formData.country}
+                  onChange={(e) => updateField('country', e.target.value)}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {step === 2 && (
           <div className="step-content">
-            <h2 className="composer-title">The Context</h2>
-            <p className="composer-subtitle">Bridge the gap between clinical impact and technical complexity.</p>
+            <h2 className="composer-title">The Details</h2>
             
             <div className="form-group">
-              <label className="form-label text-sans">Clinical Impact (Context)</label>
+              <label className="form-label text-sans">
+                {userRole === 'HEALTHCARE' ? 'Clinical Context (Short Explanation)' : 'High-Level Idea (No sensitive details)'}
+              </label>
               <textarea 
-                className={`form-textarea ${errors.clinicalContext ? 'error' : ''}`} 
-                placeholder="What medical problem are you solving? Why does this matter for patients?"
-                value={formData.clinicalContext}
-                onChange={(e) => updateField('clinicalContext', e.target.value)}
+                className={`form-textarea ${errors.context ? 'error' : ''}`} 
+                placeholder={userRole === 'HEALTHCARE' ? "What medical problem are you solving?" : "Explain your idea broadly."}
+                value={formData.context}
+                onChange={(e) => updateField('context', e.target.value)}
               />
-              {errors.clinicalContext && <span className="field-error">{errors.clinicalContext}</span>}
+              {errors.context && <span className="field-error">{errors.context}</span>}
             </div>
 
             <div className="form-group">
-              <label className="form-label text-sans">Technical Challenge</label>
+              <label className="form-label text-sans">
+                {userRole === 'HEALTHCARE' ? 'Desired Technical Expertise' : 'Healthcare Expertise Needed'}
+              </label>
               <textarea 
-                className={`form-textarea ${errors.technicalChallenge ? 'error' : ''}`} 
-                placeholder="What are the engineering or scientific hurdles? What specific tech stack is involved?"
-                value={formData.technicalChallenge}
-                onChange={(e) => updateField('technicalChallenge', e.target.value)}
+                className={`form-textarea ${errors.expertiseNeededText ? 'error' : ''}`} 
+                placeholder="What exactly are you looking for in a partner?"
+                value={formData.expertiseNeededText}
+                onChange={(e) => updateField('expertiseNeededText', e.target.value)}
               />
-              {errors.technicalChallenge && <span className="field-error">{errors.technicalChallenge}</span>}
+              {errors.expertiseNeededText && <span className="field-error">{errors.expertiseNeededText}</span>}
+            </div>
+
+             <div className="form-group">
+              <CustomSelect 
+                label="Confidentiality Level"
+                options={[
+                  { value: 'PUBLIC_PITCH', label: 'Public Pitch (Full details visible)' },
+                  { value: 'DETAILS_IN_MEETING', label: 'Details Discussed in Meeting Only' }
+                ]}
+                value={formData.confidentiality}
+                onChange={(val) => updateField('confidentiality', val)}
+              />
             </div>
           </div>
         )}
@@ -217,7 +278,6 @@ export default function ProjectComposerPage() {
         {step === 3 && (
           <div className="step-content">
             <h2 className="composer-title">Logistics & Requirements</h2>
-            <p className="composer-subtitle">Set clear expectations for your potential partner.</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '1rem' }}>
               <CustomSelect 
@@ -231,26 +291,61 @@ export default function ProjectComposerPage() {
                 value={formData.projectStage}
                 onChange={(val) => updateField('projectStage', val)}
               />
-              <CustomSelect 
-                label="Commitment Level"
-                options={[
-                  { value: 'Part-time', label: 'Part-time (Advisory)' },
-                  { value: 'Full-time', label: 'Full-time (Co-founder)' },
-                  { value: 'Project-based', label: 'Project-based (Consulting)' }
-                ]}
-                value={formData.commitment}
-                onChange={(val) => updateField('commitment', val)}
-              />
+              
+              {userRole === 'HEALTHCARE' ? (
+                <CustomSelect 
+                  label="Commitment Level"
+                  options={[
+                    { value: 'Part-time', label: 'Part-time (Advisory)' },
+                    { value: 'Full-time', label: 'Full-time (Co-founder)' },
+                    { value: 'Project-based', label: 'Project-based (Consulting)' }
+                  ]}
+                  value={formData.commitment}
+                  onChange={(val) => updateField('commitment', val)}
+                />
+              ) : (
+                <CustomSelect 
+                  label="Estimated Collaboration Type"
+                  options={[
+                    { value: 'ADVISOR', label: 'Advisor' },
+                    { value: 'CO_FOUNDER', label: 'Co-Founder' },
+                    { value: 'RESEARCH_PARTNER', label: 'Research Partner' }
+                  ]}
+                  value={formData.collaborationType}
+                  onChange={(val) => updateField('collaborationType', val)}
+                />
+              )}
             </div>
 
             <TagInput
-              label="Partner Requirements"
-              value={formData.requirementTags}
-              onChange={(tags) => updateField('requirementTags', tags)}
+              label="Partner Requirement Tags"
+              value={formData.requirements}
+              onChange={(tags) => updateField('requirements', tags)}
               presets={REQUIREMENT_TAGS}
-              placeholder="Select from above or add custom skills…"
+              placeholder="Add key skills…"
               error={errors.requirements}
             />
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <label className="form-label text-sans">Expiry (Days)</label>
+                <input 
+                  type="number" 
+                  min="1" max="180"
+                  className={`form-input`} 
+                  value={formData.expiresInDays}
+                  onChange={(e) => updateField('expiresInDays', e.target.value)}
+                />
+              </div>
+              <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center' }}>
+                <CustomCheckbox
+                  id="autoClose"
+                  label="Auto-close post when partner is found"
+                  checked={formData.autoClose}
+                  onChange={(val) => updateField('autoClose', val)}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -265,14 +360,26 @@ export default function ProjectComposerPage() {
             <button className="btn-secondary" onClick={() => setStep(step - 1)} disabled={isSubmitting}>Back</button>
           ) : <div />}
           
-          <button 
-            className="btn-primary" 
-            disabled={isSubmitting}
-            onClick={() => step < 3 ? nextStep() : handleSubmit()}
-          >
-            {isSubmitting ? 'Posting...' : (step < 3 ? 'Continue' : 'Post Project')}
-            {!isSubmitting && <span className="material-symbols-outlined">arrow_forward</span>}
-          </button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            {step === 3 && (
+              <button 
+                className="btn-secondary" 
+                disabled={isSubmitting}
+                onClick={() => handleSubmit(true)}
+              >
+                Save as Draft
+              </button>
+            )}
+            
+            <button 
+              className="btn-primary" 
+              disabled={isSubmitting}
+              onClick={() => step < 3 ? nextStep() : handleSubmit(false)}
+            >
+              {isSubmitting ? 'Processing...' : (step < 3 ? 'Continue' : 'Post Project')}
+              {!isSubmitting && step < 3 && <span className="material-symbols-outlined">arrow_forward</span>}
+            </button>
+          </div>
         </div>
       </div>
 

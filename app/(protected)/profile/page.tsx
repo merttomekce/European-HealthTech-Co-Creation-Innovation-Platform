@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { profileSchema } from '@/lib/validations';
 import TagInput from '@/components/TagInput';
 import SearchableSelect from '@/components/SearchableSelect';
+import { updateProfile, getAuthProfile } from '@/lib/actions/profile';
 import { COUNTRIES, HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
 import './profile.css';
 
@@ -20,17 +21,37 @@ export default function ProfilePage() {
   const initialLocation = parseLocation('Berlin, Germany');
 
   const [formData, setFormData] = useState({
-    fullName: 'Dr. Sarah Chen',
-    institution: 'Berlin Charité',
-    country: initialLocation.country,
-    city: initialLocation.city,
-    expertiseTags: ['Cardiology', 'Electrophysiology', 'ECG'],
+    fullName: '',
+    institution: '',
+    country: '',
+    city: '',
+    expertiseTags: [] as string[],
     role: 'healthcare' as 'healthcare' | 'engineer' | 'admin',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaved, setIsSaved] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    async function fetchProfile() {
+      const res = await getAuthProfile();
+      if (res.success && res.data) {
+        setFormData({
+          fullName: res.data.name || '',
+          institution: res.data.institution || '',
+          country: res.data.country || '',
+          city: res.data.city || '',
+          expertiseTags: res.data.expertise || [],
+          role: res.data.role === 'ENGINEER' ? 'engineer' : 
+                res.data.role === 'ADMIN' ? 'admin' : 'healthcare',
+        });
+      }
+      setIsLoading(false);
+    }
+    fetchProfile();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -63,10 +84,20 @@ export default function ProfilePage() {
     }
 
     setIsPending(true);
-    setTimeout(() => {
+    try {
+      await updateProfile({
+        fullName: formData.fullName,
+        institution: formData.institution,
+        role: formData.role === 'engineer' ? 'engineer' : 'healthcare',
+        location: locationString,
+        expertise: formData.expertiseTags.join(', '),
+      });
       setIsSaved(true);
+    } catch (e) {
+      alert("Failed to save changes.");
+    } finally {
       setIsPending(false);
-    }, 800);
+    }
   };
 
   const handleGdprAction = (action: string) => {
@@ -82,6 +113,10 @@ export default function ProfilePage() {
     .slice(0, 2)
     .join('')
     .toUpperCase();
+
+  if (isLoading) {
+    return <div className="profile-container"><div className="subtext">Loading profile...</div></div>;
+  }
 
   return (
     <div className="profile-container">
