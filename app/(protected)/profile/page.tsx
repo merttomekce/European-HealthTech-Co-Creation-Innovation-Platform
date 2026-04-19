@@ -44,8 +44,8 @@ export default function ProfilePage() {
           country: res.data.country || '',
           city: res.data.city || '',
           expertiseTags: res.data.expertise || [],
-          role: res.data.role === 'ENGINEER' ? 'engineer' : 
-                res.data.role === 'ADMIN' ? 'admin' : 'healthcare',
+          role: res.data.role === 'ENGINEER' ? 'engineer' :
+            res.data.role === 'ADMIN' ? 'admin' : 'healthcare',
         });
       }
       setIsLoading(false);
@@ -133,8 +133,8 @@ export default function ProfilePage() {
             {formData.role === 'healthcare'
               ? 'Healthcare Professional'
               : formData.role === 'engineer'
-              ? 'Engineer / Tech Expert'
-              : 'Administrator'}
+                ? 'Engineer / Tech Expert'
+                : 'Administrator'}
           </span>
         </div>
       </div>

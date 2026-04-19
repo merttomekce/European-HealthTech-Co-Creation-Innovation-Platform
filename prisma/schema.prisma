@@ -241,3 +241,14 @@ enum AuditAction {
   DATA_EXPORT_REQUESTED
   ACCOUNT_DELETED
 }
+
+model PlatformSettings {
+  id                 Int      @id @default(1)
+  maintenanceMode    Boolean  @default(false)
+  allowedDomains     String   @default(".edu, .ac.uk, .de, .fr, .nl, .se, .ch, .it")
+  sessionTimeout     Int      @default(24)
+  postExpiry         Int      @default(90)
+  requireNDA         Boolean  @default(true)
+  emailNotifications Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
+}

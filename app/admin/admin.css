@@ -1,4 +1,3 @@
-/* --- Admin Shell --- */
 .admin-shell {
   display: flex;
   height: 100vh;
@@ -7,9 +6,19 @@
   overflow: hidden;
 }
 
+/* Base Styles Overrides for Admin Context */
+.admin-shell .admin-filter-input,
+.admin-shell input[type="text"],
+.admin-shell input[type="number"],
+.admin-shell select {
+    background-color: var(--surface-container-highest);
+    color: var(--on-background);
+    border-color: var(--outline);
+}
+
 .admin-sidebar {
   width: 260px;
-  background-color: #0a0a0a;
+  background-color: var(--surface-container-low);
   border-right: 1px solid var(--outline);
   display: flex;
   flex-direction: column;
@@ -82,12 +91,12 @@
 }
 
 .admin-nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--surface-container-highest);
   color: var(--on-background);
 }
 
 .admin-nav-item.active {
-  background-color: rgba(255, 255, 255, 0.07);
+  background-color: var(--surface-container-high);
   color: var(--on-background);
 }
 
@@ -137,6 +146,29 @@
   font-size: 0.6875rem;
   color: #ef4444;
   font-weight: 500;
+}
+
+.admin-sign-out-btn {
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-background-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-sign-out-btn:hover {
+  background-color: rgba(239, 68, 68, 0.05);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* --- Main Content Area --- */
@@ -316,7 +348,7 @@
   padding: 1rem 1.5rem;
   font-size: 0.875rem;
   color: var(--on-background);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--outline);
 }
 
 .data-table tr:last-child td {
@@ -324,7 +356,7 @@
 }
 
 .data-table tr:hover td {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--surface-container-highest);
 }
 
 /* --- Status Badges --- */

@@ -32,46 +32,37 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(protected)/template.js"
     ],
-    "/(protected)/engineer/dashboard/page": [
+    "/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(protected)/engineer/dashboard/page.css",
-      "static/chunks/app/(protected)/engineer/dashboard/page.js"
+      "static/chunks/app/admin/page.js"
     ],
-    "/(protected)/my-announcements/page": [
+    "/admin/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(protected)/my-announcements/page.css",
-      "static/chunks/app/(protected)/my-announcements/page.js"
+      "static/css/app/admin/layout.css",
+      "static/chunks/app/admin/layout.js"
     ],
-    "/(protected)/my-requests/page": [
+    "/admin/settings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(protected)/my-requests/page.css",
-      "static/chunks/app/(protected)/my-requests/page.js"
+      "static/chunks/app/admin/settings/page.js"
     ],
-    "/(protected)/board/[id]/page": [
+    "/(protected)/doctor/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(protected)/board/[id]/page.css",
-      "static/chunks/app/(protected)/board/[id]/page.js"
+      "static/css/app/(protected)/doctor/dashboard/page.css",
+      "static/chunks/app/(protected)/doctor/dashboard/page.js"
     ],
-    "/(protected)/board/page": [
+    "/admin/posts/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(protected)/board/page.js"
+      "static/chunks/app/admin/posts/page.js"
     ],
-    "/(protected)/board/create/page": [
+    "/admin/logs/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(protected)/board/create/page.css",
-      "static/chunks/app/(protected)/board/create/page.js"
-    ],
-    "/(protected)/profile/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(protected)/profile/page.css",
-      "static/chunks/app/(protected)/profile/page.js"
+      "static/chunks/app/admin/logs/page.js"
     ]
   }
 }

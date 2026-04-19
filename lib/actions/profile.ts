@@ -134,3 +134,32 @@ export async function getNavProfile() {
     initials: initials.toUpperCase()
   }
 }
+
+export async function getUserProfile(userId: string) {
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        institution: true,
+        city: true,
+        country: true,
+        expertise: true,
+        createdAt: true,
+        bio: true,
+      }
+    })
+    
+    if (!dbUser) {
+       return { success: false, error: 'User not found' }
+    }
+    
+    return { success: true, data: dbUser }
+  } catch (error) {
+    console.error(error)
+    return { success: false, error: 'Failed to fetch user profile' }
+  }
+}

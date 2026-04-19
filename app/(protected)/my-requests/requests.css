@@ -101,3 +101,28 @@
   gap: 0.5rem;
   margin-left: auto;
 }
+
+.cancel-btn {
+  margin-top: 0.5rem;
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-background-muted);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.status-badge.cancelled { background: rgba(0,0,0,0.05); color: var(--on-background-muted); }

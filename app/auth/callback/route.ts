@@ -12,6 +12,17 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
+      // Log successful login
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { logAction } = await import('@/lib/audit');
+        await logAction({
+          userId: user.id,
+          actionType: 'LOGIN',
+          result: 'success',
+        });
+      }
+
       if (next === '/dashboard') {
         const { getAuthRedirect } = await import('@/lib/actions/authRedirect');
         try {

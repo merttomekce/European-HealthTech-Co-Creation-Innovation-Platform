@@ -1,31 +1,35 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
+import { getAdminDashboardStats } from '@/lib/actions/admin';
 
-export default function AdminDashboardPage() {
-  const kpis = [
-    { label: 'Total Users', value: 142, delta: '+12', type: 'positive', icon: 'group' },
-    { label: 'Active Announcements', value: 18, delta: '+3', type: 'positive', icon: 'campaign' },
-    { label: 'Meetings This Week', value: 24, delta: '+6', type: 'positive', icon: 'event' },
-    { label: 'Partner Found Rate', value: '34%', delta: '+2%', type: 'positive', icon: 'handshake' },
-    { label: 'Pending Requests', value: 12, delta: '-1', type: 'neutral', icon: 'pending' },
-    { label: 'Suspended Users', value: 2, delta: '0', type: 'neutral', icon: 'block' },
-  ];
+export default async function AdminDashboardPage() {
+  const result = await getAdminDashboardStats();
 
-  const recentActivity = [
-    { id: 1, event: 'New user registered', actor: 'amira.hassan@tu-berlin.de', time: '3 min ago', type: 'create' },
-    { id: 2, event: 'Announcement flagged for review', actor: 'System', time: '18 min ago', type: 'system' },
-    { id: 3, event: 'Partner match confirmed', actor: 'platform', time: '1 hour ago', type: 'create' },
-    { id: 4, event: 'User account suspended', actor: 'admin@healthai.eu', time: '2 hours ago', type: 'delete' },
-    { id: 5, event: 'New announcement posted', actor: 'dr.chen@charite.de', time: '3 hours ago', type: 'create' },
+  if (!result.success) {
+    return (
+      <div className="error-container">
+        <h1>Error loading dashboard</h1>
+        <p>{result.error}</p>
+      </div>
+    );
+  }
+
+  const { stats, recentLogs } = result;
+
+  const kpiData = [
+    { label: 'Total Users', value: stats.totalUsers, icon: 'group' },
+    { label: 'Active Announcements', value: stats.activePosts, icon: 'campaign' },
+    { label: 'Meetings Confirmed', value: stats.totalMeetings, icon: 'event' },
+    { label: 'Partner Found Rate', value: stats.matchRate, icon: 'handshake' },
+    { label: 'Suspended Users', value: stats.suspendedUsers, icon: 'block' },
   ];
 
   const typeColors: Record<string, string> = {
-    create: '#22c55e',
-    delete: '#ef4444',
-    system: 'var(--on-background-muted)',
-    update: '#3b82f6',
+    LOGIN: '#3b82f6',
+    POST_CREATED: '#22c55e',
+    POST_REMOVED_BY_ADMIN: '#ef4444',
+    MEETING_REQUEST_SENT: '#a855f7',
+    default: 'var(--on-background-muted)',
   };
 
   return (
@@ -36,23 +40,21 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="admin-kpi-grid">
-        {kpis.map(kpi => (
+        {kpiData.map(kpi => (
           <div key={kpi.label} className="admin-kpi-card">
             <span className="material-symbols-outlined" style={{ fontSize: '1.25rem', color: 'var(--on-background-muted)', opacity: 0.5 }}>{kpi.icon}</span>
             <div className="admin-kpi-value">{kpi.value}</div>
             <div className="admin-kpi-label">{kpi.label}</div>
-            <div className={`admin-kpi-delta ${kpi.type}`}>{kpi.delta} this week</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-        {/* Recent Activity */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
         <div className="table-container">
           <div className="table-toolbar">
-            <span className="table-toolbar-title">Recent Activity</span>
+            <span className="table-toolbar-title">Recent Activity Logs</span>
             <Link href="/admin/logs" className="table-btn" style={{ textDecoration: 'none' }}>
-              View All →
+              View All Logs →
             </Link>
           </div>
           <table className="data-table">
@@ -64,51 +66,34 @@ export default function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {recentActivity.map(item => (
-                <tr key={item.id}>
-                  <td>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: typeColors[item.type], flexShrink: 0 }} />
-                      {item.event}
-                    </span>
-                  </td>
-                  <td style={{ color: 'var(--on-background-muted)', fontSize: '0.8125rem' }}>{item.actor}</td>
-                  <td style={{ color: 'var(--on-background-muted)', fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>{item.time}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Domain Distribution */}
-        <div className="table-container">
-          <div className="table-toolbar">
-            <span className="table-toolbar-title">Top Domains</span>
-          </div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Domain</th>
-                <th>Posts</th>
-                <th>Match Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { domain: 'Cardiology', posts: 18, rate: '41%' },
-                { domain: 'Neurosurgery', posts: 14, rate: '35%' },
-                { domain: 'Biotech', posts: 11, rate: '29%' },
-                { domain: 'Radiology', posts: 8, rate: '22%' },
-                { domain: 'Orthopedics', posts: 5, rate: '18%' },
-              ].map(row => (
-                <tr key={row.domain}>
-                  <td>{row.domain}</td>
-                  <td style={{ color: 'var(--on-background-muted)' }}>{row.posts}</td>
-                  <td>
-                    <span style={{ color: '#22c55e', fontWeight: 600 }}>{row.rate}</span>
+              {recentLogs && recentLogs.length > 0 ? (
+                recentLogs.map(item => (
+                  <tr key={item.id}>
+                    <td>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ 
+                          width: 8, 
+                          height: 8, 
+                          borderRadius: '50%', 
+                          backgroundColor: typeColors[item.event] || typeColors.default, 
+                          flexShrink: 0 
+                        }} />
+                        {item.event.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--on-background-muted)', fontSize: '0.8125rem' }}>{item.actor}</td>
+                    <td style={{ color: 'var(--on-background-muted)', fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
+                      {new Date(item.time).toLocaleString()}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} style={{ textAlign: 'center', padding: '2rem', color: 'var(--on-background-muted)' }}>
+                    No recent activity found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
