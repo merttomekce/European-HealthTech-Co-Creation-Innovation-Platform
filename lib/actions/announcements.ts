@@ -1,5 +1,6 @@
 'use server';
 
+import { logAction } from '@/lib/audit';
 import prisma from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -28,7 +29,7 @@ export async function getAnnouncements() {
   try {
     const announcements = await prisma.announcement.findMany({
       where: {
-        status: 'ACTIVE' as any,
+        status: { in: ['ACTIVE', 'PARTNER_FOUND'] as any },
       },
       include: {
         author: {
@@ -111,6 +112,13 @@ export async function createAnnouncement(formData: z.infer<typeof announcementSc
         status: status as any
       },
     });
+
+    await logAction({
+      userId: user.id,
+      actionType: 'POST_CREATED',
+      targetEntity: `Announcement:${announcement.id}`,
+      result: 'success',
+    });
     revalidatePath('/board');
     return { success: true, data: announcement };
   } catch (error) {
@@ -145,6 +153,14 @@ export async function toggleAnnouncementStatus(id: string, newStatus: string) {
     const updated = await prisma.announcement.update({
       where: { id, authorId: user.id },
       data: { status: newStatus as any }
+    });
+
+    await logAction({
+      userId: user.id,
+      actionType: newStatus === 'PARTNER_FOUND' ? 'PARTNER_FOUND_MARKED' : 'POST_EDITED',
+      targetEntity: `Announcement:${id}`,
+      result: 'success',
+      metadata: { newStatus }
     });
     revalidatePath('/my-announcements');
     return { success: true, data: updated };
@@ -189,6 +205,13 @@ export async function updateAnnouncement(id: string, formData: z.infer<typeof an
         expiresAt: expiresAt,
         status: status as any
       },
+    });
+
+    await logAction({
+      userId: user.id,
+      actionType: 'POST_EDITED',
+      targetEntity: `Announcement:${id}`,
+      result: 'success',
     });
 
     revalidatePath('/board');

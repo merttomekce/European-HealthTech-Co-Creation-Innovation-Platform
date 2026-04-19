@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { logAction } from '@/lib/audit';
 
 export async function requestMeeting(announcementId: string, message: string) {
   const supabase = createClient();
@@ -50,13 +51,11 @@ export async function requestMeeting(announcementId: string, message: string) {
     });
 
     // 4. Log the action
-    await prisma.auditLog.create({
-      data: {
-        userId: user.id,
-        actionType: 'MEETING_REQUEST_SENT',
-        targetEntity: `MeetingRequest:${meetingRequest.id}`,
-        result: 'success',
-      }
+    await logAction({
+      userId: user.id,
+      actionType: 'MEETING_REQUEST_SENT',
+      targetEntity: `MeetingRequest:${meetingRequest.id}`,
+      result: 'success',
     });
 
     revalidatePath(`/board/${announcementId}`);
@@ -107,6 +106,14 @@ export async function proposeSlots(meetingRequestId: string, slots: { startTime:
         body: `Time slots have been proposed for "${meetingRequest.announcement.title}".`,
         linkUrl: `/my-requests/${meetingRequestId}`,
       }
+    });
+
+    // Log the action
+    await logAction({
+      userId: user.id,
+      actionType: 'MEETING_REQUEST_ACKNOWLEDGED',
+      targetEntity: `MeetingRequest:${meetingRequestId}`,
+      result: 'success',
     });
 
     return { success: true };
@@ -198,6 +205,15 @@ export async function confirmMeetingSlot(meetingRequestId: string, slotId: strin
       data: { status: 'CONFIRMED' as any }
     });
     
+    // Log the action
+    await logAction({
+      userId: user.id,
+      actionType: 'MEETING_REQUEST_CONFIRMED',
+      targetEntity: `MeetingRequest:${meetingRequestId}`,
+      result: 'success',
+      metadata: { slotId }
+    });
+    
     revalidatePath('/my-announcements');
     return { success: true };
   } catch (error) {
@@ -205,3 +221,56 @@ export async function confirmMeetingSlot(meetingRequestId: string, slotId: strin
   }
 }
 
+
+export async function cancelMeetingRequest(requestId: string) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  try {
+    const meetingRequest = await prisma.meetingRequest.findUnique({
+      where: { id: requestId },
+      select: { requesterId: true, recipientId: true, status: true }
+    });
+
+    if (!meetingRequest) return { success: false, error: 'Request not found' };
+
+    // Only requester or recipient can cancel
+    if (meetingRequest.requesterId !== user.id && meetingRequest.recipientId !== user.id) {
+      return { success: false, error: 'Forbidden' };
+    }
+
+    const updated = await prisma.meetingRequest.update({
+      where: { id: requestId },
+      data: { status: 'CANCELLED' as any }
+    });
+
+    // Log the action
+    await logAction({
+      userId: user.id,
+      actionType: 'MEETING_REQUEST_CANCELLED',
+      targetEntity: `MeetingRequest:${requestId}`,
+      result: 'success',
+    });
+
+    // Notify the other party
+    const otherPartyId = meetingRequest.requesterId === user.id ? meetingRequest.recipientId : meetingRequest.requesterId;
+    await prisma.notification.create({
+      data: {
+        userId: otherPartyId,
+        type: 'MEETING_CANCELLED' as any,
+        title: 'Meeting Request Cancelled',
+        body: `A meeting request has been cancelled.`,
+      }
+    });
+
+    revalidatePath('/my-requests');
+    revalidatePath('/my-announcements');
+    
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error('Error cancelling meeting:', error);
+    return { success: false, error: 'Failed to cancel request' };
+  }
+}

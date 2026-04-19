@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import SchedulingModal from '@/components/SchedulingModal';
 import MeetingStatusPill from '@/components/MeetingStatusPill';
-import { proposeSlots } from '@/lib/actions/meetings';
+import { proposeSlots, cancelMeetingRequest } from '@/lib/actions/meetings';
 import './requests.css';
 
 export default function MyRequestsClient({ initialRequests }: { initialRequests: any[] }) {
@@ -27,19 +27,40 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
     if (!selectedRequestId) return;
     setIsLoading(true);
 
-    // Convert string labels to demo Dates for Prisma
-    const dateSlots = slotLabels.map(label => {
+    try {
+      // Create actual Date objects for the proposed slots
+      // Since it's a demo/test environment, we'll propose slots for the next 3 days at 10 AM, 2 PM, and 4 PM
       const now = new Date();
-      return { startTime: now, endTime: new Date(now.getTime() + 30*60000) };
-    });
+      const dateSlots = slotLabels.map((label, idx) => {
+        const d = new Date(now);
+        d.setDate(d.getDate() + (idx % 3) + 1); // Spread over next 3 days
+        d.setHours(idx < 3 ? 10 : idx < 6 ? 14 : 16, 0, 0, 0);
+        return { startTime: d, endTime: new Date(d.getTime() + 60 * 60000) }; // 1h meetings
+      });
 
-    const res = await proposeSlots(selectedRequestId, dateSlots);
-    if (res.success) {
-      setRequests(prev => prev.map(r => r.id === selectedRequestId ? { ...r, status: 'SLOTS_PROPOSED' } : r));
+      const res = await proposeSlots(selectedRequestId, dateSlots);
+      if (res.success) {
+        setRequests(prev => prev.map(r => r.id === selectedRequestId ? { ...r, status: 'SLOTS_PROPOSED' } : r));
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSelectedProjectId(null);
+      setSelectedRequestId(null);
+      setIsLoading(false);
     }
+  };
+
+  const handleCancelRequest = async (requestId: string) => {
+    if (!confirm('Are you sure you want to cancel this meeting request?')) return;
     
-    setSelectedProjectId(null);
-    setSelectedRequestId(null);
+    setIsLoading(true);
+    const res = await cancelMeetingRequest(requestId);
+    if (res.success) {
+      setRequests(prev => prev.map(r => r.id === requestId ? { ...r, status: 'CANCELLED' } : r));
+    } else {
+      alert(res.error || 'Failed to cancel request');
+    }
     setIsLoading(false);
   };
 
@@ -95,6 +116,18 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
                   >
                     <span className="material-symbols-outlined">event</span>
                     Negotiate Meeting
+                  </button>
+                )}
+
+                {(request.status === 'PENDING' || request.status === 'ACCEPTED' || request.status === 'SLOTS_PROPOSED') && (
+                  <button 
+                    className="cancel-btn"
+                    onClick={() => handleCancelRequest(request.id)}
+                    disabled={isLoading}
+                    title="Cancel Request"
+                  >
+                    <span className="material-symbols-outlined">cancel</span>
+                    Cancel
                   </button>
                 )}
 

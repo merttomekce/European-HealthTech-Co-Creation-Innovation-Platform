@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getPlatformSettings, updatePlatformSettings } from '@/lib/actions/settings';
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
@@ -11,6 +12,27 @@ export default function AdminSettingsPage() {
     requireNDA: true,
     emailNotifications: true,
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const res = await getPlatformSettings();
+      if (res.success && res.data) {
+        setSettings({
+          maintenanceMode: res.data.maintenanceMode,
+          allowedDomains: res.data.allowedDomains,
+          sessionTimeout: res.data.sessionTimeout.toString(),
+          postExpiry: res.data.postExpiry.toString(),
+          requireNDA: res.data.requireNDA,
+          emailNotifications: res.data.emailNotifications,
+        });
+      }
+      setIsLoading(false);
+    }
+    load();
+  }, []);
 
   const toggle = (key: keyof typeof settings) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key] }));
@@ -20,6 +42,28 @@ export default function AdminSettingsPage() {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    const res = await updatePlatformSettings({
+      maintenanceMode: settings.maintenanceMode,
+      allowedDomains: settings.allowedDomains,
+      sessionTimeout: parseInt(settings.sessionTimeout),
+      postExpiry: parseInt(settings.postExpiry),
+      requireNDA: settings.requireNDA,
+      emailNotifications: settings.emailNotifications,
+    });
+    
+    setIsSaving(false);
+    if (res.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } else {
+      alert('Failed to save settings');
+    }
+  };
+
+  if (isLoading) return <div className="admin-page-content">Loading settings...</div>;
 
   return (
     <>
@@ -130,6 +174,67 @@ export default function AdminSettingsPage() {
           </div>
         )}
       </div>
+
+      <div className="settings-actions">
+        {saveSuccess && (
+          <div className="save-toast">
+            <span className="material-symbols-outlined">check_circle</span>
+            Settings saved successfully!
+          </div>
+        )}
+        <button 
+          className="save-btn" 
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+
+      <style jsx>{`
+        .settings-actions {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 1.5rem;
+          margin-top: 2rem;
+          padding-top: 2rem;
+          border-top: 1px solid var(--outline);
+        }
+        .save-btn {
+          background-color: #ef4444;
+          color: white;
+          border: none;
+          padding: 0.75rem 2rem;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .save-btn:hover:not(:disabled) {
+          background-color: #dc2626;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+        .save-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        .save-toast {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #22c55e;
+          font-size: 0.875rem;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(10px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
     </>
   );
 }

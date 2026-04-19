@@ -299,8 +299,8 @@ export default function HealthAILandingPage(): React.JSX.Element {
         {/* Feature 1: The Board */}
         <section className="mockup-section" data-index="0">
           <div style={{ width: '100%', maxWidth: '900px' }}>
-            <div className="mockup-header-tag">01. Discovery</div>
-            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>The Registry Board</h2>
+            <div className="mockup-header-tag">Step 01. Identity</div>
+            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Verified Institutional Entry</h2>
             
             <div className="app-mockup-scrollable">
               <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--outline)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-container-high)' }}>
@@ -311,26 +311,22 @@ export default function HealthAILandingPage(): React.JSX.Element {
                   <span style={{ marginLeft: '1rem', fontSize: '0.85rem', opacity: 0.5 }}>healthai.app / board</span>
                 </div>
               </div>
-              <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '2rem' }}>
-                <div style={{ borderRight: '1px solid var(--outline)', paddingRight: '1rem' }}>
-                  <div style={{ height: '0.75rem', width: '80%', background: 'var(--outline)', borderRadius: '2px', marginBottom: '2rem' }}></div>
-                  {[1,2,3,4].map(i => (
-                    <div key={i} style={{ height: '0.5rem', width: '100%', background: 'var(--surface-container-highest)', borderRadius: '2px', marginBottom: '1rem' }}></div>
-                  ))}
+              <div style={{ padding: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: 'linear-gradient(135deg, var(--surface-container-low), var(--background))' }}>
+                <div style={{ position: 'relative' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(34, 197, 94, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', border: '1px solid rgba(34, 197, 94, 0.2)', animation: 'pulse 2s infinite' }}>
+                        <span className="material-symbols-outlined" style={{ color: '#22c55e', fontSize: '40px' }}>verified_user</span>
+                    </div>
+                    <div style={{ position: 'absolute', top: -5, right: -5, width: '24px', height: '24px', background: '#22c55e', borderRadius: '50%', border: '3px solid var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span className="material-symbols-outlined" style={{ color: 'white', fontSize: '14px', fontWeight: 900 }}>check</span>
+                    </div>
                 </div>
-                <div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} style={{ padding: '1.5rem', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                          <div style={{ width: '40px', height: '10px', background: i % 2 === 0 ? '#3b82f6' : '#10b981', borderRadius: '2px', opacity: 0.3 }}></div>
-                          <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'var(--outline)' }}></div>
-                        </div>
-                        <div style={{ height: '0.8rem', width: '70%', background: 'var(--on-background)', opacity: 0.1, borderRadius: '2px', marginBottom: '0.5rem' }}></div>
-                        <div style={{ height: '0.5rem', width: '90%', background: 'var(--on-background)', opacity: 0.05, borderRadius: '2px' }}></div>
-                      </div>
-                    ))}
-                  </div>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>Identity Verified</h4>
+                <p style={{ fontSize: '0.85rem', opacity: 0.6, textAlign: 'center', maxWidth: '300px', lineHeight: 1.5 }}>
+                    Your institutional association has been successfully validated via our secure domain trust protocol.
+                </p>
+                <div style={{ marginTop: '2rem', padding: '0.75rem 1.25rem', background: 'rgba(255,255,255,0.03)', borderRadius: '99px', border: '1px solid var(--outline)', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.05em', color: 'var(--on-background-muted)', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}></div>
+                    TRUSTED DOMAIN: .EDU / .AC.UK
                 </div>
               </div>
             </div>
@@ -340,40 +336,32 @@ export default function HealthAILandingPage(): React.JSX.Element {
         {/* Feature 2: Analysis */}
         <section className="mockup-section" data-index="1">
           <div style={{ width: '100%', maxWidth: '900px' }}>
-            <div className="mockup-header-tag">02. Insights</div>
-            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Contextual Deep Dive</h2>
+            <div className="mockup-header-tag">Step 02. Matching</div>
+            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Explore Clinical Needs</h2>
             
             <div className="app-mockup-scrollable" style={{ background: 'var(--surface)' }}>
-              <div style={{ display: 'flex', height: '100%' }}>
-                <div style={{ flex: 1, padding: '3rem', borderRight: '1px solid var(--grid-line)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ color: '#3b82f6' }}>neurology</span>
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '1.25rem', fontWeight: 600 }}>TAVI Workflow Analysis</h4>
-                      <p style={{ fontSize: '0.8rem', opacity: 0.4 }}>Hospital ID: #TX-402</p>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ height: '1rem', width: '100%', background: 'var(--surface-container-high)', borderRadius: '2px' }}></div>
-                    <div style={{ height: '1rem', width: '90%', background: 'var(--surface-container-high)', borderRadius: '2px' }}></div>
-                    <div style={{ height: '1rem', width: '95%', background: 'var(--surface-container-high)', borderRadius: '2px' }}></div>
-                    <div style={{ height: '1rem', width: '40%', background: 'var(--surface-container-high)', borderRadius: '2px', marginTop: '1rem' }}></div>
-                  </div>
+              <div style={{ padding: '2rem', height: '100%', background: 'var(--background)' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
+                    <div style={{ padding: '0.5rem 1rem', background: '#3b82f6', color: 'white', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 700 }}>CARDIOLOGY AI</div>
+                    <div style={{ padding: '0.5rem 1rem', background: 'var(--surface-raised)', border: '1px solid var(--outline)', borderRadius: '20px', fontSize: '0.7rem', opacity: 0.6 }}>CITY: LONDON</div>
+                    <div style={{ padding: '0.5rem 1rem', background: 'var(--surface-raised)', border: '1px solid var(--outline)', borderRadius: '20px', fontSize: '0.7rem', opacity: 0.6 }}>ACTIVE PROJECTS</div>
                 </div>
-                <div style={{ width: '280px', padding: '2rem', background: 'var(--surface-raised)' }}>
-                  <div style={{ marginBottom: '2rem' }}>
-                    <div style={{ fontSize: '0.65rem', fontWeight: 800, opacity: 0.3, marginBottom: '0.75rem', letterSpacing: '0.1em' }}>PRECISION METRICS</div>
-                    <div style={{ padding: '1rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
-                      <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>Severity Index</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#3b82f6' }}>8.4 / 10</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem' }}>
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{ padding: '1.25rem', border: '1px solid var(--outline)', borderRadius: '16px', background: 'var(--surface-container-high)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <div style={{ width: '20px', height: '4px', background: i === 1 ? '#3b82f6' : 'var(--outline)', borderRadius: '2px' }}></div>
+                            <div style={{ width: '10px', height: '4px', background: 'var(--outline)', borderRadius: '2px' }}></div>
+                        </div>
+                        <div style={{ height: '12px', width: '80%', background: 'var(--on-background)', opacity: 0.15, borderRadius: '2px', marginBottom: '0.75rem' }}></div>
+                        <div style={{ height: '6px', width: '95%', background: 'var(--on-background)', opacity: 0.05, marginBottom: '0.4rem' }}></div>
+                        <div style={{ height: '6px', width: '70%', background: 'var(--on-background)', opacity: 0.05, marginBottom: '1.5rem' }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#3b82f6', opacity: 0.8 }}>DETAILED SPEC</div>
+                            <span className="material-symbols-outlined" style={{ fontSize: '16px', opacity: 0.3 }}>chevron_right</span>
+                        </div>
                     </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ height: '40px', width: '100%', background: 'var(--surface-container-high)', borderRadius: '6px' }}></div>
-                    <div style={{ height: '40px', width: '100%', background: 'var(--surface-container-high)', borderRadius: '6px' }}></div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -383,26 +371,25 @@ export default function HealthAILandingPage(): React.JSX.Element {
         {/* Feature 3: Proposals */}
         <section className="mockup-section" data-index="2">
           <div style={{ width: '100%', maxWidth: '900px' }}>
-            <div className="mockup-header-tag">03. Collaboration</div>
-            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Technical Proposals</h2>
+            <div className="mockup-header-tag">Step 03. Protocol</div>
+            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Secure Interest & Meeting</h2>
             
-            <div className="app-mockup-scrollable" style={{ padding: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-               <div style={{ width: '100%', maxWidth: '500px' }}>
-                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ flex: 1, padding: '1.5rem', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '12px', textAlign: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '32px', opacity: 0.2 }}>architecture</span>
-                      <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>System Arch</div>
-                    </div>
-                    <div style={{ flex: 1, padding: '1.5rem', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '12px', textAlign: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '32px', opacity: 0.2 }}>inventory_2</span>
-                      <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Resource Bid</div>
+            <div className="app-mockup-scrollable" style={{ padding: '0', background: 'rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <div style={{ width: '100%', maxWidth: '440px', background: 'var(--surface-container-low)', padding: '2rem', borderRadius: '16px', border: '1px solid var(--outline)', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h5 style={{ fontSize: '0.9rem', fontWeight: 600 }}>Interest Discovery</h5>
+                    <span className="material-symbols-outlined" style={{ opacity: 0.2 }}>close</span>
+                  </div>
+                  <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#ef4444' }}>contract</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>NDA Requirement Active</span>
                     </div>
                   </div>
-                  <div style={{ padding: '2rem', background: 'var(--background)', border: '1px solid var(--outline)', borderRadius: '16px' }}>
-                    <div style={{ height: '0.75rem', width: '40%', background: 'var(--outline)', borderRadius: '2px', marginBottom: '1.5rem' }}></div>
-                    <div style={{ height: '3rem', width: '100%', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '8px', marginBottom: '1rem' }}></div>
-                    <div style={{ height: '3rem', width: '100%', background: 'var(--surface-container-high)', border: '1px solid var(--outline)', borderRadius: '8px', marginBottom: '2rem' }}></div>
-                    <button className="btn btn-blue" style={{ width: '100%', height: '3.5rem' }}>Submit Technical Bid</button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ height: '40px', background: 'var(--surface-container-highest)', borderRadius: '6px', opacity: 0.5 }}></div>
+                    <div style={{ height: '80px', background: 'var(--surface-container-highest)', borderRadius: '6px', opacity: 0.5 }}></div>
+                    <button style={{ height: '44px', background: '#3b82f6', border: 'none', color: 'white', borderRadius: '6px', fontWeight: 600, marginTop: '0.5rem' }}>Accept NDA & Propose</button>
                   </div>
                </div>
             </div>
@@ -412,25 +399,48 @@ export default function HealthAILandingPage(): React.JSX.Element {
         {/* Feature 4: Security */}
         <section className="mockup-section" data-index="3">
           <div style={{ width: '100%', maxWidth: '900px' }}>
-            <div className="mockup-header-tag">04. Compliance</div>
-            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Protocol Trust Layer</h2>
+            <div className="mockup-header-tag">Step 04. Governance</div>
+            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Lifecycle Transparency</h2>
             
-            <div className="app-mockup-scrollable" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem', border: '1px solid rgba(16, 185, 129, 0.2)', boxShadow: '0 0 40px rgba(16, 185, 129, 0.1)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#10b981' }}>security</span>
+            <div className="app-mockup-scrollable" style={{ padding: '2rem', background: 'var(--surface)', position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                    <h5 style={{ fontSize: '1rem', fontWeight: 600 }}>Project Milestone History</h5>
+                    <div style={{ padding: '0.4rem 0.8rem', background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700 }}>TRUST SCORE: 98%</div>
                 </div>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>HIPAA & IRB Ready</h3>
-                <p style={{ opacity: 0.5, maxWidth: '300px', margin: '0 auto 2rem' }}>End-to-end encrypted protocol sharing with integrated NDA management.</p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                  <div style={{ padding: '0.75rem 1.5rem', background: 'var(--surface-container-highest)', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span> Verified
-                  </div>
-                  <div style={{ padding: '0.75rem 1.5rem', background: 'var(--surface-container-highest)', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>history</span> Audit Log
-                  </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                    {[
+                        { title: 'Protocol Published', desc: 'Secure clinical need registered', date: 'Oct 12', icon: 'campaign', color: '#3b82f6', active: true },
+                        { title: 'Technical Matching', desc: 'Engineer expertise verified', date: 'Oct 14', icon: 'handshake', color: '#10b981', active: true },
+                        { title: 'NDA Protocol Signed', desc: 'Legal barriers cleared', date: 'Oct 15', icon: 'verified', color: '#22c55e', active: true },
+                        { title: 'Live Sync Scheduled', desc: 'Co-creation phase start', date: 'Pending', icon: 'event', color: 'var(--outline)', active: false },
+                    ].map((step, i) => (
+                        <div key={i} style={{ display: 'flex', gap: '1.5rem', minHeight: '80px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ 
+                                    width: '32px', 
+                                    height: '32px', 
+                                    borderRadius: '50%', 
+                                    background: step.active ? step.color : 'transparent', 
+                                    border: `2px solid ${step.color}`, 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    boxShadow: step.active ? `0 0 15px ${step.color}44` : 'none'
+                                }}>
+                                    <span className="material-symbols-outlined" style={{ fontSize: '16px', color: step.active ? 'white' : step.color }}>{step.icon}</span>
+                                </div>
+                                {i < 3 && <div style={{ width: '2px', flex: 1, background: step.active ? step.color : 'var(--outline)', opacity: step.active ? 0.3 : 1, margin: '4px 0' }}></div>}
+                            </div>
+                            <div style={{ flex: 1, paddingTop: '2px' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 600, opacity: step.active ? 1 : 0.4 }}>{step.title}</div>
+                                <div style={{ fontSize: '0.75rem', opacity: 0.3, marginBottom: '4px' }}>{step.desc}</div>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 700, opacity: 0.2 }}>{step.date}</div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-              </div>
+                {/* Decorative Elements */}
+                <div style={{ position: 'absolute', bottom: -20, right: 20, width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(100px)', opacity: 0.05, pointerEvents: 'none' }}></div>
             </div>
           </div>
         </section>
@@ -438,39 +448,41 @@ export default function HealthAILandingPage(): React.JSX.Element {
         {/* Feature 5: Sync */}
         <section className="mockup-section" data-index="4">
           <div style={{ width: '100%', maxWidth: '900px' }}>
-            <div className="mockup-header-tag">05. Delivery</div>
-            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Interdisciplinary Sync</h2>
+            <div className="mockup-header-tag">Step 05. Action</div>
+            <h2 className="text-serif" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Role-Specific Dashboards</h2>
             
-            <div className="app-mockup-scrollable" style={{ padding: '0' }}>
-               <div style={{ display: 'flex', height: '100%' }}>
-                  <div style={{ width: '300px', borderRight: '1px solid var(--outline)', padding: '2rem' }}>
-                    <div style={{ height: '0.75rem', width: '60%', background: 'var(--outline)', borderRadius: '2px', marginBottom: '2rem' }}></div>
-                    {[1,2,3].map(i => (
-                      <div key={i} style={{ padding: '1rem', background: i === 1 ? 'rgba(59, 130, 246, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--surface-container-highest)' }}></div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ height: '0.5rem', width: '80%', background: 'var(--outline)', borderRadius: '2px' }}></div>
+            <div className="app-mockup-scrollable" style={{ padding: '0', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                    <div style={{ background: 'var(--surface-container-low)', padding: '1.5rem', borderRight: '1px solid var(--outline)' }}>
+                        <div style={{ fontSize: '0.6rem', fontWeight: 800, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.05em' }}>CLINICAL DASHBOARD</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div style={{ height: '40px', background: 'var(--background)', borderRadius: '6px', border: '1px solid var(--outline)', padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#3b82f6' }}>calendar_month</span>
+                                <div style={{ height: '4px', width: '50%', background: 'var(--on-background)', opacity: 0.15 }}></div>
+                            </div>
+                            <div style={{ height: '40px', background: 'var(--background)', borderRadius: '6px', border: '1px solid var(--outline)', padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#10b981' }}>verified</span>
+                                <div style={{ height: '4px', width: '30%', background: 'var(--on-background)', opacity: 0.15 }}></div>
+                            </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ flex: 1, padding: '2rem', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'flex-end', marginBottom: '2rem' }}>
-                      <div style={{ alignSelf: 'flex-end', padding: '1rem', background: '#3b82f6', borderRadius: '12px 12px 0 12px', fontSize: '0.85rem', maxWidth: '70%', color: 'white' }}>
-                        Ready for the clinical walkthrough on Friday?
-                      </div>
-                      <div style={{ alignSelf: 'flex-start', padding: '1rem', background: 'var(--surface-container-highest)', borderRadius: '12px 12px 12px 0', fontSize: '0.85rem', maxWidth: '70%' }}>
-                        Yes, I'll have the technical specs for the HIPAA storage ready by then.
-                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                      <div style={{ flex: 1, height: '3rem', background: 'var(--surface-container-highest)', border: '1px solid var(--outline)', borderRadius: '8px', padding: '0 1rem', display: 'flex', alignItems: 'center', opacity: 0.3, fontSize: '0.85rem' }}>Type a message...</div>
-                      <div style={{ width: '3rem', height: '3rem', borderRadius: '8px', background: 'var(--on-background)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--background)' }}>
-                        <span className="material-symbols-outlined">send</span>
-                      </div>
+                    <div style={{ background: 'var(--background)', padding: '1.5rem' }}>
+                        <div style={{ fontSize: '0.6rem', fontWeight: 800, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.05em' }}>ENGINEER TERMINAL</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div style={{ height: '54px', background: 'var(--surface-container-highest)', borderRadius: '8px', padding: '0.75rem', border: '1px solid var(--outline)' }}>
+                                <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
+                                    <div style={{ width: '4px', height: '4px', background: '#3b82f6', borderRadius: '50%' }}></div>
+                                    <div style={{ width: '4px', height: '4px', background: '#3b82f6', borderRadius: '50%', opacity: 0.3 }}></div>
+                                </div>
+                                <div style={{ height: '4px', width: '80%', background: '#3b82f6', opacity: 0.2 }}></div>
+                            </div>
+                            <div style={{ height: '30px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', color: '#3b82f6', fontWeight: 800 }}>VIEW SPECS</div>
+                        </div>
                     </div>
-                  </div>
-               </div>
+                </div>
+                <div style={{ padding: '0.75rem 1.5rem', background: 'var(--surface-container-high)', borderTop: '1px solid var(--outline)', fontSize: '0.7rem', opacity: 0.4 }}>
+                    Logged in as: research.lead@mit.edu
+                </div>
             </div>
           </div>
         </section>
