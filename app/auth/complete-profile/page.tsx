@@ -26,6 +26,18 @@ export default function OnboardingPage() {
     expertiseTags: [] as string[],
   });
 
+  React.useEffect(() => {
+    const fetchUserRole = async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.user_metadata?.role) {
+        setFormData(prev => ({ ...prev, role: user.user_metadata.role }));
+      }
+    };
+    fetchUserRole();
+  }, []);
+
   const changeStep = (direction: 1 | -1) => {
     setAnimating(true);
     setTimeout(() => {
@@ -99,7 +111,9 @@ export default function OnboardingPage() {
           location: locationString,
           expertise: formData.expertiseTags.join(', '),
         });
-        router.push('/dashboard');
+        const { getAuthRedirect } = await import('@/lib/actions/authRedirect');
+        const redirectUrl = await getAuthRedirect();
+        router.push(redirectUrl);
       } catch (err: any) {
         setGlobalError(err.message || 'Something went wrong. Please try again.');
       }

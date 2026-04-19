@@ -54,13 +54,20 @@ export default function ProtectedLayout({
     { href: '/profile', icon: User, label: 'Profile' },
   ];
 
-  // Placeholder user data
-  const user = {
-    name: 'Dr. Sarah Chen',
-    role: 'Healthcare Professional',
-    initials: 'SC',
-    notifications: 3,
-  };
+  const [userProfile, setUserProfile] = React.useState({
+    name: '',
+    role: '',
+    initials: '',
+  });
+
+  React.useEffect(() => {
+    async function loadProfile() {
+      const { getNavProfile } = await import('@/lib/actions/profile');
+      const profile = await getNavProfile();
+      setUserProfile(profile);
+    }
+    loadProfile();
+  }, []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -109,11 +116,11 @@ export default function ProtectedLayout({
 
         <div className="sidebar-footer">
           <div className="user-profile">
-            <div className="avatar-placeholder">{user.initials}</div>
+            <div className="avatar-placeholder">{userProfile.initials}</div>
             {!isCollapsed && (
               <div className="user-info">
-                <div className="user-name">{user.name}</div>
-                <div className="user-role-badge">{user.role}</div>
+                <div className="user-name">{userProfile.name}</div>
+                <div className="user-role-badge">{userProfile.role}</div>
               </div>
             )}
           </div>

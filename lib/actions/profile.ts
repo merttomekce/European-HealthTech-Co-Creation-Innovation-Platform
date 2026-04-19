@@ -69,3 +69,68 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
     throw new Error("Failed to update profile in database")
   }
 }
+
+export async function getAuthProfile() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: user.email! }
+    })
+    
+    if (!dbUser) {
+       return { success: false, error: 'User not found in database' }
+    }
+    
+    return { success: true, data: dbUser }
+  } catch (error) {
+    console.error(error)
+    return { success: false, error: 'Failed to fetch profile' }
+  }
+}
+
+export async function getNavProfile() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return {
+      name: 'Welcome',
+      role: 'Participant',
+      initials: 'W',
+    }
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { email: user.email! },
+    select: { name: true, role: true }
+  })
+
+  const name = dbUser?.name || 'New User'
+  const roleMap: Record<string, string> = {
+    'HEALTHCARE_PROFESSIONAL': 'Healthcare Professional',
+    'ENGINEER': 'Engineer / Tech Expert',
+    'ADMIN': 'Admin'
+  }
+  
+  const roleName = dbUser?.role ? roleMap[dbUser.role] : 'Participant'
+  
+  let initials = 'NU'
+  if (dbUser?.name) {
+    const parts = dbUser.name.split(' ')
+    initials = parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : `${parts[0][0]}`
+  } else if (user.email) {
+    initials = user.email.substring(0, 2).toUpperCase()
+  }
+
+  return {
+    name,
+    role: roleName,
+    initials: initials.toUpperCase()
+  }
+}

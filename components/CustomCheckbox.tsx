@@ -12,15 +12,24 @@ interface CustomCheckboxProps {
 
 export default function CustomCheckbox({ label, checked, onChange, id, error }: CustomCheckboxProps) {
   return (
-    <div className={`custom-checkbox-container ${error ? 'has-error' : ''}`} onClick={() => onChange(!checked)}>
+    <label className={`custom-checkbox-container ${error ? 'has-error' : ''}`} htmlFor={id}>
+      <input 
+        type="checkbox" 
+        id={id} 
+        checked={checked} 
+        onChange={(e) => onChange(e.target.checked)} 
+        style={{ position: 'absolute', opacity: 0, cursor: 'pointer', height: 0, width: 0 }} 
+      />
       <div className={`checkbox-box ${checked ? 'checked' : ''}`}>
         {checked && (
-          <span className="material-symbols-outlined check-icon">check</span>
+          <svg className="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
         )}
       </div>
-      <label className="checkbox-label" htmlFor={id}>
+      <span className="checkbox-label">
         {label}
-      </label>
+      </span>
 
       <style jsx>{`
         .custom-checkbox-container {
@@ -57,9 +66,9 @@ export default function CustomCheckbox({ label, checked, onChange, id, error }: 
         }
 
         .check-icon {
-          font-size: 16px;
+          width: 14px;
+          height: 14px;
           color: white;
-          font-weight: 800;
           animation: checkPop 0.2s ease-out;
         }
 
@@ -79,6 +88,6 @@ export default function CustomCheckbox({ label, checked, onChange, id, error }: 
           100% { transform: scale(1); }
         }
       `}</style>
-    </div>
+    </label>
   );
 }

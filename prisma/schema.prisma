@@ -141,6 +141,7 @@ model MeetingRequest {
 
 enum MeetingRequestStatus {
   PENDING          // sent, awaiting acknowledgment
+  ACCEPTED         // request accepted, waiting for slots
   SLOTS_PROPOSED   // one party has proposed slots (either side)
   COUNTER_PROPOSED // other party rejected all and proposed new slots
   CONFIRMED        // a slot was accepted by one party

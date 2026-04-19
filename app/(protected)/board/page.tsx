@@ -152,12 +152,12 @@ export default function BoardPage() {
                       fontWeight: 700, 
                       textTransform: 'uppercase', 
                       letterSpacing: '0.06em',
-                      color: item.author?.role === 'ENGINEER' ? '#3FABFC' : '#059669',
-                      background: item.author?.role === 'ENGINEER' ? 'rgba(63, 171, 252, 0.1)' : 'rgba(5, 150, 105, 0.1)',
+                      color: item.author?.role === 'ENGINEER' ? '#059669' : '#3FABFC',
+                      background: item.author?.role === 'ENGINEER' ? 'rgba(5, 150, 105, 0.1)' : 'rgba(63, 171, 252, 0.1)',
                       padding: '0.25rem 0.6rem',
                       borderRadius: '4px'
                     }}>
-                      {item.author?.role === 'ENGINEER' ? 'Engineer' : 'Healthcare'}
+                      Looking for {item.author?.role === 'ENGINEER' ? 'Healthcare' : 'Engineer'}
                     </span>
                     <span style={{ fontSize: '0.875rem', color: 'var(--on-background-muted)', fontWeight: 500 }}>{item.author?.institution}</span>
                   </div>

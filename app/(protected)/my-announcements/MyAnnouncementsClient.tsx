@@ -11,12 +11,15 @@ import './requests.css';
 export default function MyAnnouncementsClient({ initialData }: { initialData: any[] }) {
   const [projects, setProjects] = useState(initialData);
 
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
-    const nextStatus = currentStatus === 'ACTIVE' ? 'IN_PROGRESS' : 'ACTIVE';
+  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
+
+  const handleToggleStatus = async (id: string, nextStatus: string) => {
+    setIsUpdating(prev => ({ ...prev, [id]: true }));
     const res = await toggleAnnouncementStatus(id, nextStatus);
     if (res.success) {
       setProjects(prev => prev.map(p => p.id === id ? { ...p, status: nextStatus } : p));
     }
+    setIsUpdating(prev => ({ ...prev, [id]: false }));
   };
 
   const handleInterestStatus = async (projectId: string, requestId: string, newStatus: string) => {
@@ -99,13 +102,36 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                   </div>
 
                   <div className="manage-card-actions">
-                    <button 
-                      className="action-btn secondary"
-                      onClick={() => handleToggleStatus(project.id, project.status)}
-                    >
-                      {project.status === 'ACTIVE' ? 'Mark as Partnered' : 'Reactivate'}
-                    </button>
-                    <button className="action-btn outline">Edit</button>
+                    {project.status === 'ACTIVE' && (
+                      <button 
+                        className="action-btn secondary"
+                        disabled={isUpdating[project.id]}
+                        onClick={() => handleToggleStatus(project.id, 'PARTNER_FOUND')}
+                      >
+                        {isUpdating[project.id] ? 'Updating...' : 'Mark as Partnered'}
+                      </button>
+                    )}
+                    
+                    {project.status === 'ARCHIVED' ? (
+                      <button 
+                        className="action-btn secondary"
+                        disabled={isUpdating[project.id]}
+                        onClick={() => handleToggleStatus(project.id, 'ACTIVE')}
+                      >
+                        {isUpdating[project.id] ? 'Updating...' : 'Reactivate'}
+                      </button>
+                    ) : (
+                      <button 
+                        className="action-btn secondary"
+                        disabled={isUpdating[project.id]}
+                        style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', background: 'transparent' }}
+                        onClick={() => handleToggleStatus(project.id, 'ARCHIVED')}
+                      >
+                        {isUpdating[project.id] ? 'Updating...' : 'Archive'}
+                      </button>
+                    )}
+                    
+                    <Link href={`/board/edit/${project.id}`} className="action-btn outline" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Edit</Link>
                   </div>
                 </div>
 

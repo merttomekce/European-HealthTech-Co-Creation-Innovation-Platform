@@ -12,6 +12,15 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
+      if (next === '/dashboard') {
+        const { getAuthRedirect } = await import('@/lib/actions/authRedirect');
+        try {
+          const redirectPath = await getAuthRedirect();
+          return NextResponse.redirect(`${origin}${redirectPath}`);
+        } catch (e) {
+          return NextResponse.redirect(`${origin}${next}`);
+        }
+      }
       return NextResponse.redirect(`${origin}${next}`);
     } else {
       console.error('Supabase Auth error in callback:', error.message);

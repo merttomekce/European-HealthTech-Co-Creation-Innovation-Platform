@@ -18,6 +18,11 @@ export const announcementSchema = z.object({
   projectStage: z.string().min(2, 'Project Stage is required'),
   commitment: z.string().min(2, 'Commitment Level is required'),
   requirements: z.array(z.string().min(1, 'Requirement cannot be empty')).min(1, 'At least one requirement is needed'),
+  collaborationType: z.string().optional(),
+  confidentiality: z.string().default('PUBLIC_PITCH'),
+  expiresInDays: z.number().int().optional(),
+  autoClose: z.boolean().default(false),
+  saveAsDraft: z.boolean().default(false),
 });
 
 export const meetingSlotSchema = z.object({
