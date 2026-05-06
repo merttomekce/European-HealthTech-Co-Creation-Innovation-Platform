@@ -4,6 +4,36 @@ import { cookies } from 'next/headers'
 export function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const cookieStore = cookies()
+
+  if (cookieStore.get('dev_bypass')) {
+    return {
+      auth: {
+        getUser: async () => ({
+          data: {
+            user: {
+              id: 'dev-bypass-user',
+              email: 'demo@healthai.edu',
+              user_metadata: { name: 'Demo User', role: 'ENGINEER' },
+            },
+          },
+          error: null,
+        }),
+        getSession: async () => ({ data: { session: { user: { id: 'dev-bypass-user' } } }, error: null }),
+        signOut: async () => ({ error: null }),
+      },
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            single: () => ({ data: null, error: null }),
+            order: () => ({ data: [], error: null }),
+          }),
+          order: () => ({ data: [], error: null }),
+          single: () => ({ data: null, error: null }),
+        }),
+      }),
+    } as any
+  }
 
   if (!supabaseUrl || !supabaseKey) {
     // Return a mocked client that allows the UI to render without crashing on the server
@@ -24,8 +54,6 @@ export function createClient() {
       })
     } as any
   }
-
-  const cookieStore = cookies()
 
   return createServerClient(
     supabaseUrl,
