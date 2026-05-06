@@ -75,14 +75,59 @@ export async function getMyAnnouncements() {
   }
 }
 
-export async function createAnnouncement(formData: z.infer<typeof announcementSchema>) {
+export async function getUserAnnouncementsByAuthorId(authorId: string) {
+  try {
+    const announcements = await prisma.announcement.findMany({
+      where: {
+        authorId,
+        status: { in: ['ACTIVE', 'PARTNER_FOUND', 'MEETING_SCHEDULED'] as any },
+      },
+      include: {
+        author: {
+          select: {
+            name: true,
+            institution: true,
+            city: true,
+            country: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+    });
+
+    return { success: true, data: announcements };
+  } catch (error) {
+    console.error('Failed to fetch user announcements:', error);
+    return { success: false, error: 'Failed to fetch user announcements' };
+  }
+}
+
+export async function createAnnouncement(formData: any) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return { success: false, error: 'Unauthorized' };
 
   try {
-    const validatedData = announcementSchema.parse(formData);
+    const parseResult = announcementSchema.safeParse(formData);
+    if (!parseResult.success) {
+      console.error('Validation failed:', parseResult.error.flatten().fieldErrors);
+      return { success: false, error: 'Invalid form data. Please check all fields.' };
+    }
+    const validatedData = parseResult.data;
+
+    // Ensure user exists in Prisma, syncing by email to avoid unique constraint crashes
+    await prisma.user.upsert({
+      where: { email: user.email! },
+      update: { id: user.id }, // Sync ID to match Supabase if it differs
+      create: {
+        id: user.id,
+        email: user.email!,
+        role: 'HEALTHCARE_PROFESSIONAL',
+      }
+    });
     
     // Calculate expiration if provided
     let expiresAt = null;
@@ -119,11 +164,12 @@ export async function createAnnouncement(formData: z.infer<typeof announcementSc
       targetEntity: `Announcement:${announcement.id}`,
       result: 'success',
     });
-    revalidatePath('/board');
+    revalidatePath('/dashboard');
+    revalidatePath('/my-announcements');
     return { success: true, data: announcement };
-  } catch (error) {
-    console.error(error);
-    return { success: false, error: 'Failed to create announcement' };
+  } catch (error: any) {
+    console.error('Create announcement error:', error);
+    return { success: false, error: error.message || 'Failed to create announcement' };
   }
 }
 
@@ -214,7 +260,7 @@ export async function updateAnnouncement(id: string, formData: z.infer<typeof an
       result: 'success',
     });
 
-    revalidatePath('/board');
+    revalidatePath('/dashboard');
     revalidatePath(`/board/${id}`);
     revalidatePath('/my-announcements');
     
@@ -224,5 +270,3 @@ export async function updateAnnouncement(id: string, formData: z.infer<typeof an
     return { success: false, error: 'Failed to update post' };
   }
 }
-
-

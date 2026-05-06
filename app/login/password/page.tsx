@@ -27,7 +27,7 @@ const trustPoints = [
   },
 ] as const;
 
-export default function PasswordLoginPage() {
+function PasswordLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
@@ -157,3 +157,12 @@ export default function PasswordLoginPage() {
     </main>
   );
 }
+
+export default function PasswordLoginPage() {
+  return (
+    <React.Suspense fallback={<div className="auth-v2-container">Loading...</div>}>
+      <PasswordLoginForm />
+    </React.Suspense>
+  );
+}
+

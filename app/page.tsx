@@ -25,7 +25,7 @@ export default function Page() {
             <Link href="/login" className={styles.primary}>
               Join network <ArrowRight size={18} />
             </Link>
-            <Link href="/board" className={styles.secondary}>
+            <Link href="/dashboard" className={styles.secondary}>
               Explore projects
             </Link>
           </div>

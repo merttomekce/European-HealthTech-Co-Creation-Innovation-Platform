@@ -211,7 +211,7 @@ export default async function ConnectionsPage() {
           <div className="connections-empty">
             <h3>No live connections yet.</h3>
             <p>Open the board, express interest, and the workspace will start filling with people and threads.</p>
-            <Link href="/board" className="connections-button connections-button--primary">Browse board</Link>
+            <Link href="/dashboard" className="connections-button connections-button--primary">Browse feed</Link>
           </div>
         ) : (
           <div className="connections-stack">

@@ -4,9 +4,22 @@ import React, { useState } from 'react';
 import { profileSchema } from '@/lib/validations';
 import TagInput from '@/components/TagInput';
 import SearchableSelect from '@/components/SearchableSelect';
-import { updateProfile, getAuthProfile } from '@/lib/actions/profile';
+import { updateProfile, getAuthProfile, updateAvatar } from '@/lib/actions/profile';
 import { HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
 import './profile.css';
+
+const AVATAR_PRESETS = [
+  '/avatars/avatar_1.svg',
+  '/avatars/avatar_2.svg',
+  '/avatars/avatar_3.svg',
+  '/avatars/avatar_4.svg',
+  '/avatars/avatar_5.svg',
+  '/avatars/avatar_6.svg',
+  '/avatars/avatar_7.svg',
+  '/avatars/avatar_8.svg',
+  '/avatars/avatar_9.svg',
+  '/avatars/avatar_10.svg',
+];
 
 // Helper: parse "City, Country" string back to parts
 function parseLocation(location: string) {
@@ -17,7 +30,7 @@ function parseLocation(location: string) {
   return { city: '', country: location };
 }
 
-export default function ProfilePage() {
+export default function ProfilePage({ isModal = false }: { isModal?: boolean }) {
   const initialLocation = parseLocation('Berlin, Germany');
 
   const [formData, setFormData] = useState({
@@ -27,7 +40,11 @@ export default function ProfilePage() {
     city: '',
     expertiseTags: [] as string[],
     role: 'healthcare' as 'healthcare' | 'engineer' | 'admin',
+    image: null as string | null,
   });
+
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaved, setIsSaved] = useState(false);
@@ -52,6 +69,7 @@ export default function ProfilePage() {
           expertiseTags: res.data.expertise || [],
           role: res.data.role === 'ENGINEER' ? 'engineer' :
             res.data.role === 'ADMIN' ? 'admin' : 'healthcare',
+          image: res.data.image || null,
         });
       }
       setIsLoading(false);
@@ -146,6 +164,44 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAvatarSelect = async (avatarUrl: string) => {
+    setFormData(prev => ({ ...prev, image: avatarUrl }));
+    setShowAvatarMenu(false);
+    try {
+      await updateAvatar(avatarUrl);
+    } catch (err) {
+      console.error("Failed to update avatar", err);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        setFormData(prev => ({ ...prev, image: base64String }));
+        setShowAvatarMenu(false);
+        try {
+          await updateAvatar(base64String);
+        } catch (err) {
+          console.error("Failed to upload avatar", err);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setFormData(prev => ({ ...prev, image: null }));
+    setShowAvatarMenu(false);
+    try {
+      await updateAvatar(null);
+    } catch (err) {
+      console.error("Failed to remove avatar", err);
+    }
+  };
+
   const handleGdprAction = (action: string) => {
     alert(`Simulation: GDPR ${action} request queued.`);
   };
@@ -165,14 +221,73 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="profile-container">
-      <header className="profile-header">
-        <h1 className="profile-title">Profile Settings</h1>
-        <p className="profile-subtitle">Manage your personal information and privacy preferences.</p>
-      </header>
+    <div className={`profile-container ${isModal ? 'is-modal' : ''}`}>
+      {!isModal && (
+        <header className="profile-header">
+          <h1 className="profile-title">Profile Settings</h1>
+          <p className="profile-subtitle">Manage your personal information and privacy preferences.</p>
+        </header>
+      )}
 
       <div className="avatar-section">
-        <div className="large-avatar">{initials}</div>
+        <div 
+          className="large-avatar"
+          onMouseEnter={() => setShowAvatarMenu(true)}
+          onMouseLeave={() => setShowAvatarMenu(false)}
+        >
+          {formData.image ? (
+            <img src={formData.image} alt="Avatar" />
+          ) : (
+            initials
+          )}
+          <div className="avatar-hover-overlay">
+            <span className="material-symbols-outlined">edit</span>
+          </div>
+
+          {showAvatarMenu && (
+            <div className="avatar-menu">
+              <div className="avatar-menu-title">Select Avatar</div>
+              <div className="avatar-presets">
+                {AVATAR_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    className={`avatar-preset-btn ${formData.image === preset ? 'active' : ''}`}
+                    onClick={() => handleAvatarSelect(preset)}
+                    type="button"
+                  >
+                    <img src={preset} alt={`Preset ${idx + 1}`} />
+                  </button>
+                ))}
+              </div>
+              <div className="avatar-actions">
+                <button 
+                  className="avatar-action-btn" 
+                  onClick={() => fileInputRef.current?.click()}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined">upload</span>
+                  Upload from device
+                </button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  style={{ display: 'none' }} 
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+                <button 
+                  className="avatar-action-btn remove" 
+                  onClick={handleRemoveAvatar}
+                  disabled={!formData.image}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                  Remove picture
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="avatar-info">
           <h2>{formData.fullName}</h2>
           <span className="read-only-role">

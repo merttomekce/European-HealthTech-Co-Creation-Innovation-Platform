@@ -29,7 +29,7 @@ const trustPoints = [
   },
 ] as const;
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
@@ -250,3 +250,12 @@ export default function RegisterPage() {
     </main>
   );
 }
+
+export default function RegisterPage() {
+  return (
+    <React.Suspense fallback={<div className="auth-v2-container">Loading...</div>}>
+      <RegisterForm />
+    </React.Suspense>
+  );
+}
+

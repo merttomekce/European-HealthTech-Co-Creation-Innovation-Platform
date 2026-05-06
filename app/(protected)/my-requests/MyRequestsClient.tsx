@@ -76,8 +76,8 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
           <div className="empty-state">
             <span className="material-symbols-outlined emoji">rocket_launch</span>
             <h3>No requests yet.</h3>
-            <p>Go to the board to find projects that match your expertise.</p>
-            <Link href="/board" className="primary-btn">Explore Board</Link>
+            <p>Go to the feed to find projects that match your expertise.</p>
+            <Link href="/dashboard" className="primary-btn">Explore Feed</Link>
           </div>
         ) : (
           requests.map(request => (

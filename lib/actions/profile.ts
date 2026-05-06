@@ -70,6 +70,25 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
   }
 }
 
+export async function updateAvatar(imageUrl: string | null) {
+  const supabase = createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    throw new Error("Unauthorized")
+  }
+
+  try {
+    await prisma.user.update({
+      where: { email: user.email! },
+      data: { image: imageUrl }
+    })
+    return { success: true }
+  } catch (error) {
+    console.error("Avatar update error:", error)
+    throw new Error("Failed to update avatar")
+  }
+}
+
 export async function getAuthProfile() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -108,7 +127,7 @@ export async function getNavProfile() {
 
   const dbUser = await prisma.user.findUnique({
     where: { email: user.email! },
-    select: { name: true, role: true }
+    select: { name: true, role: true, image: true }
   })
 
   const name = dbUser?.name || 'New User'
@@ -131,7 +150,8 @@ export async function getNavProfile() {
   return {
     name,
     role: roleName,
-    initials: initials.toUpperCase()
+    initials: initials.toUpperCase(),
+    image: dbUser?.image || null
   }
 }
 
@@ -144,6 +164,7 @@ export async function getUserProfile(userId: string) {
         name: true,
         email: true,
         role: true,
+        image: true,
         institution: true,
         city: true,
         country: true,
@@ -161,5 +182,41 @@ export async function getUserProfile(userId: string) {
   } catch (error) {
     console.error(error)
     return { success: false, error: 'Failed to fetch user profile' }
+  }
+}
+
+export async function connectWithUser(targetUserId: string) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  if (user.id === targetUserId) {
+    return { success: false, error: 'You cannot connect with yourself' };
+  }
+
+  const [user1Id, user2Id] = [user.id, targetUserId].sort();
+
+  try {
+    await prisma.connection.upsert({
+      where: {
+        user1Id_user2Id: {
+          user1Id,
+          user2Id,
+        },
+      },
+      update: {},
+      create: {
+        user1Id,
+        user2Id,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: 'Failed to connect with user' };
   }
 }

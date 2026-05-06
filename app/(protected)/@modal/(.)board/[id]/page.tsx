@@ -1,30 +1,32 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 import { getAnnouncementById } from '@/lib/actions/announcements';
 import InterestModal from '@/components/InterestModal';
 import '@/app/(protected)/board/project-detail.css';
 
 export default function ProjectDetailModalPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showInterestForm, setShowInterestForm] = useState(false);
 
   useEffect(() => {
     async function init() {
       const result = await getAnnouncementById(params.id);
       if (result.success) {
         setProject(result.data);
-      } else {
-        setProject(null);
       }
       setLoading(false);
     }
-
     init();
   }, [params.id]);
+
+  const handleClose = () => {
+    router.back();
+  };
 
   if (loading) {
     return (
@@ -42,12 +44,11 @@ export default function ProjectDetailModalPage({ params }: { params: { id: strin
     return (
       <div className="detail-modal-shell">
         <div className="detail-modal-surface">
-          <Link href="/board" className="detail-back">
-            <span className="material-symbols-outlined">arrow_back</span>
-            Back to board
-          </Link>
-          <div className="detail-card" style={{ marginTop: '1rem' }}>
-            <p className="detail-text">Project not found.</p>
+          <div className="detail-modal-header" style={{ justifyContent: 'flex-end' }}>
+            <button className="detail-modal-close" onClick={handleClose}><X size={18} /></button>
+          </div>
+          <div className="detail-card">
+            <p>Project not found.</p>
           </div>
         </div>
       </div>
@@ -61,13 +62,8 @@ export default function ProjectDetailModalPage({ params }: { params: { id: strin
     <div className="detail-modal-shell">
       <div className="detail-modal-surface">
         <div className="detail-modal-header">
-          <Link href="/board" className="detail-back">
-            <span className="material-symbols-outlined">arrow_back</span>
-            Back to board
-          </Link>
-          <Link href="/board" className="detail-modal-close" aria-label="Close detail">
-            <X size={18} />
-          </Link>
+          <div />
+          <button className="detail-modal-close" onClick={handleClose}><X size={18} /></button>
         </div>
 
         <section className="detail-hero">
@@ -90,13 +86,13 @@ export default function ProjectDetailModalPage({ params }: { params: { id: strin
           </div>
 
           <div className="detail-summary-panel">
-            <div className="summary-row">
+             <div className="summary-row">
               <span className="summary-label">Commitment</span>
               <span className="summary-value">{project.commitmentLevel}</span>
             </div>
             <div className="summary-row">
               <span className="summary-label">Posted</span>
-              <span className="summary-value">{project.time}</span>
+              <span className="summary-value">{new Date(project.createdAt).toLocaleDateString()}</span>
             </div>
             <div className="summary-row">
               <span className="summary-label">Status</span>
@@ -104,73 +100,46 @@ export default function ProjectDetailModalPage({ params }: { params: { id: strin
                 {project.status?.replace(/_/g, ' ') || 'UNKNOWN'}
               </span>
             </div>
-            <div className="summary-row">
-              <span className="summary-label">Expertise</span>
-              <span className="summary-value summary-truncate" title={project.expertiseNeeded}>
-                {project.expertiseNeeded}
-              </span>
-            </div>
+            
+            <button 
+              className="btn-primary detail-cta" 
+              onClick={() => setShowInterestForm(true)}
+              disabled={project.status !== 'ACTIVE'}
+            >
+              {project.status === 'ACTIVE' ? 'I\'m Interested' : 'Post Closed'}
+            </button>
           </div>
         </section>
 
-        <section className="detail-grid">
-          <main className="detail-main">
-            <article className="detail-card">
-              <div className="detail-section-header">
-                <p className="detail-section-kicker">Project context</p>
-                <h2 className="detail-section-title">Detailed information</h2>
-              </div>
+        <div className="detail-grid">
+          <div className="detail-main-content">
+            <div className="detail-card">
+              <h3 className="detail-card-title">Project Explanation</h3>
               <div className="detail-text" style={{ whiteSpace: 'pre-wrap' }}>
-                <p>{project.explanation}</p>
+                {project.explanation}
               </div>
-            </article>
-
-            <article className="detail-card">
-              <div className="detail-section-header">
-                <p className="detail-section-kicker">What is needed</p>
-                <h2 className="detail-section-title">Expertise needed</h2>
-              </div>
-              <div className="detail-text">
-                <p>{project.expertiseNeeded}</p>
-              </div>
-            </article>
-          </main>
+            </div>
+          </div>
 
           <aside className="detail-sidebar">
             <div className="detail-sidecard">
-            <div className="summary-row">
-              <span className="summary-label">Project stage</span>
-              <span className="summary-value">{project.projectStage?.replace(/_/g, ' ') || 'CONCEPT'}</span>
-            </div>
-              <div className="summary-row">
-                <span className="summary-label">Collaboration type</span>
-                <span className="summary-value">{project.collaborationType || 'ADVISOR'}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">Visibility</span>
-                <span className="summary-value">{project.confidentiality}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">Locality</span>
-                <span className="summary-value">{project.city}, {project.country}</span>
+              <h4 className="sidecard-title">Expertise Needed</h4>
+              <div className="expertise-tags">
+                {project.expertiseNeeded.split(',').map((tag: string) => (
+                  <span key={tag} className="expertise-tag">{tag.trim()}</span>
+                ))}
               </div>
             </div>
           </aside>
-        </section>
-
-        <div className="detail-actions">
-          <button className="detail-primary-btn" onClick={() => setShowModal(true)}>
-            Express interest
-          </button>
         </div>
-
-        <InterestModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          projectId={project.id}
-          projectTitle={project.title}
-        />
       </div>
+
+      {showInterestForm && (
+        <InterestModal 
+          project={project} 
+          onClose={() => setShowInterestForm(false)} 
+        />
+      )}
     </div>
   );
 }

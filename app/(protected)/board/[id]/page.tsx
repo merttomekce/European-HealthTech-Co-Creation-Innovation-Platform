@@ -40,9 +40,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   if (!project) {
     return (
       <div className="detail-page">
-        <Link href="/board" className="detail-back">
+        <Link href="/dashboard" className="detail-back">
           <span className="material-symbols-outlined">arrow_back</span>
-          Back to board
+          Back to feed
         </Link>
         <div className="detail-card">
           <p className="detail-text">Project not found.</p>
@@ -56,9 +56,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="detail-page">
-      <Link href="/board" className="detail-back">
+      <Link href="/dashboard" className="detail-back">
         <span className="material-symbols-outlined">arrow_back</span>
-        Back to board
+        Back to feed
       </Link>
 
       <section className="detail-hero">

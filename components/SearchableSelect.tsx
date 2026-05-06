@@ -33,7 +33,7 @@ export default function SearchableSelect({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedOption = options.find((o) => o.value === value);
+  const selectedOption = options.find((o) => o.value === value) || (value ? { value, label: value } : null);
 
   const filtered = options.filter((o) =>
     o.label.toLowerCase().includes(query.toLowerCase())

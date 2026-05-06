@@ -175,11 +175,60 @@ export async function updateMeetingRequestStatus(requestId: string, status: stri
   try {
     const updated = await prisma.meetingRequest.update({
       where: { id: requestId },
-      data: { status: status as any }
+      data: { status: status as any },
+      include: {
+        announcement: { select: { title: true } },
+        requester: { select: { id: true, name: true } }
+      }
     });
+
+    let conversationId: string | undefined;
+
+    if (status === 'ACCEPTED') {
+      // Find or create conversation
+      const existingConv = await prisma.conversation.findFirst({
+        where: {
+          AND: [
+            { participants: { some: { userId: updated.requesterId } } },
+            { participants: { some: { userId: updated.recipientId } } }
+          ]
+        },
+        select: { id: true }
+      });
+
+      if (existingConv) {
+        conversationId = existingConv.id;
+      } else {
+        const newConv = await prisma.conversation.create({
+          data: {
+            participants: {
+              create: [
+                { userId: updated.requesterId },
+                { userId: updated.recipientId }
+              ]
+            }
+          }
+        });
+        conversationId = newConv.id;
+      }
+
+      // Send a system message or notification
+      await prisma.notification.create({
+        data: {
+          userId: updated.requesterId,
+          type: 'MEETING_REQUEST' as any,
+          title: 'Request Accepted',
+          body: `Your interest in "${updated.announcement.title}" was accepted. You can now start chatting!`,
+          linkUrl: `/chats/${conversationId}`,
+        }
+      });
+    }
+
     revalidatePath('/my-announcements');
-    return { success: true, data: updated };
+    revalidatePath('/chats');
+    return { success: true, data: { ...updated, conversationId } };
   } catch(e) {
+    console.error('Update status error:', e);
     return { success: false, error: 'Failed' };
   }
 }

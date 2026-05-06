@@ -22,20 +22,33 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
     setIsUpdating(prev => ({ ...prev, [id]: false }));
   };
 
-  const handleInterestStatus = async (projectId: string, requestId: string, newStatus: string) => {
-    const res = await updateMeetingRequestStatus(requestId, newStatus);
-    if (res.success) {
-      setProjects(prev => prev.map(p => {
-        if (p.id === projectId) {
-          return {
-            ...p,
-            meetingRequests: p.meetingRequests.map((req: any) => 
-              req.id === requestId ? { ...req, status: newStatus } : req
-            )
-          };
+  const handleInterestStatus = async (projectId: string, requestId: string, status: string) => {
+    try {
+      const res = await updateMeetingRequestStatus(requestId, status);
+      if (res.success) {
+        toast.success(`Request ${status.toLowerCase()}`);
+        
+        // If accepted, redirect to chat
+        if (status === 'ACCEPTED' && res.data?.conversationId) {
+          router.push(`/chats/${res.data.conversationId}`);
+        } else {
+          setProjects(prev => prev.map(p => {
+            if (p.id === projectId) {
+              return {
+                ...p,
+                meetingRequests: p.meetingRequests.map((req: any) => 
+                  req.id === requestId ? { ...req, status: status } : req
+                )
+              };
+            }
+            return p;
+          }));
         }
-        return p;
-      }));
+      } else {
+        toast.error(res.error || 'Failed to update request');
+      }
+    } catch (error) {
+      toast.error('Something went wrong');
     }
   };
 
@@ -63,7 +76,7 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
           <h1 className="manage-title">Manage Your Projects</h1>
           <p className="manage-subtitle">Track interest and coordinate with potential collaborators.</p>
         </div>
-        <Link href="/board/create" className="create-btn">
+        <Link href="/post-project" className="create-btn">
           <span className="material-symbols-outlined">add</span>
           Post New Project
         </Link>
@@ -159,7 +172,7 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                                     className="btn-accept"
                                     onClick={() => handleInterestStatus(project.id, app.id, 'ACCEPTED')}
                                   >
-                                    Accept Request
+                                    Accept & Start Chat
                                   </button>
                                   <button 
                                     className="btn-decline"

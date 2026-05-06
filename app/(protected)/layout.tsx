@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
   Home, 
-  LayoutGrid, 
   Megaphone, 
   Handshake, 
   User, 
   LogOut,
-  MessageSquare
+  MessageSquare,
+  Users
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
@@ -22,7 +22,7 @@ export default function ProtectedLayout({
   modal,
 }: {
   children: React.ReactNode;
-  modal?: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -37,13 +37,13 @@ export default function ProtectedLayout({
     <div className="shell">
       <nav className="dynamic-island-nav">
         <div className="dynamic-island-content">
-          <Link href="/dashboard" className={`island-item ${pathname.startsWith('/dashboard') ? 'active' : ''}`} title="Dashboard">
+          <Link 
+            href="/dashboard" 
+            className={`island-item ${pathname === '/dashboard' || pathname.startsWith('/doctor/dashboard') || pathname.startsWith('/engineer/dashboard') ? 'active' : ''}`} 
+            title="Home"
+          >
             <Home size={18} />
             <span className="island-label">Home</span>
-          </Link>
-          <Link href="/board" className={`island-item ${pathname.startsWith('/board') ? 'active' : ''}`} title="Co-Creation Board">
-            <LayoutGrid size={18} />
-            <span className="island-label">Board</span>
           </Link>
           <Link href="/my-announcements" className={`island-item ${pathname.startsWith('/my-announcements') ? 'active' : ''}`} title="My Announcements">
             <Megaphone size={18} />
@@ -53,9 +53,13 @@ export default function ProtectedLayout({
             <Handshake size={18} />
             <span className="island-label">Requests</span>
           </Link>
-          <Link href="/chats" className={`island-item ${pathname.startsWith('/chats') || pathname.startsWith('/connections') ? 'active' : ''}`} title="Chats & Connections">
+          <Link href="/chats" className={`island-item ${pathname.startsWith('/chats') ? 'active' : ''}`} title="Chats">
             <MessageSquare size={18} />
             <span className="island-label">Chats</span>
+          </Link>
+          <Link href="/connections" className={`island-item ${pathname.startsWith('/connections') ? 'active' : ''}`} title="Connections">
+            <Users size={18} />
+            <span className="island-label">Connections</span>
           </Link>
           <Link href="/profile" className={`island-item ${pathname.startsWith('/profile') ? 'active' : ''}`} title="Profile">
             <User size={18} />
@@ -83,7 +87,6 @@ export default function ProtectedLayout({
           {children}
         </div>
       </main>
-
       {modal}
     </div>
   );

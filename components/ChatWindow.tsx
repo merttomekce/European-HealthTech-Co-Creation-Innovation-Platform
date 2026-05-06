@@ -59,8 +59,8 @@ export default function ChatWindow({ thread }: ChatWindowProps) {
           <h3>No thread selected</h3>
           <p>Pick collaboration thread from sidebar to review request history and project context.</p>
           <div className="chat-window__empty-actions">
-            <Link href="/board" className="chat-window__button chat-window__button--primary">
-              Browse board
+            <Link href="/dashboard" className="chat-window__button chat-window__button--primary">
+              Browse feed
             </Link>
             <Link href="/connections" className="chat-window__button">
               Review connections

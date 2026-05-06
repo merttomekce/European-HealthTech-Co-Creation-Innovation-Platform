@@ -196,6 +196,7 @@
   justify-content: center;
   font-size: 0.95rem;
   font-weight: 700;
+  overflow: hidden;
 }
 
 .chat-thread__copy {
@@ -220,11 +221,18 @@
   flex-shrink: 0;
   padding: 0.28rem 0.62rem;
   border-radius: 9999px;
-  background: var(--surface-raised);
-  border: 1px solid var(--outline);
+  background: var(--blue-primary);
+  border: 1px solid var(--blue-primary);
   font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--on-background);
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  animation: badge-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .chat-thread__role,
@@ -279,6 +287,7 @@
   justify-content: center;
   font-size: 1rem;
   font-weight: 700;
+  overflow: hidden;
 }
 
 .chat-window__title-block {
@@ -569,15 +578,23 @@
   border: 1px solid var(--outline);
   border-radius: 20px;
   padding: 0.95rem 1rem;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px) scale(1.005);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .message-bubble--incoming {
   background: var(--surface);
+  transform-origin: left bottom;
 }
 
 .message-bubble--outgoing {
-  background: rgba(37, 99, 235, 0.05);
-  border-color: rgba(37, 99, 235, 0.22);
+  background: rgba(37, 99, 235, 0.04);
+  border-color: rgba(37, 99, 235, 0.18);
+  transform-origin: right bottom;
 }
 
 .message-bubble--system {
