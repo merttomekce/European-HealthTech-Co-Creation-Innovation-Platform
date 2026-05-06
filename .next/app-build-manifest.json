@@ -1,25 +1,26 @@
 {
   "pages": {
-    "/page": [
+    "/global-error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/global-error.js"
     ],
-    "/layout": [
+    "/(protected)/board/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
+      "static/css/app/(protected)/board/page.css",
+      "static/chunks/app/(protected)/board/page.js"
     ],
-    "/not-found": [
+    "/(protected)/board/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/not-found.js"
+      "static/css/app/(protected)/board/loading.css",
+      "static/chunks/app/(protected)/board/loading.js"
     ],
-    "/(protected)/dashboard/page": [
+    "/(protected)/@modal/default": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(protected)/dashboard/page.js"
+      "static/chunks/app/(protected)/@modal/default.js"
     ],
     "/(protected)/layout": [
       "static/chunks/webpack.js",
@@ -32,21 +33,55 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(protected)/template.js"
     ],
-    "/admin/page": [
+    "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/page.js"
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
     ],
-    "/admin/layout": [
+    "/error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/admin/layout.css",
-      "static/chunks/app/admin/layout.js"
+      "static/chunks/app/error.js"
     ],
-    "/admin/settings/page": [
+    "/not-found": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/settings/page.js"
+      "static/chunks/app/not-found.js"
+    ],
+    "/(protected)/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/profile/page.css",
+      "static/chunks/app/(protected)/profile/page.js"
+    ],
+    "/(protected)/chats/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(protected)/chats/page.js"
+    ],
+    "/(protected)/chats/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/chats/layout.css",
+      "static/chunks/app/(protected)/chats/layout.js"
+    ],
+    "/(protected)/my-requests/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/my-requests/page.css",
+      "static/chunks/app/(protected)/my-requests/page.js"
+    ],
+    "/(protected)/my-announcements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/my-announcements/page.css",
+      "static/chunks/app/(protected)/my-announcements/page.js"
+    ],
+    "/(protected)/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(protected)/dashboard/page.js"
     ],
     "/(protected)/doctor/dashboard/page": [
       "static/chunks/webpack.js",
@@ -54,15 +89,41 @@
       "static/css/app/(protected)/doctor/dashboard/page.css",
       "static/chunks/app/(protected)/doctor/dashboard/page.js"
     ],
-    "/admin/posts/page": [
+    "/(protected)/doctor/dashboard/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/posts/page.js"
+      "static/css/app/(protected)/doctor/dashboard/loading.css",
+      "static/chunks/app/(protected)/doctor/dashboard/loading.js"
     ],
-    "/admin/logs/page": [
+    "/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/logs/page.js"
+      "static/css/app/login/page.css",
+      "static/chunks/app/login/page.js"
+    ],
+    "/login/password/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/login/password/page.css",
+      "static/chunks/app/login/password/page.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/page.css",
+      "static/chunks/app/page.js"
+    ],
+    "/(protected)/notifications/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/notifications/page.css",
+      "static/chunks/app/(protected)/notifications/page.js"
+    ],
+    "/(protected)/@modal/(.)board/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(protected)/@modal/(.)board/[id]/page.css",
+      "static/chunks/app/(protected)/@modal/(.)board/[id]/page.js"
     ]
   }
 }

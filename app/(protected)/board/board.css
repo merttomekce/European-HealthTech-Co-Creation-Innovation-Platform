@@ -5,49 +5,34 @@
   padding-bottom: 2rem;
 }
 
-.board-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.7fr);
-  gap: 1.25rem;
-  padding: 1.75rem;
-  border: 1px solid var(--outline);
-  border-radius: 32px;
-  background:
-    radial-gradient(circle at top right, rgba(157, 182, 210, 0.35), transparent 36%),
-    linear-gradient(135deg, #f8fbff 0%, #ffffff 58%, #eff4ff 100%);
-}
-
-.board-hero-kicker,
-.board-panel-label {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  color: var(--on-background-muted);
-}
-
-.board-hero-title {
-  margin: 0.25rem 0 0;
-  font-family: var(--font-serif);
-  font-size: clamp(2.4rem, 4vw, 4.3rem);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
-}
-
-.board-hero-subtitle {
-  max-width: 60ch;
-  margin-top: 1rem;
-  color: var(--on-background-muted);
-  font-size: 1.04rem;
-  line-height: 1.6;
-}
-
-.board-hero-links {
+.feed-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.5rem 0.5rem 1rem 0.5rem;
+}
+
+.feed-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.feed-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--on-background);
+}
+
+.feed-count {
+  font-size: 0.95rem;
+  color: var(--on-background-muted);
+  font-weight: 500;
 }
 
 .board-pill-button,
@@ -63,6 +48,11 @@
 
 .board-pill-button {
   padding: 0.8rem 1rem;
+  background: var(--surface);
+  color: var(--on-background);
+}
+
+.board-pill-button.primary {
   background: var(--on-background);
   color: var(--background);
 }
@@ -72,39 +62,10 @@
   transform: translateY(-1px);
 }
 
-.board-hero-anchor,
 .board-footer-link {
   text-decoration: underline dotted;
   text-underline-offset: 0.18em;
   font-weight: 600;
-}
-
-.board-hero-panel {
-  padding: 1.25rem;
-  border-radius: 28px;
-  border: 1px solid rgba(37, 99, 235, 0.12);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 248, 255, 1));
-}
-
-.board-hero-panel-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--outline);
-}
-
-.board-hero-panel-row:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.board-panel-value {
-  font-family: var(--font-serif);
-  font-size: 2.2rem;
-  line-height: 1;
-  font-weight: 700;
 }
 
 .board-toolbar {

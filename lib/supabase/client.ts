@@ -43,6 +43,29 @@ export function createClient() {
             error: null,
           }
         },
+        signUp: async ({ email, password }: { email: string; password: string }) => {
+          if (typeof document !== 'undefined' && email === DEMO_LOGIN.email) {
+            document.cookie = 'dev_bypass=true; path=/; max-age=86400; samesite=lax'
+          }
+
+          return {
+            data: {
+              user: {
+                id: 'dev-bypass-user',
+                email,
+                user_metadata: { name: '', role: DEMO_LOGIN.role },
+              },
+              session: {
+                user: {
+                  id: 'dev-bypass-user',
+                  email,
+                  user_metadata: { name: '', role: DEMO_LOGIN.role },
+                },
+              },
+            },
+            error: null,
+          }
+        },
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       },
       channel: () => ({

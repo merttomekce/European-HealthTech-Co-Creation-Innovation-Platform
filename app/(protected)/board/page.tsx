@@ -173,38 +173,15 @@ export default function BoardPage() {
 
   return (
     <div className="board-shell">
-      <header className="board-hero">
-        <div className="board-hero-copy">
-          <p className="board-hero-kicker">Co-creation board</p>
-          <h1 className="board-hero-title">Announcement Board</h1>
-          <p className="board-hero-subtitle">
-            Find projects that match your specialty, inspect fit fast, and start collaboration without noise.
-          </p>
-          <div className="board-hero-links">
-            <Link href="/board/create" className="board-pill-button">
-              <Plus size={18} />
-              Post a project
-            </Link>
-            <a href="#board-results" className="board-hero-anchor">
-              Jump to results
-            </a>
-          </div>
+      <header className="feed-header">
+        <div className="feed-header-left">
+          <h1 className="feed-title">Announcement Board</h1>
+          <span className="feed-count">{activeCount} active projects</span>
         </div>
-
-        <div className="board-hero-panel">
-          <div className="board-hero-panel-row">
-            <span className="board-panel-label">Visible projects</span>
-            <span className="board-panel-value">{activeCount}</span>
-          </div>
-          <div className="board-hero-panel-row">
-            <span className="board-panel-label">Local matches</span>
-            <span className="board-panel-value">{localMatches}</span>
-          </div>
-          <div className="board-hero-panel-row">
-            <span className="board-panel-label">Filters active</span>
-            <span className="board-panel-value">{showAdvanced ? 5 : 2}</span>
-          </div>
-        </div>
+        <Link href="/board/create" className="board-pill-button primary">
+          <Plus size={18} />
+          Post a project
+        </Link>
       </header>
 
       <section className="board-toolbar" aria-label="Board filters">

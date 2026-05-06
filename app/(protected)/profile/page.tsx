@@ -5,7 +5,7 @@ import { profileSchema } from '@/lib/validations';
 import TagInput from '@/components/TagInput';
 import SearchableSelect from '@/components/SearchableSelect';
 import { updateProfile, getAuthProfile } from '@/lib/actions/profile';
-import { COUNTRIES, HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
+import { HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
 import './profile.css';
 
 // Helper: parse "City, Country" string back to parts
@@ -33,6 +33,12 @@ export default function ProfilePage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Dynamic location states
+  const [countries, setCountries] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+  const [isLoadingCities, setIsLoadingCities] = useState(false);
 
   React.useEffect(() => {
     async function fetchProfile() {
@@ -50,8 +56,48 @@ export default function ProfilePage() {
       }
       setIsLoading(false);
     }
+
+    async function fetchCountries() {
+      setIsLoadingCountries(true);
+      try {
+        const res = await fetch('/api/location?type=countries');
+        const data = await res.json();
+        setCountries(data);
+      } catch (err) {
+        console.error('Failed to fetch countries');
+      } finally {
+        setIsLoadingCountries(false);
+      }
+    }
+
     fetchProfile();
+    fetchCountries();
   }, []);
+
+  // Fetch cities when country changes
+  React.useEffect(() => {
+    if (!formData.country) {
+      setCities([]);
+      return;
+    }
+
+    async function fetchCities() {
+      setIsLoadingCities(true);
+      try {
+        // Find the country object to get its name (API uses name for city lookup)
+        const res = await fetch(`/api/location?type=cities&countryCode=${encodeURIComponent(formData.country)}`);
+        const data = await res.json();
+        setCities(data);
+      } catch (err) {
+        console.error('Failed to fetch cities');
+        setCities([]);
+      } finally {
+        setIsLoadingCities(false);
+      }
+    }
+
+    fetchCities();
+  }, [formData.country]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -171,25 +217,28 @@ export default function ProfilePage() {
             <div className="full-width">
               <SearchableSelect
                 label="Country"
-                options={COUNTRIES}
+                placeholder={isLoadingCountries ? "Loading countries..." : "Search countries..."}
+                options={countries}
                 value={formData.country}
-                onChange={(val) => { setFormData((p) => ({ ...p, country: val })); setIsSaved(false); }}
+                onChange={(val) => { 
+                  setFormData((p) => ({ ...p, country: val, city: '' })); 
+                  setIsSaved(false); 
+                }}
                 error={errors.country}
+                disabled={isLoadingCountries}
               />
             </div>
 
-            {/* City */}
-            <div className="form-group full-width">
-              <label className="form-label">
-                City <span style={{ color: 'var(--on-background-muted)', fontWeight: 400 }}>(optional)</span>
-              </label>
-              <input
-                type="text"
-                name="city"
-                className="form-input"
-                placeholder="Berlin"
+            {/* City Searchable Select */}
+            <div className="full-width" style={{ opacity: formData.country ? 1 : 0.5, transition: 'opacity 0.2s' }}>
+              <SearchableSelect
+                label="City"
+                placeholder={isLoadingCities ? "Loading cities..." : (formData.country ? "Search cities..." : "Select country first")}
+                options={cities}
                 value={formData.city}
-                onChange={handleInputChange}
+                onChange={(val) => { setFormData((p) => ({ ...p, city: val })); setIsSaved(false); }}
+                error={errors.city}
+                disabled={!formData.country || isLoadingCities}
               />
             </div>
           </div>

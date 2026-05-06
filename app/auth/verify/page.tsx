@@ -28,7 +28,7 @@ export default function VerifyPage() {
         </div>
         
         <div className="auth-secondary-info" style={{ marginTop: '0.5rem' }}>
-          <Link href="/auth/complete-profile">Skip to onboarding (Development Only)</Link>
+          <Link href="/auth/register">Continue to registration</Link>
         </div>
       </div>
     </div>

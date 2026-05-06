@@ -1,8 +1,9 @@
 {
-  "/page": "app/page.js",
-  "/admin/page": "app/admin/page.js",
+  "/api/location/route": "app/api/location/route.js",
+  "/login/page": "app/login/page.js",
   "/(protected)/doctor/dashboard/page": "app/(protected)/doctor/dashboard/page.js",
-  "/admin/settings/page": "app/admin/settings/page.js",
-  "/admin/posts/page": "app/admin/posts/page.js",
-  "/admin/logs/page": "app/admin/logs/page.js"
+  "/(protected)/profile/page": "app/(protected)/profile/page.js",
+  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js",
+  "/(protected)/@modal/(.)board/[id]/page": "app/(protected)/@modal/(.)board/[id]/page.js",
+  "/(protected)/chats/page": "app/(protected)/chats/page.js"
 }

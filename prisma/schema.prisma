@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 // Core identity
@@ -19,11 +19,12 @@ model User {
   emailVerified DateTime?
   role          Role      @default(ENGINEER)
   name          String?
-  institution   String?   // e.g., "MIT"
+  image         String? // URL for profile photo
+  institution   String? // e.g., "MIT"
   city          String?
   country       String?
   bio           String?   @db.Text
-  expertise     String[]  // tags array
+  expertise     String[] // tags array
   isActive      Boolean   @default(true)
   isSuspended   Boolean   @default(false)
   createdAt     DateTime  @default(now())
@@ -35,6 +36,12 @@ model User {
   receivedRequests MeetingRequest[] @relation("Recipient")
   notifications    Notification[]
   auditLogs        AuditLog[]
+
+  // Chat & Networking
+  connections1  Connection[]              @relation("ConnectionUser1")
+  connections2  Connection[]              @relation("ConnectionUser2")
+  conversations ConversationParticipant[]
+  messages      Message[]
 }
 
 enum Role {
@@ -45,14 +52,14 @@ enum Role {
 
 // Announcement (the core entity)
 model Announcement {
-  id                String             @id @default(cuid())
-  authorId          String
-  author            User               @relation(fields: [authorId], references: [id])
+  id       String @id @default(cuid())
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
 
   title             String
-  domain            String             // "cardiology imaging", "orthopedics", etc.
+  domain            String // "cardiology imaging", "orthopedics", etc.
   explanation       String             @db.Text
-  expertiseNeeded   String             // what the OTHER role provides
+  expertiseNeeded   String // what the OTHER role provides
   projectStage      ProjectStage
   commitmentLevel   CommitmentLevel
   collaborationType CollaborationType? // engineers only
@@ -95,9 +102,9 @@ enum ProjectStage {
 }
 
 enum CommitmentLevel {
-  LOW    // advisory, occasional
+  LOW // advisory, occasional
   MEDIUM // part-time research
-  HIGH   // co-founder level
+  HIGH // co-founder level
 }
 
 enum CollaborationType {
@@ -107,22 +114,22 @@ enum CollaborationType {
 }
 
 enum Confidentiality {
-  PUBLIC_PITCH       // full details visible
+  PUBLIC_PITCH // full details visible
   DETAILS_IN_MEETING // only pitch visible, rest disclosed at meeting
 }
 
 // Meeting Request workflow
 model MeetingRequest {
-  id             String               @id @default(cuid())
+  id             String       @id @default(cuid())
   announcementId String
-  announcement   Announcement         @relation(fields: [announcementId], references: [id])
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
   requesterId    String
-  requester      User                 @relation("Requester", fields: [requesterId], references: [id])
+  requester      User         @relation("Requester", fields: [requesterId], references: [id])
   recipientId    String
-  recipient      User                 @relation("Recipient", fields: [recipientId], references: [id])
+  recipient      User         @relation("Recipient", fields: [recipientId], references: [id])
 
-  message       String               @db.Text // initial interest message
-  ndaAccepted   Boolean              @default(false)
+  message       String    @db.Text // initial interest message
+  ndaAccepted   Boolean   @default(false)
   ndaAcceptedAt DateTime?
 
   status        MeetingRequestStatus @default(PENDING)
@@ -140,11 +147,11 @@ model MeetingRequest {
 }
 
 enum MeetingRequestStatus {
-  PENDING          // sent, awaiting acknowledgment
-  ACCEPTED         // request accepted, waiting for slots
-  SLOTS_PROPOSED   // one party has proposed slots (either side)
+  PENDING // sent, awaiting acknowledgment
+  ACCEPTED // request accepted, waiting for slots
+  SLOTS_PROPOSED // one party has proposed slots (either side)
   COUNTER_PROPOSED // other party rejected all and proposed new slots
-  CONFIRMED        // a slot was accepted by one party
+  CONFIRMED // a slot was accepted by one party
   DECLINED
   CANCELLED
   COMPLETED
@@ -154,7 +161,7 @@ model TimeSlot {
   id               String         @id @default(cuid())
   meetingRequestId String
   meetingRequest   MeetingRequest @relation(fields: [meetingRequestId], references: [id])
-  proposedBy       String         // userId — either party can propose
+  proposedBy       String // userId — either party can propose
   startTime        DateTime
   endTime          DateTime
   status           SlotStatus     @default(PENDING)
@@ -164,10 +171,10 @@ model TimeSlot {
 }
 
 enum SlotStatus {
-  PENDING  // awaiting selection
+  PENDING // awaiting selection
   SELECTED // this slot was chosen — meeting confirmed
   REJECTED // explicitly passed over
-  EXPIRED  // past datetime, never confirmed
+  EXPIRED // past datetime, never confirmed
 }
 
 // Notifications
@@ -187,16 +194,16 @@ model Notification {
 }
 
 enum NotificationType {
-  NEW_INTEREST           // someone expressed interest in your post
-  MEETING_REQUEST        // meeting request received
-  SLOTS_PROPOSED         // first set of time slots proposed (either party)
+  NEW_INTEREST // someone expressed interest in your post
+  MEETING_REQUEST // meeting request received
+  SLOTS_PROPOSED // first set of time slots proposed (either party)
   COUNTER_SLOTS_PROPOSED // other party proposed new slots in a new round
-  SLOT_SELECTED          // the other party selected a slot — meeting confirmed
-  MEETING_DECLINED       // your request was declined
-  MEETING_CANCELLED      // meeting was cancelled
-  PARTNER_FOUND          // announcement owner marked partner found
-  ACCOUNT_SUSPENDED      // admin action
-  SYSTEM                 // broadcast / maintenance messages
+  SLOT_SELECTED // the other party selected a slot — meeting confirmed
+  MEETING_DECLINED // your request was declined
+  MEETING_CANCELLED // meeting was cancelled
+  PARTNER_FOUND // announcement owner marked partner found
+  ACCOUNT_SUSPENDED // admin action
+  SYSTEM // broadcast / maintenance messages
 }
 
 // Audit Log (append-only, tamper-resistant)
@@ -206,10 +213,10 @@ model AuditLog {
   user         User?       @relation(fields: [userId], references: [id])
   role         Role?
   actionType   AuditAction
-  targetEntity String?     // e.g., "Announcement:clx123"
-  result       String      // "success" | "failure"
-  ipAddress    String?     // nullable, GDPR-compliant
-  metadata     Json?       // extra context, no PII
+  targetEntity String? // e.g., "Announcement:clx123"
+  result       String // "success" | "failure"
+  ipAddress    String? // nullable, GDPR-compliant
+  metadata     Json? // extra context, no PII
   createdAt    DateTime    @default(now())
   // No updatedAt — append-only
 
@@ -251,4 +258,53 @@ model PlatformSettings {
   requireNDA         Boolean  @default(true)
   emailNotifications Boolean  @default(true)
   updatedAt          DateTime @updatedAt
+}
+
+// Networking & Chat
+model Connection {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user1     User     @relation("ConnectionUser1", fields: [user1Id], references: [id])
+  user2Id   String
+  user2     User     @relation("ConnectionUser2", fields: [user2Id], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([updatedAt(sort: Desc)])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  joinedAt       DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt(sort: Asc)])
 }

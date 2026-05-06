@@ -2,10 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import { getUnreadCount } from '@/lib/actions/notifications';
 
 export default function NotificationBell() {
+  const pathname = usePathname();
   const [unreadCount, setUnreadCount] = React.useState(0);
 
   React.useEffect(() => {
@@ -17,7 +19,12 @@ export default function NotificationBell() {
   }, []);
 
   return (
-    <Link href="/notifications" className="notification-btn" aria-label="Notifications">
+    <Link 
+      href="/notifications" 
+      className={`island-item ${pathname.startsWith('/notifications') ? 'active' : ''}`}
+      aria-label="Notifications" 
+      title="Notifications"
+    >
       <Bell size={20} />
       {unreadCount > 0 && (
         <span className="notification-badge"></span>
@@ -25,3 +32,4 @@ export default function NotificationBell() {
     </Link>
   );
 }
+

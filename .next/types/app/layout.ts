@@ -1,4 +1,4 @@
-// File: C:\Users\user\European-HealthTech-Co-Creation-Innovation-Platform\app\layout.tsx
+// File: /Users/merttomekce/Documents/Code/Seng384/HealthAI/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

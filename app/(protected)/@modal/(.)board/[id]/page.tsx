@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 import { getAnnouncementById } from '@/lib/actions/announcements';
 import InterestModal from '@/components/InterestModal';
-import '../../../../board/project-detail.css';
+import '@/app/(protected)/board/project-detail.css';
 
 export default function ProjectDetailModalPage({ params }: { params: { id: string } }) {
   const [project, setProject] = useState<any>(null);

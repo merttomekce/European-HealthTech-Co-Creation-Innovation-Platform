@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getAuthRedirect } from '@/lib/actions/authRedirect';
+import { resolveAuthFlow } from '@/lib/actions/authFlow';
 import { DEMO_LOGIN, isDemoLogin } from '@/lib/demo-login';
 import '../auth/auth-v2.css';
 
@@ -30,7 +31,6 @@ const trustPoints = [
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [banner, setBanner] = React.useState<{ type: 'error' | 'success'; text: string } | null>(null);
 
@@ -48,15 +48,21 @@ export default function LoginPage() {
     checkSession();
   }, [router, supabase]);
 
-  const submitCredentials = async (emailValue: string, passwordValue: string) => {
+  const handleContinue = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     setBanner(null);
 
     try {
-      if (isDemoLogin(emailValue, passwordValue)) {
-        document.cookie = 'dev_bypass=true; path=/; max-age=86400; samesite=lax';
-        router.push('/engineer/dashboard');
-        router.refresh();
+      const normalized = email.trim().toLowerCase();
+
+      if (!normalized) {
+        setBanner({ type: 'error', text: 'Enter email first.' });
+        return;
+      }
+
+      if (isDemoLogin(normalized, DEMO_LOGIN.password)) {
+        router.push(`/login/password?email=${encodeURIComponent(normalized)}`);
         return;
       }
 
@@ -65,46 +71,32 @@ export default function LoginPage() {
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({ email: emailValue, password: passwordValue });
-      if (error) {
-        setBanner({ type: 'error', text: error.message });
-        return;
-      }
-
-      const redirectUrl = await getAuthRedirect();
-      router.push(redirectUrl);
-      router.refresh();
+      const result = await resolveAuthFlow(normalized);
+      router.push(result.nextPath);
     } catch (err: any) {
-      setBanner({ type: 'error', text: err?.message || 'Login failed.' });
+      setBanner({ type: 'error', text: err?.message || 'Could not continue.' });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await submitCredentials(email, password);
-  };
-
   const handleDemoLogin = async () => {
     setEmail(DEMO_LOGIN.email);
-    setPassword(DEMO_LOGIN.password);
-    setBanner({ type: 'success', text: 'Test account loaded. Signing in now.' });
-    await submitCredentials(DEMO_LOGIN.email, DEMO_LOGIN.password);
+    setBanner({ type: 'success', text: 'Demo email loaded. Continue to password screen.' });
   };
 
   return (
     <main className="auth-v2-container">
       <aside className="auth-v2-brand-side">
         <Link href="/" className="auth-v2-logo">
-          <span className="material-symbols-outlined" style={{ color: 'var(--orange-primary)' }}>lens_blur</span>
+          <span className="material-symbols-outlined" style={{ color: 'var(--blue-primary)' }}>lens_blur</span>
           HealthAI
         </Link>
 
         <div className="auth-v2-brand-content">
           <h1>Clinical Needs.<br />Engineering Solutions.</h1>
           <p>
-            Join a verified network of clinicians and engineers collaborating on live clinical projects.
+            Enter email first. We route registered users to password login and new users to profile setup.
           </p>
         </div>
 
@@ -128,11 +120,11 @@ export default function LoginPage() {
       <section className="auth-v2-form-side">
         <div className="auth-v2-form-card">
           <div className="auth-v2-eyebrow">Institutional Entrance</div>
-          <h2 className="auth-v2-title">Welcome back</h2>
+          <h2 className="auth-v2-title">Enter work email</h2>
 
           {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
 
-          <form className="auth-v2-form" onSubmit={handleSubmit}>
+          <form className="auth-v2-form" onSubmit={handleContinue}>
             <div className="auth-v2-group">
               <label className="auth-v2-label">Work Email</label>
               <input
@@ -145,29 +137,17 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="auth-v2-group">
-              <label className="auth-v2-label">Password</label>
-              <input
-                type="password"
-                className="auth-v2-input"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
             <button type="submit" className="auth-v2-btn" disabled={isLoading}>
-              {isLoading ? 'Verifying...' : 'Sign In'}
+              {isLoading ? 'Checking...' : 'Continue'}
             </button>
           </form>
 
           <div className="auth-v2-switch">
-            Don't have an account? <button onClick={() => router.push('/auth/complete-profile')} type="button">Sign up</button>
+            New here? <button onClick={() => router.push('/auth/register')} type="button">Create account</button>
           </div>
 
           <button type="button" className="auth-v2-demo-account" onClick={handleDemoLogin} disabled={isLoading}>
-            {isLoading ? 'Loading test account...' : 'Use test account'}
+            Load demo email
           </button>
         </div>
       </section>
