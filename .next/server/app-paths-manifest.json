@@ -1,8 +1,8 @@
 {
   "/page": "app/page.js",
   "/admin/page": "app/admin/page.js",
-  "/(protected)/doctor/dashboard/page": "app/(protected)/doctor/dashboard/page.js",
-  "/admin/settings/page": "app/admin/settings/page.js",
+  "/admin/users/page": "app/admin/users/page.js",
   "/admin/posts/page": "app/admin/posts/page.js",
-  "/admin/logs/page": "app/admin/logs/page.js"
+  "/admin/logs/page": "app/admin/logs/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js"
 }
