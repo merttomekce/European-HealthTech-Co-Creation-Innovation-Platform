@@ -37,21 +37,16 @@ const localAI = createOpenAI({
 
     const transformer = new TransformStream({
       transform(chunk, controller) {
-        // Append new chunk to buffer and split by lines
         lineBuffer += decoder.decode(chunk, { stream: true });
         const lines = lineBuffer.split('\n');
-        
-        // Keep the last partial line in the buffer
         lineBuffer = lines.pop() || '';
 
         for (const line of lines) {
           const trimmed = line.trim();
-          // SURGICAL FILTER: Drop only the line that contains stream-start
           if (trimmed.includes('stream-start')) {
             console.log('Companion: Dropping protocol chunk ->', trimmed);
             continue;
           }
-          // Re-encode valid lines (including empty lines for SSE spacing)
           controller.enqueue(encoder.encode(line + '\n'));
         }
       },
@@ -81,13 +76,22 @@ export async function POST(req: Request) {
 
     const result = await streamText({
       model: localAI.chat(modelName), 
-      system: `You are the HealthAI Companion. You help users navigate the platform, find projects, and create announcements.
+      system: `You are the HealthAI Agentic Companion, a high-fidelity AI assistant.
       User Profile: ${JSON.stringify(profile.data)}
       Current Date: ${new Date().toISOString()}
-      ${memoryContext ? `\nRelevant public platform memory:\n${memoryContext}\n` : ''}
+      ${memoryContext ? `\nRelevant platform memory:\n${memoryContext}\n` : ''}
       
-      Style: Professional, helpful, concise. 
-      You can perform actions on behalf of the user using tools.`,
+      AGENTIC WORKFLOW:
+      - To find projects: Use 'searchAnnouncements'.
+      - To propose a new post: 
+        1. Gather necessary context (title, idea, expertise needed).
+        2. Call 'showAnnouncementDraft' to present a high-fidelity preview.
+        3. Only call 'createAnnouncement' after the user explicitly confirms the draft.
+      - To assist navigation: Use 'requestUIAction'. 
+        * 'OPEN_POST_MODAL' triggers the manual project composer.
+        * 'NAVIGATE_TO_BOARD' goes to the main feed.
+      
+      TONE: Surgical, professional, proactive. Use glassmorphic tech-noir terminology.`,
       messages,
       onFinish: () => {
         console.log('Companion: Stream finished successfully.');
@@ -103,8 +107,8 @@ export async function POST(req: Request) {
             return data;
           },
         }),
-        createAnnouncement: tool({
-          description: 'Create a new project announcement on the board',
+        showAnnouncementDraft: tool({
+          description: 'Show a draft of an announcement to the user for review',
           inputSchema: z.object({
             title: z.string(),
             content: z.string(),
@@ -112,6 +116,29 @@ export async function POST(req: Request) {
             expertiseNeeded: z.string(),
             city: z.string().optional(),
             country: z.string().optional(),
+          }),
+          execute: async (args) => {
+            // This is a "UI Tool" - the execution on the server just confirms the intent
+            return { status: 'DRAFT_PROPOSED', ...args };
+          },
+        }),
+        requestUIAction: tool({
+          description: 'Request a UI action like opening a modal or navigating',
+          inputSchema: z.object({
+            action: z.enum(['OPEN_POST_MODAL', 'NAVIGATE_TO_BOARD', 'NAVIGATE_TO_CHATS']),
+            metadata: z.record(z.any()).optional(),
+          }),
+          execute: async ({ action }) => {
+            return { status: 'ACTION_REQUESTED', action };
+          },
+        }),
+        createAnnouncement: tool({
+          description: 'Directly create a new project announcement (use only if user explicitly says "post it")',
+          inputSchema: z.object({
+            title: z.string(),
+            content: z.string(),
+            type: z.enum(['RESEARCH', 'PILOT', 'CLINICAL_TRIAL', 'DEVELOPMENT', 'OTHER']),
+            expertiseNeeded: z.string(),
           }),
           execute: async (args) => {
             if (!profile.data?.id) return { error: 'Unauthorized' };
@@ -128,8 +155,8 @@ export async function POST(req: Request) {
                 confidentiality: 'PUBLIC_PITCH',
                 publicPitch: args.content,
                 authorId: profile.data.id,
-                city: args.city || profile.data.city || 'Unknown',
-                country: args.country || profile.data.country || 'Unknown',
+                city: profile.data.city || 'Unknown',
+                country: profile.data.country || 'Unknown',
                 status: 'DRAFT',
                 autoClose: false,
               },
