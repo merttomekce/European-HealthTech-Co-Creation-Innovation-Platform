@@ -3,9 +3,8 @@
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { getAuthRedirect } from '@/lib/actions/authRedirect';
-import { resolveAuthFlow } from '@/lib/actions/authFlow';
 import { DEMO_LOGIN, isDemoLogin } from '@/lib/demo-login';
+import { resolveAuthFlowClient } from '@/lib/auth-flow-client';
 import '../auth/auth-v2.css';
 
 const trustPoints = [
@@ -23,7 +22,7 @@ const trustPoints = [
   },
 ] as const;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const playLandingTransition = searchParams.get('from') === 'landing';
@@ -38,8 +37,7 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const redirectUrl = await getAuthRedirect();
-        router.replace(redirectUrl);
+        router.replace('/dashboard');
       }
     };
     checkSession();
@@ -68,7 +66,7 @@ export default function LoginPage() {
         return;
       }
 
-      const result = await resolveAuthFlow(normalized);
+      const result = await resolveAuthFlowClient(normalized);
       router.push(result.nextPath);
     } catch (err: any) {
       setBanner({ type: 'error', text: err?.message || 'Could not continue.' });
@@ -136,3 +134,10 @@ export default function LoginPage() {
   );
 }
 
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={<div className="auth-v2-container">Loading...</div>}>
+      <LoginForm />
+    </React.Suspense>
+  );
+}

@@ -45,8 +45,9 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
   // 5. Update Database
   try {
     await prisma.user.upsert({
-      where: { email: user.email! },
+      where: { id: user.id },
       update: {
+        email: user.email!,
         name: validated.fullName,
         institution: validated.institution,
         role: prismalRole,
@@ -84,7 +85,7 @@ export async function updateAvatar(imageUrl: string | null) {
 
   try {
     await prisma.user.update({
-      where: { email: user.email! },
+      where: { id: user.id },
       data: { image: imageUrl }
     })
     return { success: true }
@@ -104,7 +105,7 @@ export async function getAuthProfile() {
 
   try {
     const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! }
+      where: { id: user.id }
     })
     
     if (!dbUser) {
@@ -131,7 +132,7 @@ export async function getNavProfile() {
   }
 
   const dbUser = await prisma.user.findUnique({
-    where: { email: user.email! },
+    where: { id: user.id },
     select: { name: true, role: true, image: true }
   })
 

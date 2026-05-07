@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { updateProfile } from '@/lib/actions/profile';
+import { getAuthProfile, updateProfile } from '@/lib/actions/profile';
 import { profileSchema } from '@/lib/validations';
 import TagInput from '@/components/TagInput';
 import SearchableSelect from '@/components/SearchableSelect';
@@ -16,6 +16,7 @@ export default function OnboardingPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [animating, setAnimating] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -27,6 +28,20 @@ export default function OnboardingPage() {
   });
 
   React.useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const result = await getAuthProfile();
+        if (result.success && result.data?.role === 'ADMIN') {
+          router.replace('/admin');
+          return;
+        }
+      } catch (error) {
+        // Keep onboarding available if the profile lookup fails.
+      } finally {
+        setIsCheckingAccess(false);
+      }
+    };
+
     const fetchUserRole = async () => {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
@@ -35,6 +50,7 @@ export default function OnboardingPage() {
         setFormData(prev => ({ ...prev, role: user.user_metadata.role }));
       }
     };
+    checkAccess();
     fetchUserRole();
   }, []);
 
@@ -228,6 +244,18 @@ export default function OnboardingPage() {
         return null;
     }
   };
+
+  if (isCheckingAccess) {
+    return (
+      <div className="onboarding-container">
+        <div className="onboarding-main">
+          <div className="onboarding-form">
+            <h2>Checking access…</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="onboarding-container">

@@ -3,6 +3,8 @@ import { getMyAnnouncements } from '@/lib/actions/announcements';
 import MyAnnouncementsClient from './MyAnnouncementsClient';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MyAnnouncementsPage() {
   const result = await getMyAnnouncements();
 

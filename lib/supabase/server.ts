@@ -36,10 +36,10 @@ export function createClient() {
   }
 
   if (!supabaseUrl || !supabaseKey) {
-    // Return a mocked client that allows the UI to render without crashing on the server
+    // Missing Supabase config must not create a shared authenticated identity.
     return {
       auth: {
-        getUser: async () => ({ data: { user: { id: 'dummy-user', email: 'demo@healthai.edu', user_metadata: { name: 'Demo User', role: 'ENGINEER' } } }, error: null }),
+        getUser: async () => ({ data: { user: null }, error: null }),
         getSession: async () => ({ data: { session: null }, error: null }),
       },
       from: () => ({

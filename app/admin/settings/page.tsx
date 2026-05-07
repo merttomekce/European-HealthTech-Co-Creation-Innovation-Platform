@@ -152,7 +152,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Maintenance Mode */}
-      <div className="settings-section" style={{ borderColor: settings.maintenanceMode ? 'rgba(239,68,68,0.4)' : undefined }}>
+      <div className="settings-section" style={{ borderColor: settings.maintenanceMode ? 'rgba(37,99,235,0.35)' : undefined }}>
         <div className="settings-section-header">
           <div className="settings-section-title">System Status</div>
           <div className="settings-section-desc">Control platform availability.</div>
@@ -164,7 +164,7 @@ export default function AdminSettingsPage() {
           </div>
           <label className="toggle">
             <input type="checkbox" checked={settings.maintenanceMode} onChange={() => toggle('maintenanceMode')} aria-label="Enable Maintenance Mode" />
-            <span className="toggle-track" style={{ backgroundColor: settings.maintenanceMode ? '#ef4444' : undefined, borderColor: settings.maintenanceMode ? '#ef4444' : undefined }} />
+            <span className="toggle-track" style={{ backgroundColor: settings.maintenanceMode ? 'var(--blue-primary)' : undefined, borderColor: settings.maintenanceMode ? 'var(--blue-primary)' : undefined }} />
           </label>
         </div>
         {settings.maintenanceMode && (
@@ -202,20 +202,20 @@ export default function AdminSettingsPage() {
           border-top: 1px solid var(--outline);
         }
         .save-btn {
-          background-color: #ef4444;
+          background-color: var(--blue-primary);
           color: white;
           border: none;
           padding: 0.75rem 2rem;
-          border-radius: 8px;
+          border-radius: 9999px;
           font-weight: 600;
           font-size: 0.875rem;
           cursor: pointer;
           transition: all 0.2s;
         }
         .save-btn:hover:not(:disabled) {
-          background-color: #dc2626;
+          background-color: color-mix(in srgb, var(--blue-primary) 88%, white);
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+          box-shadow: 0 12px 26px rgba(37,99,235,0.18);
         }
         .save-btn:disabled {
           opacity: 0.6;

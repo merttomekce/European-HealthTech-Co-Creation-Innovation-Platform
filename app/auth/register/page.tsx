@@ -4,9 +4,8 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { getAuthRedirect } from '@/lib/actions/authRedirect';
-import { resolveAuthFlow } from '@/lib/actions/authFlow';
 import { updateProfile } from '@/lib/actions/profile';
+import { resolveAuthFlowClient } from '@/lib/auth-flow-client';
 import SearchableSelect from '@/components/SearchableSelect';
 import '../auth.css';
 import '../auth-v2.css';
@@ -57,8 +56,7 @@ function RegisterForm() {
     const checkSession = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const redirectUrl = await getAuthRedirect();
-        router.replace(redirectUrl);
+        router.replace('/dashboard');
       }
     };
     checkSession();
@@ -119,7 +117,7 @@ function RegisterForm() {
       }
 
       try {
-        const result = await resolveAuthFlow(email);
+        const result = await resolveAuthFlowClient(email);
         if (!isActive) return;
         if (result.registered) {
           router.replace(result.nextPath);
@@ -150,6 +148,7 @@ function RegisterForm() {
         return;
       }
 
+      document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
       const { data, error } = await supabase.auth.signUp({
         email,
         password: formData.password,
@@ -178,8 +177,7 @@ function RegisterForm() {
         expertise: formData.expertise,
       });
 
-      const redirectUrl = await getAuthRedirect();
-      router.push(redirectUrl);
+      router.push('/dashboard');
       router.refresh();
     } catch (err: any) {
       setBanner({ type: 'error', text: err?.message || 'Registration failed.' });

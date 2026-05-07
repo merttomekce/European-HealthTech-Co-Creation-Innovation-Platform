@@ -63,7 +63,6 @@ export default function AdminLogsClient({ initialLogs }: { initialLogs: Log[] })
                 className="table-btn primary" 
                 onClick={handleExport}
                 disabled={isExporting}
-                style={{ backgroundColor: '#ef4444', color: 'white', border: 'none' }}
             >
                 <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>download</span>
                 {isExporting ? 'Exporting...' : 'Export CSV'}
@@ -145,15 +144,16 @@ export default function AdminLogsClient({ initialLogs }: { initialLogs: Log[] })
         .admin-filter-input {
             width: 100%;
             padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 14px;
+            border: 1px solid var(--outline);
             font-size: 0.8125rem;
             outline: none;
-            background: white;
+            background: var(--surface-raised);
+            color: var(--on-background);
         }
         .admin-filter-input:focus {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 2px rgba(239,68,68,0.1);
+            border-color: var(--blue-primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
         }
       `}</style>
     </>

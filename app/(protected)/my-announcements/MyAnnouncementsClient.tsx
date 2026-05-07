@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import MeetingStatusPill from '@/components/MeetingStatusPill';
 import { toggleAnnouncementStatus } from '@/lib/actions/announcements';
 import { updateMeetingRequestStatus, confirmMeetingSlot } from '@/lib/actions/meetings';
@@ -9,6 +10,7 @@ import './manage.css';
 import './requests.css';
 
 export default function MyAnnouncementsClient({ initialData }: { initialData: any[] }) {
+  const router = useRouter();
   const [projects, setProjects] = useState(initialData);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
@@ -26,8 +28,6 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
     try {
       const res = await updateMeetingRequestStatus(requestId, status);
       if (res.success) {
-        toast.success(`Request ${status.toLowerCase()}`);
-        
         // If accepted, redirect to chat
         if (status === 'ACCEPTED' && res.data?.conversationId) {
           router.push(`/chats/${res.data.conversationId}`);
@@ -45,10 +45,10 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
           }));
         }
       } else {
-        toast.error(res.error || 'Failed to update request');
+        window.alert(res.error || 'Failed to update request');
       }
     } catch (error) {
-      toast.error('Something went wrong');
+      window.alert('Something went wrong');
     }
   };
 

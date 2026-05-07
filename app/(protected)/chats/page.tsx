@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import ChatSidebar, { ChatThreadSummary } from '@/components/ChatSidebar';
 import ChatWindow, { ChatThreadDetail } from '@/components/ChatWindow';
 
+export const dynamic = 'force-dynamic';
+
 function roleLabel(role?: string | null) {
   switch (role) {
     case 'HEALTHCARE_PROFESSIONAL':
@@ -25,13 +27,10 @@ function initialsFrom(name?: string | null, fallback = 'TH') {
   return parts.slice(0, 2).map((part) => part[0]).join('').toUpperCase();
 }
 
-async function loadConversation(userId: string, partnerId: string) {
-  return prisma.conversation.findFirst({
+async function loadConversation(requestId: string) {
+  return prisma.conversation.findUnique({
     where: {
-      AND: [
-        { participants: { some: { userId } } },
-        { participants: { some: { userId: partnerId } } },
-      ],
+      id: requestId,
     },
     include: {
       messages: {
@@ -59,7 +58,7 @@ async function buildThreadSummary(userId: string, request: any): Promise<ChatThr
   const location = [partner?.city, partner?.country].filter(Boolean).join(', ') || 'Location not shared';
   const direction = isOutgoing ? 'outgoing' : 'incoming';
   const status = request.status as string;
-  const conversation = partner?.id ? await loadConversation(userId, partner.id) : null;
+  const conversation = await loadConversation(request.id);
 
   return {
     id: request.id,

@@ -31,7 +31,9 @@ export default function ProtectedLayout({
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/');
+    document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
+    router.replace('/login');
+    router.refresh();
   };
 
   return (

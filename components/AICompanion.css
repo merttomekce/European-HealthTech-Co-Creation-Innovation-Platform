@@ -178,7 +178,7 @@
   gap: 1.5rem;
 }
 
-.message-row {
+.companion-shell .message-row {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
@@ -186,15 +186,15 @@
   max-width: 100%;
 }
 
-.message-row--user {
+.companion-shell .message-row--user {
   align-self: flex-end;
 }
 
-.message-row--assistant {
+.companion-shell .message-row--assistant {
   align-self: flex-start;
 }
 
-.message-meta {
+.companion-shell .message-meta {
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -203,12 +203,12 @@
   margin-left: 0.5rem;
 }
 
-.message-row--user .message-meta {
+.companion-shell .message-row--user .message-meta {
   text-align: right;
   margin-right: 0.5rem;
 }
 
-.message-bubble {
+.companion-shell .message-bubble {
   padding: 1rem 1.25rem;
   font-size: 0.9375rem;
   line-height: 1.5;
@@ -219,14 +219,14 @@
   white-space: pre-wrap;
 }
 
-.message-bubble--user {
+.companion-shell .message-bubble--user {
   background: #1e293b;
   color: white;
   border-radius: 20px 20px 4px 20px;
   margin-left: auto;
 }
 
-.message-bubble--assistant {
+.companion-shell .message-bubble--assistant {
   background: white;
   color: #0f172a;
   border: 1px solid #e2e8f0;
@@ -234,7 +234,7 @@
   margin-right: auto;
 }
 
-.companion-error {
+.companion-shell .companion-error {
   border-color: #fee2e2 !important;
   background: #fffafa !important;
   color: #991b1b !important;
@@ -296,7 +296,7 @@
   cursor: not-allowed;
 }
 
-.typing-dot {
+.companion-shell .typing-dot {
   width: 6px;
   height: 6px;
   background: #94a3b8;
@@ -304,8 +304,8 @@
   animation: typing 1.4s infinite both;
 }
 
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+.companion-shell .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.companion-shell .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes typing {
   0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }

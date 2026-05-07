@@ -4,7 +4,7 @@ import { logAction } from '@/lib/audit';
 import prisma from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { syncAnnouncementMemory } from '@/lib/vector-memory';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_noStore as noStore } from 'next/cache';
 import { z } from 'zod';
 
 const announcementSchema = z.object({
@@ -27,6 +27,7 @@ const announcementSchema = z.object({
 
 
 export async function getAnnouncements() {
+  noStore();
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -62,6 +63,7 @@ export async function getAnnouncements() {
 }
 
 export async function getMyAnnouncements() {
+  noStore();
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -125,10 +127,10 @@ export async function createAnnouncement(formData: any) {
     }
     const validatedData = parseResult.data;
 
-    // Ensure user exists in Prisma, syncing by email to avoid unique constraint crashes
+    // Ensure user exists in Prisma without merging separate auth identities.
     await prisma.user.upsert({
-      where: { email: user.email! },
-      update: { id: user.id }, // Sync ID to match Supabase if it differs
+      where: { id: user.id },
+      update: { email: user.email! },
       create: {
         id: user.id,
         email: user.email!,

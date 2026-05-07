@@ -184,15 +184,16 @@ export default function AdminPostsClient({ initialPosts }: { initialPosts: Post[
         .admin-filter-input {
             width: 100%;
             padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 14px;
+            border: 1px solid var(--outline);
             font-size: 0.8125rem;
             outline: none;
-            background: white;
+            background: var(--surface-raised);
+            color: var(--on-background);
         }
         .admin-filter-input:focus {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 2px rgba(239,68,68,0.1);
+            border-color: var(--blue-primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
         }
       `}</style>
 
@@ -248,15 +249,15 @@ export default function AdminPostsClient({ initialPosts }: { initialPosts: Post[
             backdrop-filter: blur(4px);
         }
         .admin-modal {
-            background: var(--surface-container);
+            background: var(--surface);
             border: 1px solid var(--outline);
-            border-radius: 16px;
+            border-radius: 24px;
             width: 90%;
             max-width: 600px;
             max-height: 80vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(15,23,42,0.18);
         }
         .admin-modal-header {
             padding: 1.5rem;
@@ -298,8 +299,8 @@ export default function AdminPostsClient({ initialPosts }: { initialPosts: Post[
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #ef4444;
-            border: 4px solid var(--surface-container);
+            background: var(--blue-primary);
+            border: 4px solid var(--surface);
             flex-shrink: 0;
             z-index: 1;
         }
@@ -328,8 +329,8 @@ export default function AdminPostsClient({ initialPosts }: { initialPosts: Post[
         .timeline-meta {
             margin-top: 0.5rem;
             padding: 0.5rem;
-            background: rgba(0,0,0,0.05);
-            border-radius: 4px;
+            background: var(--surface-raised);
+            border-radius: 12px;
             font-size: 0.75rem;
             font-family: monospace;
             word-break: break-all;

@@ -1,6 +1,20 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const protectedPrefixes = [
+  '/dashboard',
+  '/doctor',
+  '/engineer',
+  '/my-announcements',
+  '/my-requests',
+  '/board',
+  '/post-project',
+  '/profile',
+  '/chats',
+  '/notifications',
+  '/admin',
+];
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -56,18 +70,9 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protection logic
-  // 1. EDU Domain Gate: If logged in, ensure email ends with .edu
-  if (user && !user.email?.toLowerCase().endsWith('.edu')) {
-    // This is a safety net in case they bypass client-side checks
-    // Force logout or redirect to an error page
-    await supabase.auth.signOut()
-    return NextResponse.redirect(new URL('/?error=invalid_domain', request.url))
-  }
-
-  // 2. Protected Routes: If not logged in, redirect (protected) routes to landing
-  if (!user && request.nextUrl.pathname.startsWith('/(protected)')) {
-    return NextResponse.redirect(new URL('/', request.url))
+  // Protected routes: route groups are not part of the URL, so match real paths.
+  if (!user && protectedPrefixes.some((prefix) => request.nextUrl.pathname.startsWith(prefix))) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   return response

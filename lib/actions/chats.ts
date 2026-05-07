@@ -40,18 +40,14 @@ export async function sendChatMessage(meetingRequestId: string, content: string)
       return { success: false, error: 'Unauthorized' }
     }
 
-    const existingConv = await prisma.conversation.findFirst({
-      where: {
-        AND: [
-          { participants: { some: { userId: request.requesterId } } },
-          { participants: { some: { userId: request.recipientId } } },
-        ],
-      },
+    const existingConv = await prisma.conversation.findUnique({
+      where: { id: meetingRequestId },
       select: { id: true },
     })
 
     const conversation = existingConv || await prisma.conversation.create({
       data: {
+        id: meetingRequestId,
         participants: {
           create: [
             { userId: request.requesterId },

@@ -46,25 +46,32 @@ export function createClient() {
         signUp: async ({ email, password }: { email: string; password: string }) => {
           if (typeof document !== 'undefined' && email === DEMO_LOGIN.email) {
             document.cookie = 'dev_bypass=true; path=/; max-age=86400; samesite=lax'
-          }
-
-          return {
-            data: {
-              user: {
-                id: 'dev-bypass-user',
-                email,
-                user_metadata: { name: '', role: DEMO_LOGIN.role },
-              },
-              session: {
+            return {
+              data: {
                 user: {
                   id: 'dev-bypass-user',
                   email,
                   user_metadata: { name: '', role: DEMO_LOGIN.role },
                 },
+                session: {
+                  user: {
+                    id: 'dev-bypass-user',
+                    email,
+                    user_metadata: { name: '', role: DEMO_LOGIN.role },
+                  },
+                },
               },
-            },
-            error: null,
+              error: null,
+            }
           }
+
+          return { data: { user: null, session: null }, error: new Error('Supabase is not configured') }
+        },
+        signOut: async () => {
+          if (typeof document !== 'undefined') {
+            document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax'
+          }
+          return { error: null }
         },
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       },

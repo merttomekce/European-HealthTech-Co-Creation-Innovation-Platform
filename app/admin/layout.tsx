@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import '../(protected)/protected.css';
 import './admin.css';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

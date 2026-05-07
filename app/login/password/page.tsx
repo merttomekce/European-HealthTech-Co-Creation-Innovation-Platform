@@ -4,7 +4,6 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { getAuthRedirect } from '@/lib/actions/authRedirect';
 import { DEMO_LOGIN, isDemoLogin } from '@/lib/demo-login';
 import '../../auth/auth-v2.css';
 
@@ -41,8 +40,7 @@ function PasswordLoginForm() {
     const checkSession = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const redirectUrl = await getAuthRedirect();
-        router.replace(redirectUrl);
+        router.replace('/dashboard');
       }
     };
     checkSession();
@@ -72,14 +70,14 @@ function PasswordLoginForm() {
         return;
       }
 
+      document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         setBanner({ type: 'error', text: error.message });
         return;
       }
 
-      const redirectUrl = await getAuthRedirect();
-      router.push(redirectUrl);
+      router.push('/dashboard');
       router.refresh();
     } catch (err: any) {
       setBanner({ type: 'error', text: err?.message || 'Login failed.' });
