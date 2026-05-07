@@ -53,24 +53,24 @@ export default function ChatSidebar({ threads, selectedId }: ChatSidebarProps) {
       <div className="chat-sidebar__header">
         <div className="chat-sidebar__topline">
           <div>
-            <p className="chat-sidebar__kicker">Collaboration inbox</p>
-            <h2 className="chat-sidebar__title">Threads</h2>
+            <p className="chat-sidebar__kicker">Secure Messaging</p>
+            <h2 className="chat-sidebar__title">Inbox</h2>
           </div>
-          <span className="chat-sidebar__count">{threads.length}</span>
+          <span className="chat-sidebar__count">{threads.length} active</span>
         </div>
 
         <div className="chat-sidebar__summary">
-          <span>{incomingCount} incoming</span>
-          <span>{threads.length - incomingCount} outgoing</span>
+          <span>{incomingCount} Incoming Requests</span>
+          <span>{threads.length - incomingCount} Active Dialogs</span>
         </div>
 
         <label className="chat-sidebar__search">
-          <Search size={16} />
+          <Search size={18} />
           <input
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search names, domains, statuses"
+            placeholder="Search collaborations..."
           />
         </label>
       </div>
@@ -78,8 +78,8 @@ export default function ChatSidebar({ threads, selectedId }: ChatSidebarProps) {
       <div className="chat-sidebar__list">
         {filtered.length === 0 ? (
           <div className="chat-sidebar__empty">
-            <PanelLeftClose size={18} />
-            <p>No matching threads.</p>
+            <PanelLeftClose size={24} />
+            <p>No threads found in archive.</p>
           </div>
         ) : (
           filtered.map((thread) => (
@@ -93,16 +93,17 @@ export default function ChatSidebar({ threads, selectedId }: ChatSidebarProps) {
               <div className="chat-thread__copy">
                 <div className="chat-thread__row">
                   <span className="chat-thread__name">{thread.partnerName}</span>
-                  <span className="chat-thread__badge">{thread.unread > 0 ? `${thread.unread}` : statusLabel(thread.status)}</span>
+                  {thread.unread > 0 ? (
+                    <span className="chat-thread__badge">{thread.unread}</span>
+                  ) : (
+                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--blue-primary)', textTransform: 'uppercase' }}>
+                      {statusLabel(thread.status)}
+                    </span>
+                  )}
                 </div>
-                <div className="chat-thread__role">{thread.partnerRole} · {thread.partnerInstitution}</div>
+                <div className="chat-thread__role">{thread.partnerRole}</div>
                 <div className="chat-thread__preview">{thread.preview}</div>
-                <div className="chat-thread__foot">
-                  <span>{thread.domain}</span>
-                  <span>{thread.threadLabel}</span>
-                </div>
               </div>
-              <MessageSquareText size={16} className="chat-thread__icon" />
             </Link>
           ))
         )}

@@ -37,9 +37,6 @@ model User {
   notifications    Notification[]
   auditLogs        AuditLog[]
 
-  // Chat & Networking
-  connections1  Connection[]              @relation("ConnectionUser1")
-  connections2  Connection[]              @relation("ConnectionUser2")
   conversations ConversationParticipant[]
   messages      Message[]
 }
@@ -258,20 +255,6 @@ model PlatformSettings {
   requireNDA         Boolean  @default(true)
   emailNotifications Boolean  @default(true)
   updatedAt          DateTime @updatedAt
-}
-
-// Networking & Chat
-model Connection {
-  id        String   @id @default(cuid())
-  user1Id   String
-  user1     User     @relation("ConnectionUser1", fields: [user1Id], references: [id])
-  user2Id   String
-  user2     User     @relation("ConnectionUser2", fields: [user2Id], references: [id])
-  createdAt DateTime @default(now())
-
-  @@unique([user1Id, user2Id])
-  @@index([user1Id])
-  @@index([user2Id])
 }
 
 model Conversation {

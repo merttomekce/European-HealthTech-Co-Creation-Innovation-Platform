@@ -1,9 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getAuthRedirect } from '@/lib/actions/authRedirect';
 import { resolveAuthFlow } from '@/lib/actions/authFlow';
@@ -12,17 +10,14 @@ import '../auth/auth-v2.css';
 
 const trustPoints = [
   {
-    icon: ShieldCheck,
     title: 'Verified entry',
     copy: 'Institutional accounts keep project discussion credible.',
   },
   {
-    icon: UsersRound,
     title: 'Collaboration ready',
     copy: 'Jump into active projects without re-learning the interface.',
   },
   {
-    icon: Sparkles,
     title: 'Same shell everywhere',
     copy: 'Public, auth, and protected routes share one visual language.',
   },
@@ -30,6 +25,8 @@ const trustPoints = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const playLandingTransition = searchParams.get('from') === 'landing';
   const [email, setEmail] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [banner, setBanner] = React.useState<{ type: 'error' | 'success'; text: string } | null>(null);
@@ -80,77 +77,62 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setEmail(DEMO_LOGIN.email);
-    setBanner({ type: 'success', text: 'Demo email loaded. Continue to password screen.' });
-  };
+
 
   return (
-    <main className="auth-v2-container">
-      <aside className="auth-v2-brand-side">
-        <Link href="/" className="auth-v2-logo">
-          <span className="material-symbols-outlined" style={{ color: 'var(--blue-primary)' }}>lens_blur</span>
-          HealthAI
-        </Link>
-
-        <div className="auth-v2-brand-content">
-          <h1>Clinical Needs.<br />Engineering Solutions.</h1>
-          <p>
-            Enter email first. We route registered users to password login and new users to profile setup.
-          </p>
-        </div>
-
-        <div className="auth-v2-trust-list">
-          {trustPoints.map(({ icon: Icon, title, copy }) => (
-            <div key={title} className="auth-v2-trust-item">
-              <span className="auth-v2-trust-icon"><Icon size={16} aria-hidden="true" /></span>
-              <div>
-                <strong>{title}</strong>
-                <span>{copy}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="auth-v2-brand-footer">
-          Secure institutional access. Shared project space.
-        </div>
-      </aside>
-
-      <section className="auth-v2-form-side">
-        <div className="auth-v2-form-card">
-          <div className="auth-v2-eyebrow">Institutional Entrance</div>
-          <h2 className="auth-v2-title">Enter work email</h2>
-
-          {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
-
-          <form className="auth-v2-form" onSubmit={handleContinue}>
-            <div className="auth-v2-group">
-              <label className="auth-v2-label">Work Email</label>
-              <input
-                type="email"
-                className="auth-v2-input"
-                placeholder="name@institution.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <button type="submit" className="auth-v2-btn" disabled={isLoading}>
-              {isLoading ? 'Checking...' : 'Continue'}
-            </button>
-          </form>
-
-          <div className="auth-v2-switch">
-            New here? <button onClick={() => router.push('/auth/register')} type="button">Create account</button>
+    <main className={`auth-v2-container ${playLandingTransition ? 'auth-v2-animate-in' : ''}`}>
+        <aside className="auth-v2-brand-side">
+          <div className="auth-v2-brand-content">
+            <h1>Clinical Needs.<br />Engineering Solutions.</h1>
+            <p>
+              Enter email first. We route registered users to password login and new users to profile setup.
+            </p>
           </div>
 
-          <button type="button" className="auth-v2-demo-account" onClick={handleDemoLogin} disabled={isLoading}>
-            Load demo email
-          </button>
-        </div>
-      </section>
+          <div className="auth-v2-trust-list">
+            {trustPoints.map(({ title, copy }) => (
+              <div key={title} className="auth-v2-trust-item">
+                <div>
+                  <strong>{title}</strong>
+                  <span>{copy}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="auth-v2-brand-footer">
+            Secure institutional access. Shared project space.
+          </div>
+        </aside>
+
+        <section className="auth-v2-form-side">
+          <div className="auth-v2-form-card">
+            <div className="auth-v2-eyebrow">Institutional Entrance</div>
+            <h2 className="auth-v2-title">Enter work email</h2>
+
+            {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
+
+            <form className="auth-v2-form" onSubmit={handleContinue}>
+              <div className="auth-v2-group">
+                <label className="auth-v2-label">Work Email</label>
+                <input
+                  type="email"
+                  className="auth-v2-input"
+                  placeholder="name@institution.edu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="auth-v2-btn" disabled={isLoading}>
+                {isLoading ? 'Checking...' : 'Continue'}
+              </button>
+            </form>
+
+          </div>
+        </section>
     </main>
   );
 }
+

@@ -21,21 +21,12 @@ const AVATAR_PRESETS = [
   '/avatars/avatar_10.svg',
 ];
 
-// Helper: parse "City, Country" string back to parts
-function parseLocation(location: string) {
-  const parts = location.split(',').map((s) => s.trim());
-  if (parts.length >= 2) {
-    return { city: parts.slice(0, parts.length - 1).join(', '), country: parts[parts.length - 1] };
-  }
-  return { city: '', country: location };
-}
-
-export default function ProfilePage({ isModal = false }: { isModal?: boolean }) {
-  const initialLocation = parseLocation('Berlin, Germany');
+export default function ProfilePage() {
 
   const [formData, setFormData] = useState({
     fullName: '',
     institution: '',
+    bio: '',
     country: '',
     city: '',
     expertiseTags: [] as string[],
@@ -64,6 +55,7 @@ export default function ProfilePage({ isModal = false }: { isModal?: boolean }) 
         setFormData({
           fullName: res.data.name || '',
           institution: res.data.institution || '',
+          bio: res.data.bio || '',
           country: res.data.country || '',
           city: res.data.city || '',
           expertiseTags: res.data.expertise || [],
@@ -155,6 +147,7 @@ export default function ProfilePage({ isModal = false }: { isModal?: boolean }) 
         role: formData.role === 'engineer' ? 'engineer' : 'healthcare',
         location: locationString,
         expertise: formData.expertiseTags.join(', '),
+        bio: formData.bio,
       });
       setIsSaved(true);
     } catch (e) {
@@ -221,13 +214,11 @@ export default function ProfilePage({ isModal = false }: { isModal?: boolean }) 
   }
 
   return (
-    <div className={`profile-container ${isModal ? 'is-modal' : ''}`}>
-      {!isModal && (
-        <header className="profile-header">
-          <h1 className="profile-title">Profile Settings</h1>
-          <p className="profile-subtitle">Manage your personal information and privacy preferences.</p>
-        </header>
-      )}
+    <div className="profile-page">
+      <header className="profile-header">
+        <h1 className="profile-title">Profile Settings</h1>
+        <p className="profile-subtitle">Manage your personal information and privacy preferences.</p>
+      </header>
 
       <div className="avatar-section">
         <div 
@@ -367,7 +358,8 @@ export default function ProfilePage({ isModal = false }: { isModal?: boolean }) 
               <textarea
                 name="bio"
                 className="form-textarea"
-                defaultValue="Cardiologist specializing in electrophysiology. Looking to collaborate on signal processing for wearable ECG devices."
+                value={formData.bio}
+                onChange={handleInputChange}
                 placeholder="Brief description of your background and goals…"
               />
             </div>
@@ -419,6 +411,13 @@ export default function ProfilePage({ isModal = false }: { isModal?: boolean }) 
       </div>
 
       <style jsx>{`
+        .profile-page {
+          max-width: 980px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
         .field-error {
           color: #ef4444;
           font-size: 0.75rem;

@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getAuthRedirect } from '@/lib/actions/authRedirect';
+import { resolveAuthFlow } from '@/lib/actions/authFlow';
 import { updateProfile } from '@/lib/actions/profile';
-import { DEMO_LOGIN } from '@/lib/demo-login';
+import SearchableSelect from '@/components/SearchableSelect';
 import '../auth.css';
 import '../auth-v2.css';
 
@@ -44,6 +44,11 @@ function RegisterForm() {
   });
   const [isLoading, setIsLoading] = React.useState(false);
   const [banner, setBanner] = React.useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [countries, setCountries] = React.useState<Array<{ value: string; label: string; group?: string }>>([]);
+  const [cities, setCities] = React.useState<Array<{ value: string; label: string }>>([]);
+  const [isLoadingCountries, setIsLoadingCountries] = React.useState(false);
+  const [isLoadingCities, setIsLoadingCities] = React.useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = React.useState(true);
 
   const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const supabase = createClient();
@@ -60,9 +65,78 @@ function RegisterForm() {
   }, [router, supabase]);
 
   React.useEffect(() => {
+    async function loadCountries() {
+      setIsLoadingCountries(true);
+      try {
+        const res = await fetch('/api/location?type=countries');
+        const data = await res.json();
+        setCountries(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setCountries([]);
+      } finally {
+        setIsLoadingCountries(false);
+      }
+    }
+
+    loadCountries();
+  }, []);
+
+  React.useEffect(() => {
+    if (!formData.country) {
+      setCities([]);
+      return;
+    }
+
+    async function loadCities() {
+      setIsLoadingCities(true);
+      try {
+        const res = await fetch(`/api/location?type=cities&countryCode=${encodeURIComponent(formData.country)}`);
+        const data = await res.json();
+        setCities(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setCities([]);
+      } finally {
+        setIsLoadingCities(false);
+      }
+    }
+
+    loadCities();
+  }, [formData.country]);
+
+  React.useEffect(() => {
     if (!email) {
       router.replace('/login');
     }
+  }, [email, router]);
+
+  React.useEffect(() => {
+    let isActive = true;
+
+    async function precheckRegistration() {
+      if (!email) {
+        if (isActive) setIsCheckingEmail(false);
+        return;
+      }
+
+      try {
+        const result = await resolveAuthFlow(email);
+        if (!isActive) return;
+        if (result.registered) {
+          router.replace(result.nextPath);
+          return;
+        }
+      } catch (error) {
+        // Let the form load if the lookup backend is unavailable.
+      } finally {
+        if (isActive) setIsCheckingEmail(false);
+      }
+    }
+
+    precheckRegistration();
+
+    return () => {
+      isActive = false;
+    };
   }, [email, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -115,139 +189,135 @@ function RegisterForm() {
   };
 
   return (
+    isCheckingEmail ? (
+      <main className="auth-v2-container"><div className="auth-v2-brand-side"><div className="auth-v2-brand-content"><h1>Checking email…</h1></div></div></main>
+    ) : (
     <main className="auth-v2-container">
-      <aside className="auth-v2-brand-side">
-        <Link href="/" className="auth-v2-logo">
-          <span className="material-symbols-outlined" style={{ color: 'var(--blue-primary)' }}>lens_blur</span>
-          HealthAI
-        </Link>
-
-        <div className="auth-v2-brand-content">
-          <h1>Clinical Needs.<br />Engineering Solutions.</h1>
-          <p>
-            New email detected. Create account, set profile, enter collaboration network.
-          </p>
-        </div>
-
-        <div className="auth-v2-trust-list">
-          {trustPoints.map(({ icon: Icon, title, copy }) => (
-            <div key={title} className="auth-v2-trust-item">
-              <span className="auth-v2-trust-icon"><Icon size={16} aria-hidden="true" /></span>
-              <div>
-                <strong>{title}</strong>
-                <span>{copy}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="auth-v2-brand-footer">
-          Secure institutional access. Shared project space.
-        </div>
-      </aside>
-
-      <section className="auth-v2-form-side">
-        <div className="auth-v2-form-card">
-          <div className="auth-v2-eyebrow">New account</div>
-          <h2 className="auth-v2-title">Set up profile</h2>
-
-          {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
-
-          <div className="auth-v2-help">Email</div>
-          <div className="auth-v2-email-chip">{email || 'No email found'}</div>
-
-          <form className="auth-v2-form" onSubmit={handleSubmit}>
-            <div className="auth-v2-group">
-              <label className="auth-v2-label">Password</label>
-              <input
-                type="password"
-                className="auth-v2-input"
-                placeholder="Create password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="auth-v2-form-grid">
-              <div className="auth-v2-group">
-                <label className="auth-v2-label">Full name</label>
-                <input
-                  type="text"
-                  className="auth-v2-input"
-                  placeholder="Dr. Sarah Chen"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="auth-v2-group">
-                <label className="auth-v2-label">Institution</label>
-                <input
-                  type="text"
-                  className="auth-v2-input"
-                  placeholder="Charité"
-                  value={formData.institution}
-                  onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="auth-v2-group">
-                <label className="auth-v2-label">Role</label>
-                <select
-                  className="auth-v2-input"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as 'healthcare' | 'engineer' })}
-                >
-                  <option value="healthcare">Healthcare professional</option>
-                  <option value="engineer">Engineer / tech expert</option>
-                </select>
-              </div>
-              <div className="auth-v2-group">
-                <label className="auth-v2-label">Country</label>
-                <input
-                  type="text"
-                  className="auth-v2-input"
-                  placeholder="Germany"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="auth-v2-group">
-                <label className="auth-v2-label">City</label>
-                <input
-                  type="text"
-                  className="auth-v2-input"
-                  placeholder="Berlin"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                />
-              </div>
-              <div className="auth-v2-group">
-                <label className="auth-v2-label">Expertise</label>
-                <input
-                  type="text"
-                  className="auth-v2-input"
-                  placeholder="machine learning, ICU workflows"
-                  value={formData.expertise}
-                  onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <button type="submit" className="auth-v2-btn" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </button>
-          </form>
-
-          <div className="auth-v2-switch">
-            Already registered? <button onClick={() => router.push('/login')} type="button">Back to login</button>
+        <aside className="auth-v2-brand-side">
+          <div className="auth-v2-brand-content">
+            <h1>Clinical Needs.<br />Engineering Solutions.</h1>
+            <p>
+              New email detected. Create account, set profile, enter collaboration network.
+            </p>
           </div>
-        </div>
-      </section>
+
+          <div className="auth-v2-trust-list">
+            {trustPoints.map(({ icon: Icon, title, copy }) => (
+              <div key={title} className="auth-v2-trust-item">
+                <span className="auth-v2-trust-icon"><Icon size={16} aria-hidden="true" /></span>
+                <div>
+                  <strong>{title}</strong>
+                  <span>{copy}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="auth-v2-brand-footer">
+            Secure institutional access. Shared project space.
+          </div>
+        </aside>
+
+        <section className="auth-v2-form-side">
+          <div className="auth-v2-form-card">
+            <div className="auth-v2-eyebrow">New account</div>
+            <h2 className="auth-v2-title">Set up profile</h2>
+
+            {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
+
+            <div className="auth-v2-help">Email</div>
+            <div className="auth-v2-email-chip">{email || 'No email found'}</div>
+
+            <form className="auth-v2-form" onSubmit={handleSubmit}>
+              <div className="auth-v2-group">
+                <label className="auth-v2-label">Password</label>
+                <input
+                  type="password"
+                  className="auth-v2-input"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="auth-v2-form-grid">
+                <div className="auth-v2-group">
+                  <label className="auth-v2-label">Full name</label>
+                  <input
+                    type="text"
+                    className="auth-v2-input"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="auth-v2-group">
+                  <label className="auth-v2-label">Institution</label>
+                  <input
+                    type="text"
+                    className="auth-v2-input"
+                    value={formData.institution}
+                    onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="auth-v2-group">
+                  <label className="auth-v2-label">Role</label>
+                  <select
+                    className="auth-v2-input auth-v2-role-select"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'healthcare' | 'engineer' })}
+                  >
+                    <option value="healthcare">Healthcare professional</option>
+                    <option value="engineer">Engineer / tech expert</option>
+                  </select>
+                </div>
+                <div className="auth-v2-group">
+                  <label className="auth-v2-label">Expertise</label>
+                  <input
+                    type="text"
+                    className="auth-v2-input"
+                    value={formData.expertise}
+                    onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="auth-v2-group">
+                  <SearchableSelect
+                    label="Country"
+                    options={countries}
+                    value={formData.country}
+                    onChange={(val) => setFormData({ ...formData, country: val, city: '' })}
+                    placeholder="Select country"
+                    error={undefined}
+                    disabled={isLoadingCountries}
+                  />
+                </div>
+                <div className="auth-v2-group">
+                  <SearchableSelect
+                    label="City"
+                    options={cities}
+                    value={formData.city}
+                    onChange={(val) => setFormData({ ...formData, city: val })}
+                    placeholder={formData.country ? "Select city" : "Select country first"}
+                    error={undefined}
+                    disabled={!formData.country || isLoadingCities}
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="auth-v2-btn" disabled={isLoading}>
+                {isLoading ? 'Creating account...' : 'Create account'}
+              </button>
+            </form>
+
+            <div className="auth-v2-switch">
+              Already registered? <button onClick={() => router.push('/login')} type="button">Back to login</button>
+            </div>
+          </div>
+        </section>
     </main>
+    )
   );
 }
 
@@ -258,4 +328,3 @@ export default function RegisterPage() {
     </React.Suspense>
   );
 }
-

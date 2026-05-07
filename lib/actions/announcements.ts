@@ -3,6 +3,7 @@
 import { logAction } from '@/lib/audit';
 import prisma from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
+import { syncAnnouncementMemory } from '@/lib/vector-memory';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -26,9 +27,15 @@ const announcementSchema = z.object({
 
 
 export async function getAnnouncements() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: 'Unauthorized' };
+
   try {
     const announcements = await prisma.announcement.findMany({
       where: {
+        authorId: { not: user.id },
         status: { in: ['ACTIVE', 'PARTNER_FOUND'] as any },
       },
       include: {
@@ -158,6 +165,8 @@ export async function createAnnouncement(formData: any) {
       },
     });
 
+    await syncAnnouncementMemory(announcement);
+
     await logAction({
       userId: user.id,
       actionType: 'POST_CREATED',
@@ -200,6 +209,8 @@ export async function toggleAnnouncementStatus(id: string, newStatus: string) {
       where: { id, authorId: user.id },
       data: { status: newStatus as any }
     });
+
+    await syncAnnouncementMemory(updated);
 
     await logAction({
       userId: user.id,
@@ -252,6 +263,8 @@ export async function updateAnnouncement(id: string, formData: z.infer<typeof an
         status: status as any
       },
     });
+
+    await syncAnnouncementMemory(announcement);
 
     await logAction({
       userId: user.id,

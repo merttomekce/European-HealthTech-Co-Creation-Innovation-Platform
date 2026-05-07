@@ -1,13 +1,11 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import prisma from '@/lib/prisma';
 import { getUserAnnouncementsByAuthorId } from '@/lib/actions/announcements';
 import { getUserProfile } from '@/lib/actions/profile';
 import FeedPostCard from '@/components/FeedPostCard';
-import ConnectButton from '@/components/ConnectButton';
 import '../profile.css';
-import './public-profile.css';
+import '../public-profile.css';
 
 function roleLabel(role?: string | null) {
   if (role === 'ENGINEER') return 'Engineer / Tech Expert';
@@ -45,31 +43,11 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
   const profile = profileRes.data;
   const posts = postsRes.success ? postsRes.data || [] : [];
   const isOwnProfile = currentUser.id === profile.id;
-  const isConnected = isOwnProfile
-    ? true
-    : Boolean(
-        await prisma.connection.findFirst({
-          where: {
-            OR: [
-              { user1Id: currentUser.id, user2Id: profile.id },
-              { user1Id: profile.id, user2Id: currentUser.id },
-            ],
-          },
-          select: { id: true },
-        })
-      );
 
   const location = [profile.city, profile.country].filter(Boolean).join(', ') || 'Location not shared';
   const joinedAt = new Date(profile.createdAt).toLocaleDateString([], { month: 'short', year: 'numeric' });
   const memberPosts = posts.length;
-  const connectionsCount = await prisma.connection.count({
-    where: {
-      OR: [
-        { user1Id: profile.id },
-        { user2Id: profile.id },
-      ],
-    },
-  });
+  const expertiseCount = profile.expertise?.length || 0;
 
   return (
     <div className="public-profile-page">
@@ -103,11 +81,11 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
         </div>
 
         <div className="public-profile-actions">
-          <ConnectButton
-            targetUserId={profile.id}
-            initialConnected={isConnected}
-            isOwnProfile={isOwnProfile}
-          />
+          {isOwnProfile && (
+            <Link href="/profile" className="public-profile-button public-profile-button--primary">
+              Edit profile
+            </Link>
+          )}
           <a href="#posts" className="public-profile-button public-profile-button--ghost">
             View posts
           </a>
@@ -120,16 +98,16 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
           <strong>{memberPosts.toString().padStart(2, '0')}</strong>
         </div>
         <div className="public-profile-stat">
-          <span>Connections</span>
-          <strong>{connectionsCount.toString().padStart(2, '0')}</strong>
+          <span>Expertise</span>
+          <strong>{expertiseCount.toString().padStart(2, '0')}</strong>
         </div>
         <div className="public-profile-stat">
           <span>Member since</span>
           <strong>{joinedAt}</strong>
         </div>
         <div className="public-profile-stat">
-          <span>Status</span>
-          <strong>{isConnected ? 'Connected' : 'Open to connect'}</strong>
+          <span>Location</span>
+          <strong>{location}</strong>
         </div>
       </section>
 

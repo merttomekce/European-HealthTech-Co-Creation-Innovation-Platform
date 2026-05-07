@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -91,69 +90,64 @@ function PasswordLoginForm() {
 
   return (
     <main className="auth-v2-container">
-      <aside className="auth-v2-brand-side">
-        <Link href="/" className="auth-v2-logo">
-          <span className="material-symbols-outlined" style={{ color: 'var(--blue-primary)' }}>lens_blur</span>
-          HealthAI
-        </Link>
-
-        <div className="auth-v2-brand-content">
-          <h1>Clinical Needs.<br />Engineering Solutions.</h1>
-          <p>
-            Registered email found. Enter password to continue into HealthAI.
-          </p>
-        </div>
-
-        <div className="auth-v2-trust-list">
-          {trustPoints.map(({ icon: Icon, title, copy }) => (
-            <div key={title} className="auth-v2-trust-item">
-              <span className="auth-v2-trust-icon"><Icon size={16} aria-hidden="true" /></span>
-              <div>
-                <strong>{title}</strong>
-                <span>{copy}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="auth-v2-brand-footer">
-          Secure institutional access. Shared project space.
-        </div>
-      </aside>
-
-      <section className="auth-v2-form-side">
-        <div className="auth-v2-form-card">
-          <div className="auth-v2-eyebrow">Welcome back</div>
-          <h2 className="auth-v2-title">Enter password</h2>
-
-          {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
-
-          <div className="auth-v2-help">Signed in as</div>
-          <div className="auth-v2-email-chip">{email || 'No email found'}</div>
-
-          <form className="auth-v2-form" onSubmit={handleSubmit}>
-            <div className="auth-v2-group">
-              <label className="auth-v2-label">Password</label>
-              <input
-                type="password"
-                className="auth-v2-input"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <button type="submit" className="auth-v2-btn" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </form>
-
-          <div className="auth-v2-switch">
-            Wrong email? <button onClick={() => router.push('/login')} type="button">Change it</button>
+        <aside className="auth-v2-brand-side">
+          <div className="auth-v2-brand-content">
+            <h1>Clinical Needs.<br />Engineering Solutions.</h1>
+            <p>
+              Registered email found. Enter password to continue into HealthAI.
+            </p>
           </div>
-        </div>
-      </section>
+
+          <div className="auth-v2-trust-list">
+            {trustPoints.map(({ icon: Icon, title, copy }) => (
+              <div key={title} className="auth-v2-trust-item">
+                <span className="auth-v2-trust-icon"><Icon size={16} aria-hidden="true" /></span>
+                <div>
+                  <strong>{title}</strong>
+                  <span>{copy}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="auth-v2-brand-footer">
+            Secure institutional access. Shared project space.
+          </div>
+        </aside>
+
+        <section className="auth-v2-form-side">
+          <div className="auth-v2-form-card">
+            <div className="auth-v2-eyebrow">Welcome back</div>
+            <h2 className="auth-v2-title">Enter password</h2>
+
+            {banner && <div className={`auth-v2-banner ${banner.type}`}>{banner.text}</div>}
+
+            <div className="auth-v2-help">Signed in as</div>
+            <div className="auth-v2-email-chip">{email || 'No email found'}</div>
+
+            <form className="auth-v2-form" onSubmit={handleSubmit}>
+              <div className="auth-v2-group">
+                <label className="auth-v2-label">Password</label>
+                <input
+                  type="password"
+                  className="auth-v2-input"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="auth-v2-btn" disabled={isLoading}>
+                {isLoading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </form>
+
+            <div className="auth-v2-switch">
+              Wrong email? <button onClick={() => router.push('/login')} type="button">Change it</button>
+            </div>
+          </div>
+        </section>
     </main>
   );
 }
@@ -165,4 +159,3 @@ export default function PasswordLoginPage() {
     </React.Suspense>
   );
 }
-

@@ -11,6 +11,7 @@ const profileSchema = z.object({
   role: z.enum(['healthcare', 'engineer']),
   location: z.string().min(2, "Location is required"),
   expertise: z.string().min(2, "Please provide some expertise tags"),
+  bio: z.string().max(500).optional(),
 })
 
 export async function updateProfile(formData: z.infer<typeof profileSchema>) {
@@ -34,6 +35,8 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
     .map(s => s.trim())
     .filter(s => s.length > 0)
 
+  const bio = validated.bio?.trim() || null
+
   // 4. Map Role
   const prismalRole: Role = validated.role === 'healthcare' 
     ? Role.HEALTHCARE_PROFESSIONAL 
@@ -50,6 +53,7 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
         city: city,
         country: country,
         expertise: expertiseArray,
+        bio,
       },
       create: {
         id: user.id, // Ensure Prisma ID matches Supabase Auth ID
@@ -60,6 +64,7 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
         city: city,
         country: country,
         expertise: expertiseArray,
+        bio,
       }
     })
 
@@ -182,41 +187,5 @@ export async function getUserProfile(userId: string) {
   } catch (error) {
     console.error(error)
     return { success: false, error: 'Failed to fetch user profile' }
-  }
-}
-
-export async function connectWithUser(targetUserId: string) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { success: false, error: 'Unauthorized' };
-  }
-
-  if (user.id === targetUserId) {
-    return { success: false, error: 'You cannot connect with yourself' };
-  }
-
-  const [user1Id, user2Id] = [user.id, targetUserId].sort();
-
-  try {
-    await prisma.connection.upsert({
-      where: {
-        user1Id_user2Id: {
-          user1Id,
-          user2Id,
-        },
-      },
-      update: {},
-      create: {
-        user1Id,
-        user2Id,
-      },
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error(error);
-    return { success: false, error: 'Failed to connect with user' };
   }
 }

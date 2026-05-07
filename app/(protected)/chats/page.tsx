@@ -25,7 +25,33 @@ function initialsFrom(name?: string | null, fallback = 'TH') {
   return parts.slice(0, 2).map((part) => part[0]).join('').toUpperCase();
 }
 
-function buildThreadSummary(userId: string, request: any): ChatThreadSummary & ChatThreadDetail {
+async function loadConversation(userId: string, partnerId: string) {
+  return prisma.conversation.findFirst({
+    where: {
+      AND: [
+        { participants: { some: { userId } } },
+        { participants: { some: { userId: partnerId } } },
+      ],
+    },
+    include: {
+      messages: {
+        include: {
+          sender: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
+    },
+  });
+}
+
+async function buildThreadSummary(userId: string, request: any): Promise<ChatThreadSummary & ChatThreadDetail> {
   const isOutgoing = request.requesterId === userId;
   const partner = isOutgoing ? request.recipient : request.requester;
   const partnerName = partner?.name || 'Unknown collaborator';
@@ -33,7 +59,7 @@ function buildThreadSummary(userId: string, request: any): ChatThreadSummary & C
   const location = [partner?.city, partner?.country].filter(Boolean).join(', ') || 'Location not shared';
   const direction = isOutgoing ? 'outgoing' : 'incoming';
   const status = request.status as string;
-  const lastSlot = request.proposedSlots?.[request.proposedSlots.length - 1];
+  const conversation = partner?.id ? await loadConversation(userId, partner.id) : null;
 
   return {
     id: request.id,
@@ -55,6 +81,7 @@ function buildThreadSummary(userId: string, request: any): ChatThreadSummary & C
     announcedBy: request.announcement.author?.name || 'Research lead',
     announcementId: request.announcementId,
     partnerId: partner?.id || null,
+    conversationId: conversation?.id || null,
     location,
     expertiseNeeded: request.announcement.expertiseNeeded || 'Not specified',
     commitmentLevel: request.announcement.commitmentLevel,
@@ -92,9 +119,26 @@ function buildThreadSummary(userId: string, request: any): ChatThreadSummary & C
       status: slot.status,
     })),
     agreedSlot: request.agreedSlot ? request.agreedSlot.toISOString() : null,
-    titleLabel: request.announcement.title,
+    messages: [
+      {
+        id: `${request.id}-initial`,
+        senderId: isOutgoing ? userId : partner?.id || request.requesterId,
+        senderName: isOutgoing ? 'You' : partnerName,
+        timestamp: request.createdAt.toISOString(),
+        body: request.message,
+        tone: isOutgoing ? 'outgoing' : 'incoming',
+      },
+      ...(conversation?.messages || []).map((message: any) => ({
+        id: message.id,
+        senderId: message.senderId,
+        senderName: message.sender?.name || 'Participant',
+        timestamp: message.createdAt.toISOString(),
+        body: message.content,
+        tone: message.senderId === userId ? 'outgoing' : 'incoming',
+      })),
+    ],
+    canSendMessages: Boolean(conversation) && !['CANCELLED', 'DECLINED'].includes(status),
     signal: isOutgoing ? 'Waiting for reply' : status === 'PENDING' ? 'Needs review' : 'In progress',
-    threadLabelHint: lastSlot ? 'Negotiation active' : isOutgoing ? 'Sent thread' : 'Review thread',
   } as ChatThreadDetail & ChatThreadSummary;
 }
 
@@ -128,7 +172,7 @@ async function loadThreads() {
     },
   });
 
-  return requests.map((request) => buildThreadSummary(user.id, request));
+  return Promise.all(requests.map((request) => buildThreadSummary(user.id, request)));
 }
 
 function Workspace({ threads, selectedId }: { threads: ChatThreadDetail[]; selectedId?: string }) {

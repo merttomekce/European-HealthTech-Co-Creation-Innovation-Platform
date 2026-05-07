@@ -1,16 +1,19 @@
 import React from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getAnnouncements } from '@/lib/actions/announcements';
 import prisma from '@/lib/prisma';
-import FeedPostCard from '@/components/FeedPostCard';
+import DashboardFeedBrowser from '@/components/DashboardFeedBrowser';
 import './dashboard.css';
 
 export default async function DashboardPage() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    redirect('/login');
+  }
 
   const userData = await prisma.user.findUnique({
     where: { id: user.id },
@@ -46,23 +49,12 @@ export default async function DashboardPage() {
             </div>
           </header>
 
-          {opportunityFeed.length === 0 ? (
-            <div className="dashboard-empty">
-              <span className="material-symbols-outlined dashboard-empty-icon">search_off</span>
-              <p>No new opportunities yet.</p>
-            </div>
-          ) : (
-            <div className="dashboard-feed-stream">
-              {opportunityFeed.map((ann: any) => (
-                <FeedPostCard
-                  key={ann.id}
-                  announcement={ann}
-                  currentUserId={user.id}
-                  roleTone="engineer"
-                />
-              ))}
-            </div>
-          )}
+          <DashboardFeedBrowser
+            announcements={opportunityFeed as any[]}
+            currentUserId={user.id}
+            roleTone="engineer"
+            emptyMessage="No matches for this search."
+          />
         </div>
 
       </section>

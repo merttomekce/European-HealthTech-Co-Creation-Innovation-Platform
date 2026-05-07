@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, CalendarClock, MessageSquareText, ShieldCheck, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowUpRight, MessageSquareText, Send, ShieldCheck } from 'lucide-react';
 import MessageBubble from './MessageBubble';
-import ProjectDetailContent from './ProjectDetailContent';
+import { sendChatMessage } from '@/lib/actions/chats';
 import type { ChatThreadSummary } from './ChatSidebar';
 
 interface ProposedSlot {
@@ -31,6 +32,18 @@ export interface ChatThreadDetail extends ChatThreadSummary {
   announcement: any;
   proposedSlots: ProposedSlot[];
   agreedSlot?: string | null;
+  conversationId?: string | null;
+  messages: ChatMessage[];
+  canSendMessages?: boolean;
+}
+
+interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  timestamp: string;
+  body: string;
+  tone: 'incoming' | 'outgoing' | 'system';
 }
 
 interface ChatWindowProps {
@@ -51,6 +64,11 @@ function formatStatus(value: string) {
 }
 
 export default function ChatWindow({ thread }: ChatWindowProps) {
+  const router = useRouter();
+  const [draft, setDraft] = useState('');
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   if (!thread) {
     return (
       <section className="chat-window chat-window--empty">
@@ -62,29 +80,44 @@ export default function ChatWindow({ thread }: ChatWindowProps) {
             <Link href="/dashboard" className="chat-window__button chat-window__button--primary">
               Browse feed
             </Link>
-            <Link href="/connections" className="chat-window__button">
-              Review connections
-            </Link>
           </div>
         </div>
       </section>
     );
   }
 
-  const messages = [
-    {
-      id: `${thread.requestId}-message`,
-      tone: thread.direction === 'outgoing' ? ('outgoing' as const) : ('incoming' as const),
-      author: thread.partnerName,
-      timestamp: formatDate(thread.createdAt),
-      body: thread.message,
-    },
+  const messages: ChatMessage[] = [
+    ...thread.messages,
     {
       id: `${thread.requestId}-status`,
-      tone: 'system' as const,
+      senderId: 'system',
+      senderName: 'System',
+      timestamp: formatDate(thread.updatedAt),
       body: `Request status: ${formatStatus(thread.status)}`,
+      tone: 'system',
     },
   ];
+
+  const canSend = thread.canSendMessages !== false;
+
+  const handleSend = () => {
+    const text = draft.trim();
+    if (!text || !canSend) return;
+
+    setSendError(null);
+    startTransition(() => {
+      void (async () => {
+        const result = await sendChatMessage(thread.requestId, text);
+        if (!result.success) {
+          setSendError(result.error || 'Failed to send message');
+          return;
+        }
+
+        setDraft('');
+        router.refresh();
+      })();
+    });
+  };
 
   return (
     <section className="chat-window">
@@ -95,23 +128,22 @@ export default function ChatWindow({ thread }: ChatWindowProps) {
             <p className="chat-window__kicker">{thread.threadLabel}</p>
             <h1 className="chat-window__title">{thread.partnerName}</h1>
             <div className="chat-window__meta">
-              <span>{thread.partnerRole}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <ShieldCheck size={14} />
+                {thread.partnerRole}
+              </span>
               <span>{thread.partnerInstitution}</span>
-              <span>{thread.domain}</span>
+              <span style={{ color: 'var(--blue-primary)', fontWeight: 700 }}>{thread.domain}</span>
             </div>
           </div>
         </div>
 
         <div className="chat-window__actions">
-          <span className="chat-window__status">
-            <ShieldCheck size={14} />
-            {formatStatus(thread.status)}
-          </span>
           <Link href={thread.partnerId ? `/profile/${thread.partnerId}` : '/profile'} className="chat-window__button">
-            Profile
+            View Credentials
           </Link>
           <Link href={`/board/${thread.announcementId}`} className="chat-window__button chat-window__button--primary">
-            Open post
+            Review Project
             <ArrowUpRight size={16} />
           </Link>
         </div>
@@ -121,58 +153,53 @@ export default function ChatWindow({ thread }: ChatWindowProps) {
         <div className="chat-window__transcript">
           <div className="chat-window__timeline">
             {messages.map((message) => (
-              <MessageBubble key={message.id} tone={message.tone} author={message.author} timestamp={message.timestamp}>
+              <MessageBubble key={message.id} tone={message.tone} author={message.senderName} timestamp={message.timestamp}>
                 {message.body}
               </MessageBubble>
             ))}
           </div>
-
-          {thread.proposedSlots.length > 0 && (
-            <div className="chat-window__slot-rail">
-              <div className="chat-window__slot-rail-header">
-                <CalendarClock size={16} />
-                Proposed slots
-              </div>
-              <div className="chat-window__slot-list">
-                {thread.proposedSlots.map((slot) => (
-                  <div key={slot.id} className="chat-window__slot">
-                    <span>{formatDate(slot.startTime)}</span>
-                    <span>{formatDate(slot.endTime)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
-        <aside className="chat-window__context">
-          <ProjectDetailContent announcement={thread.announcement} compact />
-
-          <div className="chat-window__context-card">
-            <div className="chat-window__context-title">
-              <Users size={16} />
-              Thread summary
+        <form
+          className="chat-window__composer"
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSend();
+          }}
+        >
+          <label className="chat-window__composer-label" htmlFor="chat-message">
+            Message
+          </label>
+          <textarea
+            id="chat-message"
+            className="chat-window__composer-input"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                handleSend();
+              }
+            }}
+            placeholder={canSend ? 'Write a message...' : 'Messaging disabled for closed threads'}
+            disabled={!canSend || isPending}
+            rows={3}
+          />
+          <div className="chat-window__composer-footer">
+            <div className="chat-window__composer-hint">
+              {canSend ? 'Enter to send, Shift+Enter for a new line.' : 'This thread is closed.'}
+              {sendError && <span className="chat-window__composer-error">{sendError}</span>}
             </div>
-            <div className="chat-window__context-grid">
-              <div className="chat-window__context-item">
-                <span>Opened</span>
-                <strong>{formatDate(thread.createdAt)}</strong>
-              </div>
-              <div className="chat-window__context-item">
-                <span>Updated</span>
-                <strong>{formatDate(thread.updatedAt)}</strong>
-              </div>
-              <div className="chat-window__context-item">
-                <span>Location</span>
-                <strong>{thread.location}</strong>
-              </div>
-              <div className="chat-window__context-item">
-                <span>Need</span>
-                <strong>{thread.expertiseNeeded}</strong>
-              </div>
-            </div>
+            <button
+              type="submit"
+              className="chat-window__button chat-window__button--primary"
+              disabled={!canSend || isPending || draft.trim().length === 0}
+            >
+              <Send size={16} />
+              {isPending ? 'Sending…' : 'Send'}
+            </button>
           </div>
-        </aside>
+        </form>
       </div>
     </section>
   );

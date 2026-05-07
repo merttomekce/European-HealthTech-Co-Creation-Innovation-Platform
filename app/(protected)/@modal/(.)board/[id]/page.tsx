@@ -100,30 +100,37 @@ export default function ProjectDetailModalPage({ params }: { params: { id: strin
                 {project.status?.replace(/_/g, ' ') || 'UNKNOWN'}
               </span>
             </div>
-            
-            <button 
-              className="btn-primary detail-cta" 
-              onClick={() => setShowInterestForm(true)}
-              disabled={project.status !== 'ACTIVE'}
-            >
-              {project.status === 'ACTIVE' ? 'I\'m Interested' : 'Post Closed'}
-            </button>
+            <div className="detail-summary-actions">
+              <button
+                className="detail-primary-btn detail-cta"
+                onClick={() => setShowInterestForm(true)}
+                disabled={project.status !== 'ACTIVE'}
+              >
+                {project.status === 'ACTIVE' ? "I'm Interested" : 'Post Closed'}
+              </button>
+            </div>
           </div>
         </section>
 
         <div className="detail-grid">
-          <div className="detail-main-content">
+          <main className="detail-main">
             <div className="detail-card">
-              <h3 className="detail-card-title">Project Explanation</h3>
+              <div className="detail-section-header">
+                <p className="detail-section-kicker">Project context</p>
+                <h2 className="detail-section-title">Project explanation</h2>
+              </div>
               <div className="detail-text" style={{ whiteSpace: 'pre-wrap' }}>
-                {project.explanation}
+                <p>{project.explanation}</p>
               </div>
             </div>
-          </div>
+          </main>
 
           <aside className="detail-sidebar">
             <div className="detail-sidecard">
-              <h4 className="sidecard-title">Expertise Needed</h4>
+              <div className="detail-section-header">
+                <p className="detail-section-kicker">What is needed</p>
+                <h2 className="detail-section-title">Expertise needed</h2>
+              </div>
               <div className="expertise-tags">
                 {project.expertiseNeeded.split(',').map((tag: string) => (
                   <span key={tag} className="expertise-tag">{tag.trim()}</span>
@@ -135,9 +142,11 @@ export default function ProjectDetailModalPage({ params }: { params: { id: strin
       </div>
 
       {showInterestForm && (
-        <InterestModal 
-          project={project} 
-          onClose={() => setShowInterestForm(false)} 
+        <InterestModal
+          isOpen={showInterestForm}
+          onClose={() => setShowInterestForm(false)}
+          projectId={project.id}
+          projectTitle={project.title}
         />
       )}
     </div>

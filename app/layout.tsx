@@ -2,6 +2,7 @@ import React from 'react';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { TopProgressBar } from '@/components/TopProgressBar';
+import RouteBackdrop from './RouteBackdrop';
 
 export const metadata = {
   title: 'HealthAI - The Digital Void',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <RouteBackdrop />
           <TopProgressBar />
           {children}
         </ThemeProvider>

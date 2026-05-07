@@ -5,6 +5,26 @@
   background-color: var(--background);
   color: var(--on-background);
   overflow-x: hidden;
+  --companion-drawer-width: 0px;
+  --companion-drawer-gap: 1.5rem;
+  --companion-page-shift: 0px;
+}
+
+.shell--companion-open {
+  --companion-drawer-width: clamp(22rem, 30vw, 26.25rem);
+  --companion-page-shift: clamp(8rem, 12vw, 12rem);
+}
+
+.content-shell {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: width;
+}
+
+.shell--companion-open .content-shell {
+  width: calc(100% - var(--companion-drawer-width) - var(--companion-drawer-gap));
 }
 
 /* Dynamic Island Navigation */
@@ -20,6 +40,12 @@
   width: 100%;
   max-width: fit-content;
   pointer-events: none;
+  transition: left 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: left, transform;
+}
+
+.shell--companion-open .dynamic-island-nav {
+  left: calc((100vw - var(--companion-drawer-width) - var(--companion-drawer-gap)) / 2);
 }
 
 .dynamic-island-content {
@@ -143,6 +169,8 @@
   padding-top: 6rem;
   display: flex;
   flex-direction: column;
+  padding-right: 0;
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .page-container {
@@ -151,10 +179,25 @@
   width: 100%;
   margin: 0 auto;
   flex: 1;
+  transition: max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1), margin 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: max-width, margin;
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  .shell--companion-open {
+    --companion-drawer-width: 0px;
+    --companion-page-shift: 0px;
+  }
+
+  .shell--companion-open .content-shell {
+    width: 100%;
+  }
+
+  .shell--companion-open .dynamic-island-nav {
+    left: 50%;
+  }
+
   .dynamic-island-nav {
     top: auto;
     bottom: 1.5rem;
@@ -162,6 +205,7 @@
   .main-content {
     padding-top: 1rem;
     padding-bottom: 6rem;
+    padding-right: 0;
   }
   .dynamic-island-content {
     gap: 0.25rem;
@@ -181,6 +225,9 @@
   }
   .page-container {
     padding: 1rem 1.5rem 1.5rem;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: none;
   }
 }
 
