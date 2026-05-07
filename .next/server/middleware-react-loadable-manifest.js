@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app\\\\(protected)\\\\layout.tsx -> @/lib/actions/profile\":{\"id\":\"app\\\\(protected)\\\\layout.tsx -> @/lib/actions/profile\",\"files\":[\"static/chunks/_app-pages-browser_lib_actions_profile_ts.js\"]}}"
