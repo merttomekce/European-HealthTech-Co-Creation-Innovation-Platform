@@ -12,9 +12,9 @@ export async function getAuthRedirect(): Promise<string> {
     return '/?error=auth_failed'
   }
 
-  // Find user in Prisma
+  // Find user in Prisma by Supabase auth id. Email is not an ownership boundary.
   let dbUser = await prisma.user.findUnique({
-    where: { email: user.email! }
+    where: { id: user.id }
   })
 
   // If user doesn't exist in Prisma (e.g., just signed up), create them

@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { unstable_noStore as noStore } from 'next/cache';
 import { logAction } from '@/lib/audit';
 
 export async function requestMeeting(announcementId: string, message: string) {
@@ -79,6 +80,9 @@ export async function proposeSlots(meetingRequestId: string, slots: { startTime:
     });
 
     if (!meetingRequest) return { success: false, error: 'Not found' };
+    if (meetingRequest.requesterId !== user.id && meetingRequest.recipientId !== user.id) {
+      return { success: false, error: 'Forbidden' };
+    }
 
     // Create time slots
     await prisma.timeSlot.createMany({
@@ -123,6 +127,7 @@ export async function proposeSlots(meetingRequestId: string, slots: { startTime:
 }
 
 export async function getMySentRequests() {
+  noStore();
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -145,6 +150,7 @@ export async function getMySentRequests() {
 }
 
 export async function getMyReceivedRequests() {
+  noStore();
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -173,13 +179,67 @@ export async function updateMeetingRequestStatus(requestId: string, status: stri
   if (!user) return { success: false, error: 'Unauthorized' };
 
   try {
+    const existing = await prisma.meetingRequest.findUnique({
+      where: { id: requestId },
+      select: { requesterId: true, recipientId: true }
+    });
+
+    if (!existing) return { success: false, error: 'Request not found' };
+    if (existing.requesterId !== user.id && existing.recipientId !== user.id) {
+      return { success: false, error: 'Forbidden' };
+    }
+
     const updated = await prisma.meetingRequest.update({
       where: { id: requestId },
-      data: { status: status as any }
+      data: { status: status as any },
+      include: {
+        announcement: { select: { title: true } },
+        requester: { select: { id: true, name: true } }
+      }
     });
+
+    let conversationId: string | undefined;
+
+    if (status === 'ACCEPTED') {
+      const existingConv = await prisma.conversation.findUnique({
+        where: { id: requestId },
+        select: { id: true }
+      });
+
+      if (existingConv) {
+        conversationId = existingConv.id;
+      } else {
+        const newConv = await prisma.conversation.create({
+          data: {
+            id: requestId,
+            participants: {
+              create: [
+                { userId: updated.requesterId },
+                { userId: updated.recipientId }
+              ]
+            }
+          }
+        });
+        conversationId = newConv.id;
+      }
+
+      // Send a system message or notification
+      await prisma.notification.create({
+        data: {
+          userId: updated.requesterId,
+          type: 'MEETING_REQUEST' as any,
+          title: 'Request Accepted',
+          body: `Your interest in "${updated.announcement.title}" was accepted. You can now start chatting!`,
+          linkUrl: `/chats/${conversationId}`,
+        }
+      });
+    }
+
     revalidatePath('/my-announcements');
-    return { success: true, data: updated };
+    revalidatePath('/chats');
+    return { success: true, data: { ...updated, conversationId } };
   } catch(e) {
+    console.error('Update status error:', e);
     return { success: false, error: 'Failed' };
   }
 }
@@ -190,6 +250,16 @@ export async function confirmMeetingSlot(meetingRequestId: string, slotId: strin
   if (!user) return { success: false, error: 'Unauthorized' };
 
   try {
+    const request = await prisma.meetingRequest.findUnique({
+      where: { id: meetingRequestId },
+      select: { requesterId: true, recipientId: true }
+    });
+
+    if (!request) return { success: false, error: 'Request not found' };
+    if (request.requesterId !== user.id && request.recipientId !== user.id) {
+      return { success: false, error: 'Forbidden' };
+    }
+
     await prisma.timeSlot.updateMany({
       where: { meetingRequestId, id: { not: slotId } },
       data: { status: 'CANCELLED' as any }

@@ -10,17 +10,23 @@ import TagInput from '@/components/TagInput';
 import CustomCheckbox from '@/components/CustomCheckbox';
 import { MEDICAL_DOMAINS, REQUIREMENT_TAGS } from '@/lib/data/options';
 import { announcementSchema } from '@/lib/validations';
+import { getAuthProfile } from '@/lib/actions/profile';
 import './composer.css';
 
 export default function ProjectComposerPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [cityOptions, setCityOptions] = useState<Array<{ value: string; label: string; group?: string }>>([]);
+  const [isLoadingCities, setIsLoadingCities] = useState(false);
   
   const [userRole, setUserRole] = useState<'ENGINEER' | 'HEALTHCARE' | null>(null);
   const [userProfile, setUserProfile] = useState<{ city: string, country: string } | null>(null);
+  const [countries, setCountries] = useState<any[]>([]);
+  const [isLoadingCountries, setIsLoadingCountries] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -41,19 +47,113 @@ export default function ProjectComposerPage() {
 
   useEffect(() => {
     async function init() {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { getNavProfile } = await import('@/lib/actions/profile');
-        const profile = await getNavProfile();
-        setUserRole(profile.role.includes('Engineer') ? 'ENGINEER' : 'HEALTHCARE');
-        // Fallback profile
-        setUserProfile({ city: 'San Francisco', country: 'USA' }); 
+      setIsLoading(true);
+      setIsLoadingCountries(true);
+      try {
+        // 1. Fetch Countries
+        const countryRes = await fetch('/api/location?type=countries');
+        const countryData = await countryRes.json();
+        let countryOptions = Array.isArray(countryData) ? countryData : [];
+
+        // 2. Fetch Profile
+        const profile = await getAuthProfile();
+        let defaultCountry = '';
+        let defaultCity = '';
+
+        if (profile.success && profile.data) {
+          defaultCountry = profile.data.country || '';
+          defaultCity = profile.data.city || '';
+          setUserProfile({ city: defaultCity, country: defaultCountry });
+
+          // Ensure the default country is in the list
+          if (defaultCountry && !countryOptions.some(c => c.value === defaultCountry)) {
+            countryOptions.unshift({ value: defaultCountry, label: defaultCountry });
+          }
+        }
+        
+        setCountries(countryOptions);
+
+        // 3. Set Form Data and PRE-FETCH Cities if country exists
+        setFormData((prev) => ({
+          ...prev,
+          country: defaultCountry,
+          city: defaultCity,
+        }));
+
+        if (defaultCountry) {
+          setIsLoadingCities(true);
+          try {
+            const cityRes = await fetch(`/api/location?type=cities&countryCode=${encodeURIComponent(defaultCountry)}`);
+            const cityData = await cityRes.json();
+            const options = Array.isArray(cityData) ? cityData : [];
+            if (defaultCity && !options.some((opt: any) => opt.value === defaultCity)) {
+              options.unshift({ value: defaultCity, label: defaultCity });
+            }
+            setCityOptions(options);
+          } catch (cityErr) {
+            console.error('Failed to pre-fetch cities:', cityErr);
+            if (defaultCity) setCityOptions([{ value: defaultCity, label: defaultCity }]);
+          } finally {
+            setIsLoadingCities(false);
+          }
+        }
+
+        // 4. Determine Role
+        const { createClient } = await import('@/lib/supabase/client');
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+
+        if (user) {
+          const metaRole = user.user_metadata?.role;
+          if (metaRole === 'engineer') {
+            setUserRole('ENGINEER');
+          } else if (metaRole === 'healthcare') {
+            setUserRole('HEALTHCARE');
+          } else {
+            const { getNavProfile } = await import('@/lib/actions/profile');
+            const navProfile = await getNavProfile();
+            setUserRole(navProfile.role.includes('Engineer') ? 'ENGINEER' : 'HEALTHCARE');
+          }
+        }
+      } catch (err) {
+        console.error('Initialization error:', err);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingCountries(false);
       }
     }
     init();
-  }, []);
+  }, [router]);
+
+  useEffect(() => {
+    async function loadCities() {
+      if (!formData.country) {
+        setCityOptions([]);
+        return;
+      }
+
+      setIsLoadingCities(true);
+      try {
+        const res = await fetch(`/api/location?type=cities&countryCode=${encodeURIComponent(formData.country)}`);
+        const data = await res.json();
+        const options = Array.isArray(data) ? data : [];
+        const currentCity = formData.city?.trim();
+        if (currentCity && !options.some((opt: any) => opt.value === currentCity)) {
+          options.unshift({ value: currentCity, label: currentCity });
+        }
+        setCityOptions(options);
+      } catch (error) {
+        console.error('Failed to load cities for composer:', error);
+        const currentCity = formData.city?.trim();
+        setCityOptions(currentCity ? [{ value: currentCity, label: currentCity }] : []);
+      } finally {
+        setIsLoadingCities(false);
+      }
+    }
+
+    loadCities();
+  }, [formData.country]);
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -118,7 +218,8 @@ export default function ProjectComposerPage() {
       'Project-based': 'LOW'
     };
 
-    const explanationText = userRole === 'HEALTHCARE' 
+    const role = userRole ?? 'HEALTHCARE';
+    const explanationText = role === 'HEALTHCARE' 
       ? `Clinical Context: ${formData.context}\n\nTechnical Challenge: ${formData.expertiseNeededText}`
       : `High-Level Idea: ${formData.context}\n\nHealthcare Expertise Needed: ${formData.expertiseNeededText}`;
 
@@ -147,19 +248,21 @@ export default function ProjectComposerPage() {
     }
   };
 
-  if (!userRole) return <div className="composer-container"><p>Loading form...</p></div>;
+  if (isLoading) return <div className="composer-container"><p>Loading form...</p></div>;
+
+  const activeRole = userRole ?? 'HEALTHCARE';
 
   return (
     <div className="composer-container">
-      <Link href="/board" className="subtext" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem', textDecoration: 'none' }}>
+      <Link href="/dashboard" className="subtext" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem', textDecoration: 'none' }}>
         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span>
-        Back to Board
+        Back to feed
       </Link>
 
       <header className="composer-header">
         <h1 className="text-serif" style={{ fontSize: '3rem', marginBottom: '1rem' }}>Post a Project</h1>
         <p className="subtext">
-          {userRole === 'ENGINEER' ? 'Attract medical domain experts for your tech solution.' : 'Find the engineers needed to solve your clinical challenge.'}
+          {activeRole === 'ENGINEER' ? 'Attract medical domain experts for your tech solution.' : 'Find the engineers needed to solve your clinical challenge.'}
         </p>
       </header>
 
@@ -208,23 +311,32 @@ export default function ProjectComposerPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
               <div className="form-group">
-                <label className="form-label text-sans">City</label>
-                <input 
-                  type="text" 
-                  className={`form-input`} 
-                  placeholder={userProfile?.city || 'e.g. London'}
-                  value={formData.city}
-                  onChange={(e) => updateField('city', e.target.value)}
+                <SearchableSelect
+                  label="Country"
+                  options={countries}
+                  value={formData.country}
+                  onChange={(val) => {
+                    updateField('country', val);
+                    updateField('city', '');
+                  }}
+                  placeholder={isLoadingCountries ? 'Loading countries...' : 'Search countries…'}
+                  disabled={isLoadingCountries}
                 />
               </div>
               <div className="form-group">
-                <label className="form-label text-sans">Country</label>
-                <input 
-                  type="text" 
-                  className={`form-input`} 
-                  placeholder={userProfile?.country || 'e.g. UK'}
-                  value={formData.country}
-                  onChange={(e) => updateField('country', e.target.value)}
+                <SearchableSelect
+                  label="City"
+                  options={cityOptions}
+                  value={formData.city}
+                  onChange={(val) => updateField('city', val)}
+                  placeholder={
+                    isLoadingCities
+                      ? 'Loading cities…'
+                      : formData.country
+                        ? 'Search cities…'
+                        : 'Select country first'
+                  }
+                  disabled={!formData.country || isLoadingCities}
                 />
               </div>
             </div>
@@ -237,11 +349,11 @@ export default function ProjectComposerPage() {
             
             <div className="form-group">
               <label className="form-label text-sans">
-                {userRole === 'HEALTHCARE' ? 'Clinical Context (Short Explanation)' : 'High-Level Idea (No sensitive details)'}
+                {activeRole === 'HEALTHCARE' ? 'Clinical Context (Short Explanation)' : 'High-Level Idea (No sensitive details)'}
               </label>
               <textarea 
                 className={`form-textarea ${errors.context ? 'error' : ''}`} 
-                placeholder={userRole === 'HEALTHCARE' ? "What medical problem are you solving?" : "Explain your idea broadly."}
+                placeholder={activeRole === 'HEALTHCARE' ? "What medical problem are you solving?" : "Explain your idea broadly."}
                 value={formData.context}
                 onChange={(e) => updateField('context', e.target.value)}
               />
@@ -250,7 +362,7 @@ export default function ProjectComposerPage() {
 
             <div className="form-group">
               <label className="form-label text-sans">
-                {userRole === 'HEALTHCARE' ? 'Desired Technical Expertise' : 'Healthcare Expertise Needed'}
+                {activeRole === 'HEALTHCARE' ? 'Desired Technical Expertise' : 'Healthcare Expertise Needed'}
               </label>
               <textarea 
                 className={`form-textarea ${errors.expertiseNeededText ? 'error' : ''}`} 
@@ -292,7 +404,7 @@ export default function ProjectComposerPage() {
                 onChange={(val) => updateField('projectStage', val)}
               />
               
-              {userRole === 'HEALTHCARE' ? (
+              {activeRole === 'HEALTHCARE' ? (
                 <CustomSelect 
                   label="Commitment Level"
                   options={[

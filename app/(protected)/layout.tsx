@@ -1,156 +1,96 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
   Home, 
-  LayoutGrid, 
   Megaphone, 
   Handshake, 
   User, 
-  LogOut, 
-  Menu,
-  PanelLeftClose,
-  PanelLeftOpen
+  LogOut,
+  MessageSquare
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import AICompanion from '@/components/AICompanion';
 import './protected.css';
-
-interface NavItemProps {
-  href: string;
-  icon: any;
-  label: string;
-  active: boolean;
-  isCollapsed?: boolean;
-  onClick?: () => void;
-}
-
-const NavItem = ({ href, icon: Icon, label, active, isCollapsed, onClick }: NavItemProps) => (
-  <Link href={href} className={`nav-item ${active ? 'active' : ''} ${isCollapsed ? 'collapsed' : ''}`} onClick={onClick} title={label}>
-    <div className="nav-icon">
-      <Icon size={20} />
-    </div>
-    {!isCollapsed && <span>{label}</span>}
-  </Link>
-);
 
 export default function ProtectedLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
-
-  const navItems = [
-    { href: '/dashboard', icon: Home, label: 'Dashboard' },
-    { href: '/board', icon: LayoutGrid, label: 'Co-Creation Board' },
-    { href: '/my-announcements', icon: Megaphone, label: 'My Announcements' },
-    { href: '/my-requests', icon: Handshake, label: 'My Requests' },
-    { href: '/profile', icon: User, label: 'Profile' },
-  ];
-
-  const [userProfile, setUserProfile] = React.useState({
-    name: '',
-    role: '',
-    initials: '',
-  });
-
-  React.useEffect(() => {
-    async function loadProfile() {
-      const { getNavProfile } = await import('@/lib/actions/profile');
-      const profile = await getNavProfile();
-      setUserProfile(profile);
-    }
-    loadProfile();
-  }, []);
-
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
   const router = useRouter();
+  const [companionOpen, setCompanionOpen] = useState(false);
+
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/');
+    document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
+    router.replace('/login');
+    router.refresh();
   };
 
   return (
-    <div className={`shell ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-      {/* Mobile Backdrop */}
-      {isMobileMenuOpen && (
-        <div className="mobile-backdrop" onClick={closeMobileMenu} />
-      )}
+    <div className={`shell ${companionOpen ? 'shell--companion-open' : ''}`}>
+      <div className="content-shell">
+        <nav className="dynamic-island-nav">
+          <div className="dynamic-island-content">
+            <Link 
+              href="/dashboard" 
+              className={`island-item ${pathname === '/dashboard' || pathname.startsWith('/doctor/dashboard') || pathname.startsWith('/engineer/dashboard') ? 'active' : ''}`} 
+              title="Home"
+            >
+              <Home size={18} />
+              <span className="island-label">Home</span>
+            </Link>
+            <Link href="/my-announcements" className={`island-item ${pathname.startsWith('/my-announcements') ? 'active' : ''}`} title="My Announcements">
+              <Megaphone size={18} />
+              <span className="island-label">Posts</span>
+            </Link>
+            <Link href="/my-requests" className={`island-item ${pathname.startsWith('/my-requests') ? 'active' : ''}`} title="My Requests">
+              <Handshake size={18} />
+              <span className="island-label">Requests</span>
+            </Link>
+            <Link href="/chats" className={`island-item ${pathname.startsWith('/chats') ? 'active' : ''}`} title="Chats">
+              <MessageSquare size={18} />
+              <span className="island-label">Chats</span>
+            </Link>
+            <Link href="/profile" className={`island-item ${pathname.startsWith('/profile') ? 'active' : ''}`} title="Profile">
+              <User size={18} />
+              <span className="island-label">Profile</span>
+            </Link>
 
-      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
-        <div className="logo-section">
-          {!isCollapsed && <div className="logo-text">HealthAI</div>}
-          {isCollapsed && <div className="logo-text-collapsed">H</div>}
-          <button 
-            className="collapse-btn" 
-            onClick={toggleCollapse} 
-            aria-label="Toggle Sidebar"
-          >
-            {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-          </button>
-        </div>
-
-        <nav className="nav-group">
-          {navItems.map((item) => (
-            <NavItem
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              active={pathname.startsWith(item.href)}
-              isCollapsed={isCollapsed}
-              onClick={closeMobileMenu}
-            />
-          ))}
+            <div className="island-divider"></div>
+            
+            <div className="island-widget">
+              <NotificationBell />
+            </div>
+            <div className="island-widget">
+              <ThemeToggle />
+            </div>
+            
+            <button className="island-item sign-out" onClick={handleSignOut} title="Sign Out">
+              <LogOut size={18} />
+              <span className="island-label">Sign Out</span>
+            </button>
+          </div>
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="user-profile">
-            <div className="avatar-placeholder">{userProfile.initials}</div>
-            {!isCollapsed && (
-              <div className="user-info">
-                <div className="user-name">{userProfile.name}</div>
-                <div className="user-role-badge">{userProfile.role}</div>
-              </div>
-            )}
+        <main className="main-content">
+          <div className="page-container">
+            {children}
           </div>
-          <button className="sign-out-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign Out">
-            <LogOut size={18} />
-            {!isCollapsed && <span>Sign Out</span>}
-          </button>
-        </div>
-      </aside>
+        </main>
+      </div>
 
-      <main className="main-content">
-        <header className="top-bar">
-          <button 
-            className="mobile-menu-btn" 
-            onClick={toggleMobileMenu}
-            aria-label="Toggle Menu"
-          >
-            <Menu size={24} />
-          </button>
-          
-          <div className="top-bar-right">
-              <ThemeToggle />
-              <NotificationBell />
-          </div>
-        </header>
-
-        <div className="page-container">
-          {children}
-        </div>
-      </main>
+      <AICompanion open={companionOpen} onOpenChange={setCompanionOpen} />
+      {modal}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { getMySentRequests } from '@/lib/actions/meetings';
 import MyRequestsClient from './MyRequestsClient';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MyRequestsPage() {
   const result = await getMySentRequests();
 

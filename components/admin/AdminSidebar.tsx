@@ -3,139 +3,73 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { Home, Group, Newspaper, History, Settings, LogOut } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { LogOut } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import AICompanion from '@/components/AICompanion';
 
-const AdminNavItem = ({ href, icon, label, active, onClick }: { href: string; icon: string; label: string; active: boolean; onClick?: () => void }) => (
-  <Link href={href} className={`admin-nav-item ${active ? 'active' : ''}`} onClick={onClick}>
-    <span className="material-symbols-outlined">{icon}</span>
-    {label}
-  </Link>
-);
+const navItems = [
+  { href: '/admin', label: 'Home', icon: Home, match: (pathname: string) => pathname === '/admin' },
+  { href: '/admin/users', label: 'Users', icon: Group, match: (pathname: string) => pathname.startsWith('/admin/users') },
+  { href: '/admin/posts', label: 'Posts', icon: Newspaper, match: (pathname: string) => pathname.startsWith('/admin/posts') },
+  { href: '/admin/logs', label: 'Logs', icon: History, match: (pathname: string) => pathname.startsWith('/admin/logs') },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, match: (pathname: string) => pathname.startsWith('/admin/settings') },
+];
 
-export default function AdminSidebar({ children, adminName = "Platform Admin" }: { children: React.ReactNode, adminName?: string }) {
+export default function AdminSidebar({ children }: { children: React.ReactNode; adminName?: string }) {
   const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const router = useRouter();
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const closeSidebar = () => setIsSidebarOpen(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [companionOpen, setCompanionOpen] = useState(false);
 
   const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/');
+    document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
+    router.replace('/login');
+    router.refresh();
   };
 
   return (
-    <div className="admin-shell">
-      {isSidebarOpen && <div className="mobile-backdrop" onClick={closeSidebar} style={{ zIndex: 999, position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} />}
-      
-      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="admin-logo-section">
-          <div className="admin-logo-text">HealthAI</div>
-          <span className="admin-badge">Admin</span>
-        </div>
-        <div className="admin-divider" />
+    <div className={`shell ${companionOpen ? 'shell--companion-open' : ''}`}>
+      <div className="content-shell">
+        <nav className="dynamic-island-nav">
+          <div className="dynamic-island-content">
+            {navItems.map(({ href, label, icon: Icon, match }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`island-item ${match(pathname) ? 'active' : ''}`}
+                title={label}
+              >
+                <Icon size={18} />
+                <span className="island-label">{label}</span>
+              </Link>
+            ))}
 
-        <nav className="admin-nav-group">
-          <div className="admin-nav-label">Platform</div>
-          <AdminNavItem 
-            href="/admin" 
-            icon="monitoring" 
-            label="KPI Dashboard" 
-            active={pathname === '/admin'} 
-            onClick={closeSidebar}
-          />
+            <div className="island-divider" />
 
-          <div className="admin-nav-label">Resources</div>
-          <AdminNavItem 
-            href="/admin/users" 
-            icon="group" 
-            label="Users" 
-            active={pathname.startsWith('/admin/users')} 
-            onClick={closeSidebar}
-          />
-          <AdminNavItem 
-            href="/admin/posts" 
-            icon="article" 
-            label="Announcements" 
-            active={pathname.startsWith('/admin/posts')} 
-            onClick={closeSidebar}
-          />
+            <div className="island-widget">
+              <ThemeToggle />
+            </div>
 
-          <div className="admin-nav-label">Governance</div>
-          <AdminNavItem 
-            href="/admin/logs" 
-            icon="history" 
-            label="Audit Logs" 
-            active={pathname.startsWith('/admin/logs')} 
-            onClick={closeSidebar}
-          />
-          <AdminNavItem 
-            href="/admin/settings" 
-            icon="settings" 
-            label="Settings" 
-            active={pathname.startsWith('/admin/settings')} 
-            onClick={closeSidebar}
-          />
+            <button className="island-item sign-out" onClick={handleSignOut} title="Sign Out" disabled={isSigningOut}>
+              <LogOut size={18} />
+              <span className="island-label">{isSigningOut ? 'Signing out' : 'Sign Out'}</span>
+            </button>
+          </div>
         </nav>
 
-        <div className="admin-sidebar-footer">
-          <div className="admin-user-section">
-            <div className="admin-avatar">{adminName.substring(0, 2).toUpperCase()}</div>
-            <div>
-              <div className="admin-user-name">{adminName}</div>
-              <div className="admin-user-role">ADMIN</div>
-            </div>
+        <main className="main-content">
+          <div className="page-container admin-page-container">
+            {children}
           </div>
-          <button className="admin-sign-out-btn" onClick={handleSignOut} title="Sign Out">
-            <LogOut size={18} />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </aside>
+        </main>
+      </div>
 
-      <main className="admin-main">
-        <header className="admin-topbar">
-          <button 
-            className="mobile-menu-btn" 
-            onClick={toggleSidebar}
-            aria-label="Toggle Menu"
-            style={{ 
-              display: 'none', 
-              marginRight: 'auto', 
-              background: 'none', 
-              border: 'none', 
-              color: 'var(--on-background)',
-              cursor: 'pointer'
-            }}
-          >
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-          
-          <div className="admin-topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <ThemeToggle />
-            <div className="admin-topbar-info">
-              <span className="status-dot" />
-              Platform Operational
-            </div>
-          </div>
-        </header>
-
-        <div className="admin-page-content">
-          {children}
-        </div>
-      </main>
-
-      <style jsx>{`
-        @media (max-width: 1024px) {
-          .mobile-menu-btn {
-            display: block !important;
-          }
-        }
-      `}</style>
+      <AICompanion open={companionOpen} onOpenChange={setCompanionOpen} />
     </div>
   );
 }

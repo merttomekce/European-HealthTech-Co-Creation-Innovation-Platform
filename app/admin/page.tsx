@@ -53,7 +53,7 @@ export default async function AdminDashboardPage() {
         <div className="table-container">
           <div className="table-toolbar">
             <span className="table-toolbar-title">Recent Activity Logs</span>
-            <Link href="/admin/logs" className="table-btn" style={{ textDecoration: 'none' }}>
+            <Link href="/admin/logs" className="table-btn primary" style={{ textDecoration: 'none' }}>
               View All Logs →
             </Link>
           </div>

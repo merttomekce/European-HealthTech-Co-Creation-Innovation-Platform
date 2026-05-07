@@ -4,35 +4,49 @@ import React, { useState } from 'react';
 import { profileSchema } from '@/lib/validations';
 import TagInput from '@/components/TagInput';
 import SearchableSelect from '@/components/SearchableSelect';
-import { updateProfile, getAuthProfile } from '@/lib/actions/profile';
-import { COUNTRIES, HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
+import { updateProfile, getAuthProfile, updateAvatar } from '@/lib/actions/profile';
+import { HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
 import './profile.css';
 
-// Helper: parse "City, Country" string back to parts
-function parseLocation(location: string) {
-  const parts = location.split(',').map((s) => s.trim());
-  if (parts.length >= 2) {
-    return { city: parts.slice(0, parts.length - 1).join(', '), country: parts[parts.length - 1] };
-  }
-  return { city: '', country: location };
-}
+const AVATAR_PRESETS = [
+  '/avatars/avatar_1.svg',
+  '/avatars/avatar_2.svg',
+  '/avatars/avatar_3.svg',
+  '/avatars/avatar_4.svg',
+  '/avatars/avatar_5.svg',
+  '/avatars/avatar_6.svg',
+  '/avatars/avatar_7.svg',
+  '/avatars/avatar_8.svg',
+  '/avatars/avatar_9.svg',
+  '/avatars/avatar_10.svg',
+];
 
 export default function ProfilePage() {
-  const initialLocation = parseLocation('Berlin, Germany');
 
   const [formData, setFormData] = useState({
     fullName: '',
     institution: '',
+    bio: '',
     country: '',
     city: '',
     expertiseTags: [] as string[],
     role: 'healthcare' as 'healthcare' | 'engineer' | 'admin',
+    image: null as string | null,
   });
+
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaved, setIsSaved] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Dynamic location states
+  const [countries, setCountries] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+  const [isLoadingCities, setIsLoadingCities] = useState(false);
 
   React.useEffect(() => {
     async function fetchProfile() {
@@ -41,17 +55,59 @@ export default function ProfilePage() {
         setFormData({
           fullName: res.data.name || '',
           institution: res.data.institution || '',
+          bio: res.data.bio || '',
           country: res.data.country || '',
           city: res.data.city || '',
           expertiseTags: res.data.expertise || [],
           role: res.data.role === 'ENGINEER' ? 'engineer' :
             res.data.role === 'ADMIN' ? 'admin' : 'healthcare',
+          image: res.data.image || null,
         });
       }
       setIsLoading(false);
     }
+
+    async function fetchCountries() {
+      setIsLoadingCountries(true);
+      try {
+        const res = await fetch('/api/location?type=countries');
+        const data = await res.json();
+        setCountries(data);
+      } catch (err) {
+        console.error('Failed to fetch countries');
+      } finally {
+        setIsLoadingCountries(false);
+      }
+    }
+
     fetchProfile();
+    fetchCountries();
   }, []);
+
+  // Fetch cities when country changes
+  React.useEffect(() => {
+    if (!formData.country) {
+      setCities([]);
+      return;
+    }
+
+    async function fetchCities() {
+      setIsLoadingCities(true);
+      try {
+        // Find the country object to get its name (API uses name for city lookup)
+        const res = await fetch(`/api/location?type=cities&countryCode=${encodeURIComponent(formData.country)}`);
+        const data = await res.json();
+        setCities(data);
+      } catch (err) {
+        console.error('Failed to fetch cities');
+        setCities([]);
+      } finally {
+        setIsLoadingCities(false);
+      }
+    }
+
+    fetchCities();
+  }, [formData.country]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -91,12 +147,51 @@ export default function ProfilePage() {
         role: formData.role === 'engineer' ? 'engineer' : 'healthcare',
         location: locationString,
         expertise: formData.expertiseTags.join(', '),
+        bio: formData.bio,
       });
       setIsSaved(true);
     } catch (e) {
       alert("Failed to save changes.");
     } finally {
       setIsPending(false);
+    }
+  };
+
+  const handleAvatarSelect = async (avatarUrl: string) => {
+    setFormData(prev => ({ ...prev, image: avatarUrl }));
+    setShowAvatarMenu(false);
+    try {
+      await updateAvatar(avatarUrl);
+    } catch (err) {
+      console.error("Failed to update avatar", err);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        setFormData(prev => ({ ...prev, image: base64String }));
+        setShowAvatarMenu(false);
+        try {
+          await updateAvatar(base64String);
+        } catch (err) {
+          console.error("Failed to upload avatar", err);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setFormData(prev => ({ ...prev, image: null }));
+    setShowAvatarMenu(false);
+    try {
+      await updateAvatar(null);
+    } catch (err) {
+      console.error("Failed to remove avatar", err);
     }
   };
 
@@ -119,14 +214,71 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="profile-container">
+    <div className="profile-page">
       <header className="profile-header">
         <h1 className="profile-title">Profile Settings</h1>
         <p className="profile-subtitle">Manage your personal information and privacy preferences.</p>
       </header>
 
       <div className="avatar-section">
-        <div className="large-avatar">{initials}</div>
+        <div 
+          className="large-avatar"
+          onMouseEnter={() => setShowAvatarMenu(true)}
+          onMouseLeave={() => setShowAvatarMenu(false)}
+        >
+          {formData.image ? (
+            <img src={formData.image} alt="Avatar" />
+          ) : (
+            initials
+          )}
+          <div className="avatar-hover-overlay">
+            <span className="material-symbols-outlined">edit</span>
+          </div>
+
+          {showAvatarMenu && (
+            <div className="avatar-menu">
+              <div className="avatar-menu-title">Select Avatar</div>
+              <div className="avatar-presets">
+                {AVATAR_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    className={`avatar-preset-btn ${formData.image === preset ? 'active' : ''}`}
+                    onClick={() => handleAvatarSelect(preset)}
+                    type="button"
+                  >
+                    <img src={preset} alt={`Preset ${idx + 1}`} />
+                  </button>
+                ))}
+              </div>
+              <div className="avatar-actions">
+                <button 
+                  className="avatar-action-btn" 
+                  onClick={() => fileInputRef.current?.click()}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined">upload</span>
+                  Upload from device
+                </button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  style={{ display: 'none' }} 
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+                <button 
+                  className="avatar-action-btn remove" 
+                  onClick={handleRemoveAvatar}
+                  disabled={!formData.image}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                  Remove picture
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="avatar-info">
           <h2>{formData.fullName}</h2>
           <span className="read-only-role">
@@ -171,25 +323,28 @@ export default function ProfilePage() {
             <div className="full-width">
               <SearchableSelect
                 label="Country"
-                options={COUNTRIES}
+                placeholder={isLoadingCountries ? "Loading countries..." : "Search countries..."}
+                options={countries}
                 value={formData.country}
-                onChange={(val) => { setFormData((p) => ({ ...p, country: val })); setIsSaved(false); }}
+                onChange={(val) => { 
+                  setFormData((p) => ({ ...p, country: val, city: '' })); 
+                  setIsSaved(false); 
+                }}
                 error={errors.country}
+                disabled={isLoadingCountries}
               />
             </div>
 
-            {/* City */}
-            <div className="form-group full-width">
-              <label className="form-label">
-                City <span style={{ color: 'var(--on-background-muted)', fontWeight: 400 }}>(optional)</span>
-              </label>
-              <input
-                type="text"
-                name="city"
-                className="form-input"
-                placeholder="Berlin"
+            {/* City Searchable Select */}
+            <div className="full-width" style={{ opacity: formData.country ? 1 : 0.5, transition: 'opacity 0.2s' }}>
+              <SearchableSelect
+                label="City"
+                placeholder={isLoadingCities ? "Loading cities..." : (formData.country ? "Search cities..." : "Select country first")}
+                options={cities}
                 value={formData.city}
-                onChange={handleInputChange}
+                onChange={(val) => { setFormData((p) => ({ ...p, city: val })); setIsSaved(false); }}
+                error={errors.city}
+                disabled={!formData.country || isLoadingCities}
               />
             </div>
           </div>
@@ -203,7 +358,8 @@ export default function ProfilePage() {
               <textarea
                 name="bio"
                 className="form-textarea"
-                defaultValue="Cardiologist specializing in electrophysiology. Looking to collaborate on signal processing for wearable ECG devices."
+                value={formData.bio}
+                onChange={handleInputChange}
                 placeholder="Brief description of your background and goals…"
               />
             </div>
@@ -255,6 +411,13 @@ export default function ProfilePage() {
       </div>
 
       <style jsx>{`
+        .profile-page {
+          max-width: 980px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
         .field-error {
           color: #ef4444;
           font-size: 0.75rem;

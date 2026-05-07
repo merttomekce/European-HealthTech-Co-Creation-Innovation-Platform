@@ -10,7 +10,7 @@ import TagInput from '@/components/TagInput';
 import CustomCheckbox from '@/components/CustomCheckbox';
 import { MEDICAL_DOMAINS, REQUIREMENT_TAGS } from '@/lib/data/options';
 import { announcementSchema } from '@/lib/validations';
-import '../../create/composer.css';
+import '../../../post-project/composer.css';
 
 export default function ProjectEditPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -41,73 +41,90 @@ export default function ProjectEditPage({ params }: { params: { id: string } }) 
 
   useEffect(() => {
     async function init() {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/');
-        return;
-      }
-
-      const { getNavProfile } = await import('@/lib/actions/profile');
-      const profile = await getNavProfile();
-      const loadedRole = profile.role.includes('Engineer') ? 'ENGINEER' : 'HEALTHCARE';
-      setUserRole(loadedRole);
-
-      const result = await getAnnouncementById(params.id);
-      if (result.success && result.data) {
-        const post = result.data;
-        if (post.authorId !== user.id) {
-          router.push('/board');
+      try {
+        const { createClient } = await import('@/lib/supabase/client');
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+        if (!user) {
+          setIsLoading(false);
           return;
         }
 
-        // Parse explanation back into fields based on role
-        let context = post.explanation;
-        let expertiseNeededText = post.explanation;
-        
-        if (loadedRole === 'HEALTHCARE') {
-            const split = post.explanation.split('Technical Challenge: ');
-            if (split.length > 1) {
-                context = split[0].replace('Clinical Context: ', '').trim();
-                expertiseNeededText = split[1].trim();
-            }
+        let loadedRole: 'ENGINEER' | 'HEALTHCARE' = 'HEALTHCARE';
+        const metaRole = user.user_metadata?.role;
+        if (metaRole === 'engineer') {
+          loadedRole = 'ENGINEER';
+        } else if (metaRole === 'healthcare') {
+          loadedRole = 'HEALTHCARE';
         } else {
-            const split = post.explanation.split('Healthcare Expertise Needed: ');
-            if (split.length > 1) {
-                context = split[0].replace('High-Level Idea: ', '').trim();
-                expertiseNeededText = split[1].trim();
-            }
+          try {
+            const { getNavProfile } = await import('@/lib/actions/profile');
+            const profile = await getNavProfile();
+            loadedRole = profile.role.includes('Engineer') ? 'ENGINEER' : 'HEALTHCARE';
+          } catch (profileError) {
+            console.error('Failed to load nav profile for edit composer:', profileError);
+          }
         }
 
-        // Reverse map commitments and stages
-        const stageMap: any = { 'IDEA': 'Ideation', 'PROTOTYPE_DEVELOPED': 'Prototype', 'PILOT_TESTING': 'Testing', 'PRE_DEPLOYMENT': 'Scale' };
-        const commitmentMap: any = { 'MEDIUM': 'Part-time', 'HIGH': 'Full-time', 'LOW': 'Project-based' };
+        setUserRole(loadedRole);
 
-        let daysRemaining = 30;
-        if (post.expiresAt) {
-            const diffTime = Math.abs(new Date(post.expiresAt).getTime() - new Date().getTime());
-            daysRemaining = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+        const result = await getAnnouncementById(params.id);
+        if (result.success && result.data) {
+          const post = result.data;
+          if (post.authorId !== user.id) {
+            router.push('/dashboard');
+            return;
+          }
+
+          // Parse explanation back into fields based on role
+          let context = post.explanation;
+          let expertiseNeededText = post.explanation;
+          
+          if (loadedRole === 'HEALTHCARE') {
+              const split = post.explanation.split('Technical Challenge: ');
+              if (split.length > 1) {
+                  context = split[0].replace('Clinical Context: ', '').trim();
+                  expertiseNeededText = split[1].trim();
+              }
+          } else {
+              const split = post.explanation.split('Healthcare Expertise Needed: ');
+              if (split.length > 1) {
+                  context = split[0].replace('High-Level Idea: ', '').trim();
+                  expertiseNeededText = split[1].trim();
+              }
+          }
+
+          // Reverse map commitments and stages
+          const stageMap: any = { 'IDEA': 'Ideation', 'PROTOTYPE_DEVELOPED': 'Prototype', 'PILOT_TESTING': 'Testing', 'PRE_DEPLOYMENT': 'Scale' };
+          const commitmentMap: any = { 'MEDIUM': 'Part-time', 'HIGH': 'Full-time', 'LOW': 'Project-based' };
+
+          let daysRemaining = 30;
+          if (post.expiresAt) {
+              const diffTime = Math.abs(new Date(post.expiresAt).getTime() - new Date().getTime());
+              daysRemaining = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+          }
+
+          setFormData({
+              title: post.title,
+              domain: post.domain,
+              pitch: post.publicPitch || '',
+              context: context,
+              expertiseNeededText: expertiseNeededText,
+              projectStage: stageMap[post.projectStage] || 'Ideation',
+              commitment: commitmentMap[post.commitmentLevel] || 'Part-time',
+              collaborationType: post.collaborationType || 'ADVISOR',
+              requirements: post.expertiseNeeded.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0),
+              confidentiality: post.confidentiality,
+              expiresInDays: daysRemaining,
+              autoClose: post.autoClose,
+              city: post.city || '',
+              country: post.country || '',
+          });
         }
-
-        setFormData({
-            title: post.title,
-            domain: post.domain,
-            pitch: post.publicPitch || '',
-            context: context,
-            expertiseNeededText: expertiseNeededText,
-            projectStage: stageMap[post.projectStage] || 'Ideation',
-            commitment: commitmentMap[post.commitmentLevel] || 'Part-time',
-            collaborationType: post.collaborationType || 'ADVISOR',
-            requirements: post.expertiseNeeded.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0),
-            confidentiality: post.confidentiality,
-            expiresInDays: daysRemaining,
-            autoClose: post.autoClose,
-            city: post.city || '',
-            country: post.country || '',
-        });
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
     init();
   }, [params.id, router]);
@@ -175,7 +192,8 @@ export default function ProjectEditPage({ params }: { params: { id: string } }) 
       'Project-based': 'LOW'
     };
 
-    const explanationText = userRole === 'HEALTHCARE' 
+    const role = userRole ?? 'HEALTHCARE';
+    const explanationText = role === 'HEALTHCARE' 
       ? `Clinical Context: ${formData.context}\n\nTechnical Challenge: ${formData.expertiseNeededText}`
       : `High-Level Idea: ${formData.context}\n\nHealthcare Expertise Needed: ${formData.expertiseNeededText}`;
 
@@ -204,7 +222,9 @@ export default function ProjectEditPage({ params }: { params: { id: string } }) 
     }
   };
 
-  if (isLoading || !userRole) return <div className="composer-container"><p>Loading form...</p></div>;
+  if (isLoading) return <div className="composer-container"><p>Loading form...</p></div>;
+
+  const activeRole = userRole ?? 'HEALTHCARE';
 
   return (
     <div className="composer-container">
@@ -291,7 +311,7 @@ export default function ProjectEditPage({ params }: { params: { id: string } }) 
             
             <div className="form-group">
               <label className="form-label text-sans">
-                {userRole === 'HEALTHCARE' ? 'Clinical Context (Short Explanation)' : 'High-Level Idea (No sensitive details)'}
+                {activeRole === 'HEALTHCARE' ? 'Clinical Context (Short Explanation)' : 'High-Level Idea (No sensitive details)'}
               </label>
               <textarea 
                 className={`form-textarea ${errors.context ? 'error' : ''}`} 
@@ -303,7 +323,7 @@ export default function ProjectEditPage({ params }: { params: { id: string } }) 
 
             <div className="form-group">
               <label className="form-label text-sans">
-                {userRole === 'HEALTHCARE' ? 'Desired Technical Expertise' : 'Healthcare Expertise Needed'}
+                {activeRole === 'HEALTHCARE' ? 'Desired Technical Expertise' : 'Healthcare Expertise Needed'}
               </label>
               <textarea 
                 className={`form-textarea ${errors.expertiseNeededText ? 'error' : ''}`} 
@@ -344,7 +364,7 @@ export default function ProjectEditPage({ params }: { params: { id: string } }) 
                 onChange={(val) => updateField('projectStage', val)}
               />
               
-              {userRole === 'HEALTHCARE' ? (
+              {activeRole === 'HEALTHCARE' ? (
                 <CustomSelect 
                   label="Commitment Level"
                   options={[

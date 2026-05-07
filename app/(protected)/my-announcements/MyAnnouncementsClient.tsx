@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import MeetingStatusPill from '@/components/MeetingStatusPill';
 import { toggleAnnouncementStatus } from '@/lib/actions/announcements';
 import { updateMeetingRequestStatus, confirmMeetingSlot } from '@/lib/actions/meetings';
@@ -9,6 +10,7 @@ import './manage.css';
 import './requests.css';
 
 export default function MyAnnouncementsClient({ initialData }: { initialData: any[] }) {
+  const router = useRouter();
   const [projects, setProjects] = useState(initialData);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
@@ -22,20 +24,31 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
     setIsUpdating(prev => ({ ...prev, [id]: false }));
   };
 
-  const handleInterestStatus = async (projectId: string, requestId: string, newStatus: string) => {
-    const res = await updateMeetingRequestStatus(requestId, newStatus);
-    if (res.success) {
-      setProjects(prev => prev.map(p => {
-        if (p.id === projectId) {
-          return {
-            ...p,
-            meetingRequests: p.meetingRequests.map((req: any) => 
-              req.id === requestId ? { ...req, status: newStatus } : req
-            )
-          };
+  const handleInterestStatus = async (projectId: string, requestId: string, status: string) => {
+    try {
+      const res = await updateMeetingRequestStatus(requestId, status);
+      if (res.success) {
+        // If accepted, redirect to chat
+        if (status === 'ACCEPTED' && res.data?.conversationId) {
+          router.push(`/chats/${res.data.conversationId}`);
+        } else {
+          setProjects(prev => prev.map(p => {
+            if (p.id === projectId) {
+              return {
+                ...p,
+                meetingRequests: p.meetingRequests.map((req: any) => 
+                  req.id === requestId ? { ...req, status: status } : req
+                )
+              };
+            }
+            return p;
+          }));
         }
-        return p;
-      }));
+      } else {
+        window.alert(res.error || 'Failed to update request');
+      }
+    } catch (error) {
+      window.alert('Something went wrong');
     }
   };
 
@@ -63,7 +76,7 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
           <h1 className="manage-title">Manage Your Projects</h1>
           <p className="manage-subtitle">Track interest and coordinate with potential collaborators.</p>
         </div>
-        <Link href="/board/create" className="create-btn">
+        <Link href="/post-project" className="create-btn">
           <span className="material-symbols-outlined">add</span>
           Post New Project
         </Link>
@@ -159,7 +172,7 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                                     className="btn-accept"
                                     onClick={() => handleInterestStatus(project.id, app.id, 'ACCEPTED')}
                                   >
-                                    Accept Request
+                                    Accept & Start Chat
                                   </button>
                                   <button 
                                     className="btn-decline"

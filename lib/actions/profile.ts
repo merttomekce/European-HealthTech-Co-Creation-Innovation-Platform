@@ -11,6 +11,7 @@ const profileSchema = z.object({
   role: z.enum(['healthcare', 'engineer']),
   location: z.string().min(2, "Location is required"),
   expertise: z.string().min(2, "Please provide some expertise tags"),
+  bio: z.string().max(500).optional(),
 })
 
 export async function updateProfile(formData: z.infer<typeof profileSchema>) {
@@ -34,6 +35,8 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
     .map(s => s.trim())
     .filter(s => s.length > 0)
 
+  const bio = validated.bio?.trim() || null
+
   // 4. Map Role
   const prismalRole: Role = validated.role === 'healthcare' 
     ? Role.HEALTHCARE_PROFESSIONAL 
@@ -42,14 +45,16 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
   // 5. Update Database
   try {
     await prisma.user.upsert({
-      where: { email: user.email! },
+      where: { id: user.id },
       update: {
+        email: user.email!,
         name: validated.fullName,
         institution: validated.institution,
         role: prismalRole,
         city: city,
         country: country,
         expertise: expertiseArray,
+        bio,
       },
       create: {
         id: user.id, // Ensure Prisma ID matches Supabase Auth ID
@@ -60,6 +65,7 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
         city: city,
         country: country,
         expertise: expertiseArray,
+        bio,
       }
     })
 
@@ -67,6 +73,25 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
   } catch (error) {
     console.error("Profile update error:", error)
     throw new Error("Failed to update profile in database")
+  }
+}
+
+export async function updateAvatar(imageUrl: string | null) {
+  const supabase = createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    throw new Error("Unauthorized")
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { image: imageUrl }
+    })
+    return { success: true }
+  } catch (error) {
+    console.error("Avatar update error:", error)
+    throw new Error("Failed to update avatar")
   }
 }
 
@@ -80,7 +105,7 @@ export async function getAuthProfile() {
 
   try {
     const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! }
+      where: { id: user.id }
     })
     
     if (!dbUser) {
@@ -107,8 +132,8 @@ export async function getNavProfile() {
   }
 
   const dbUser = await prisma.user.findUnique({
-    where: { email: user.email! },
-    select: { name: true, role: true }
+    where: { id: user.id },
+    select: { name: true, role: true, image: true }
   })
 
   const name = dbUser?.name || 'New User'
@@ -131,7 +156,8 @@ export async function getNavProfile() {
   return {
     name,
     role: roleName,
-    initials: initials.toUpperCase()
+    initials: initials.toUpperCase(),
+    image: dbUser?.image || null
   }
 }
 
@@ -144,6 +170,7 @@ export async function getUserProfile(userId: string) {
         name: true,
         email: true,
         role: true,
+        image: true,
         institution: true,
         city: true,
         country: true,

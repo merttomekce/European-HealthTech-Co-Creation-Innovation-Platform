@@ -1,137 +1,196 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { getUserAnnouncementsByAuthorId } from '@/lib/actions/announcements';
 import { getUserProfile } from '@/lib/actions/profile';
+import FeedPostCard from '@/components/FeedPostCard';
 import '../profile.css';
+import '../public-profile.css';
 
-export default function PublicProfilePage({ params }: { params: { id: string } }) {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+function roleLabel(role?: string | null) {
+  if (role === 'ENGINEER') return 'Engineer / Tech Expert';
+  if (role === 'HEALTHCARE_PROFESSIONAL') return 'Healthcare Professional';
+  if (role === 'ADMIN') return 'Administrator';
+  return 'Collaborator';
+}
 
-  useEffect(() => {
-    async function fetch() {
-      const res = await getUserProfile(params.id);
-      if (res.success) {
-        setUser(res.data);
-      } else {
-        alert(res.error || 'User not found');
-        router.push('/dashboard');
-      }
-      setLoading(false);
-    }
-    fetch();
-  }, [params.id, router]);
+function initials(name?: string | null, email?: string | null) {
+  if (name) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    if (parts.length > 1) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return email ? email.slice(0, 2).toUpperCase() : 'NA';
+}
 
-  if (loading) return <div className="profile-container"><p className="subtext">Loading user profile...</p></div>;
-  if (!user) return null;
+export default async function PublicProfilePage({ params }: { params: { id: string } }) {
+  const supabase = createClient();
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-  const initials = user.name
-    ? user.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()
-    : user.email.substring(0, 2).toUpperCase();
+  if (!currentUser) {
+    redirect('/login');
+  }
+
+  const [profileRes, postsRes] = await Promise.all([
+    getUserProfile(params.id),
+    getUserAnnouncementsByAuthorId(params.id),
+  ]);
+
+  if (!profileRes.success || !profileRes.data) {
+    redirect('/dashboard');
+  }
+
+  const profile = profileRes.data;
+  const posts = postsRes.success ? postsRes.data || [] : [];
+  const isOwnProfile = currentUser.id === profile.id;
+
+  const location = [profile.city, profile.country].filter(Boolean).join(', ') || 'Location not shared';
+  const joinedAt = new Date(profile.createdAt).toLocaleDateString([], { month: 'short', year: 'numeric' });
+  const memberPosts = posts.length;
+  const expertiseCount = profile.expertise?.length || 0;
 
   return (
-    <div className="profile-container">
-      <header className="profile-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-            <button onClick={() => router.back()} className="icon-btn" style={{ padding: '0.5rem' }}>
-                <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-            <h1 className="profile-title">User Profile</h1>
-        </div>
-        <p className="profile-subtitle">Public professional overview for this platform member.</p>
-      </header>
+    <div className="public-profile-page">
+      <section className="public-profile-hero">
+        <Link href="/dashboard" className="public-profile-back">
+          <span className="material-symbols-outlined">arrow_back</span>
+          Back to feed
+        </Link>
 
-      <div className="avatar-section">
-        <div className="large-avatar">{initials}</div>
-        <div className="avatar-info">
-          <h2>{user.name || 'Anonymous User'}</h2>
-          <span className="read-only-role">
-            {user.role === 'HEALTHCARE_PROFESSIONAL'
-               ? 'Healthcare Professional'
-               : user.role === 'ENGINEER'
-               ? 'Engineer / Tech Expert'
-               : 'Administrator'}
-          </span>
-        </div>
-      </div>
+        <div className="public-profile-header">
+          <div className="public-profile-avatar">
+            {profile.image ? (
+              <img src={profile.image} alt={profile.name || 'Profile avatar'} />
+            ) : (
+              <span>{initials(profile.name, profile.email)}</span>
+            )}
+          </div>
 
-      <div className="form-section">
-        <h3>Professional Information</h3>
-        <div className="view-grid">
-            <div className="view-group">
-                <label className="view-label">Institution / Company</label>
-                <div className="view-value">{user.institution || 'Institutional affiliation not provided'}</div>
+          <div className="public-profile-heading">
+            <p className="public-profile-kicker">Member profile</p>
+            <h1 className="public-profile-name">{profile.name || 'Anonymous user'}</h1>
+            <div className="public-profile-meta">
+              <span>{roleLabel(profile.role)}</span>
+              <span>{profile.institution || 'Institution not shared'}</span>
+              <span>{location}</span>
             </div>
-            <div className="view-group">
-                <label className="view-label">Location</label>
-                <div className="view-value">
-                    {user.city && user.country ? `${user.city}, ${user.country}` : user.country || user.city || 'Location not specified'}
-                </div>
-            </div>
-            <div className="view-group full-width">
-                <label className="view-label">Bio</label>
-                <div className="view-value" style={{ whiteSpace: 'pre-wrap' }}>
-                    {user.bio || 'No professional biography provided.'}
-                </div>
-            </div>
-            <div className="view-group full-width">
-                <label className="view-label">Expertise</label>
-                <div className="expertise-tags-display">
-                    {user.expertise && user.expertise.length > 0 ? (
-                        user.expertise.map((tag: string) => (
-                            <span key={tag} className="view-tag">{tag}</span>
-                        ))
-                    ) : (
-                        <span className="subtext">No tags specified</span>
-                    )}
-                </div>
-            </div>
+            <p className="public-profile-bio-snippet">
+              {profile.bio || 'No bio added yet. This person has not filled out a public summary.'}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <style jsx>{`
-        .view-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-        .view-group.full-width {
-            grid-column: 1 / -1;
-        }
-        .view-label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--on-background-muted);
-            margin-bottom: 0.5rem;
-        }
-        .view-value {
-            font-size: 1rem;
-            color: var(--on-background);
-            line-height: 1.6;
-        }
-        .expertise-tags-display {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-        }
-        .view-tag {
-            background-color: var(--surface-raised);
-            color: var(--primary);
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            border: 1px solid var(--outline);
-        }
-      `}</style>
+        <div className="public-profile-actions">
+          {isOwnProfile && (
+            <Link href="/profile" className="public-profile-button public-profile-button--primary">
+              Edit profile
+            </Link>
+          )}
+          <a href="#posts" className="public-profile-button public-profile-button--ghost">
+            View posts
+          </a>
+        </div>
+      </section>
+
+      <section className="public-profile-stats">
+        <div className="public-profile-stat">
+          <span>Posts</span>
+          <strong>{memberPosts.toString().padStart(2, '0')}</strong>
+        </div>
+        <div className="public-profile-stat">
+          <span>Expertise</span>
+          <strong>{expertiseCount.toString().padStart(2, '0')}</strong>
+        </div>
+        <div className="public-profile-stat">
+          <span>Member since</span>
+          <strong>{joinedAt}</strong>
+        </div>
+        <div className="public-profile-stat">
+          <span>Location</span>
+          <strong>{location}</strong>
+        </div>
+      </section>
+
+      <section className="public-profile-grid">
+        <main className="public-profile-main">
+          <article className="public-profile-card">
+            <div className="public-profile-section-head">
+              <p>Bio</p>
+              <h2>About this member</h2>
+            </div>
+            <p className="public-profile-copy">
+              {profile.bio || 'This member has not written a public biography yet.'}
+            </p>
+          </article>
+
+          <article className="public-profile-card">
+            <div className="public-profile-section-head">
+              <p>Expertise</p>
+              <h2>Skills and focus areas</h2>
+            </div>
+            <div className="public-profile-tag-list">
+              {profile.expertise && profile.expertise.length > 0 ? (
+                profile.expertise.map((tag) => (
+                  <span key={tag} className="public-profile-tag">{tag}</span>
+                ))
+              ) : (
+                <span className="public-profile-empty">No expertise tags shared.</span>
+              )}
+            </div>
+          </article>
+
+          <article className="public-profile-card" id="posts">
+            <div className="public-profile-section-head">
+              <p>Posts</p>
+              <h2>Recent collaboration posts</h2>
+            </div>
+
+            {posts.length > 0 ? (
+              <div className="public-profile-post-list">
+                {posts.map((post) => (
+                  <FeedPostCard
+                    key={post.id}
+                    announcement={post}
+                    currentUserId={currentUser.id}
+                    roleTone={profile.role === 'ENGINEER' ? 'engineer' : 'doctor'}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="public-profile-empty-state">
+                No posts published yet.
+              </div>
+            )}
+          </article>
+        </main>
+
+        <aside className="public-profile-side">
+          <article className="public-profile-card">
+            <div className="public-profile-section-head">
+              <p>Details</p>
+              <h2>Public info</h2>
+            </div>
+            <div className="public-profile-detail-list">
+              <div className="public-profile-detail-row">
+                <span>Institution</span>
+                <strong>{profile.institution || 'Not shared'}</strong>
+              </div>
+              <div className="public-profile-detail-row">
+                <span>Location</span>
+                <strong>{location}</strong>
+              </div>
+              <div className="public-profile-detail-row">
+                <span>Role</span>
+                <strong>{roleLabel(profile.role)}</strong>
+              </div>
+              <div className="public-profile-detail-row">
+                <span>Joined</span>
+                <strong>{joinedAt}</strong>
+              </div>
+            </div>
+          </article>
+        </aside>
+      </section>
     </div>
   );
 }

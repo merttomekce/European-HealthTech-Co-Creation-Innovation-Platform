@@ -16,6 +16,7 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   error?: string;
+  disabled?: boolean;
 }
 
 export default function SearchableSelect({
@@ -25,13 +26,14 @@ export default function SearchableSelect({
   onChange,
   placeholder = 'Search or select…',
   error,
+  disabled = false,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedOption = options.find((o) => o.value === value);
+  const selectedOption = options.find((o) => o.value === value) || (value ? { value, label: value } : null);
 
   const filtered = options.filter((o) =>
     o.label.toLowerCase().includes(query.toLowerCase())
@@ -56,6 +58,7 @@ export default function SearchableSelect({
   }, []);
 
   const open = () => {
+    if (disabled) return;
     setIsOpen(true);
     setTimeout(() => inputRef.current?.focus(), 50);
   };
@@ -68,6 +71,7 @@ export default function SearchableSelect({
 
   const clear = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (disabled) return;
     onChange('');
   };
 
@@ -76,7 +80,7 @@ export default function SearchableSelect({
       <label className="form-label">{label}</label>
 
       <div
-        className={`ss-trigger ${isOpen ? 'open' : ''} ${error ? 'error' : ''}`}
+        className={`ss-trigger ${isOpen ? 'open' : ''} ${error ? 'error' : ''} ${disabled ? 'disabled' : ''}`}
         onClick={open}
         tabIndex={0}
         role="combobox"
@@ -165,6 +169,11 @@ export default function SearchableSelect({
           font-family: inherit;
           font-size: 0.9375rem;
           user-select: none;
+        }
+        .ss-trigger.disabled {
+          cursor: not-allowed;
+          opacity: 0.6;
+          background: var(--surface-container-low);
         }
         .ss-trigger:hover,
         .ss-trigger.open {

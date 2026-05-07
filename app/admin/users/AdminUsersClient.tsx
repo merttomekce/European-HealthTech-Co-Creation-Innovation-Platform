@@ -67,8 +67,8 @@ export default function AdminUsersClient({ initialUsers }: { initialUsers: User[
                 className="table-btn"
                 onClick={() => setFilter(f)}
                 style={{ 
-                  borderColor: filter === f ? 'rgba(239,68,68,0.5)' : undefined, 
-                  color: filter === f ? '#ef4444' : undefined,
+                  borderColor: filter === f ? 'rgba(37,99,235,0.25)' : undefined,
+                  color: filter === f ? 'var(--blue-primary)' : undefined,
                   opacity: isLoading ? 0.5 : 1
                 }}
                 disabled={isLoading}

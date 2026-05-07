@@ -37,6 +37,7 @@ Duplicate the `.env.example` file twice:
   npx supabase start
   ```
 - Copy the provided local URLs/Keys to your `.env` and `.env.local` files.
+- Vector memory uses Supabase `pgvector` plus a local embedding model. Set `LOCAL_AI_EMBEDDING_MODEL` and `LOCAL_AI_EMBEDDING_DIMENSIONS` in your env when you want semantic search to run.
 
 ### 3. Generate Database Client & Push Schema
 Sync your database with Prisma:
