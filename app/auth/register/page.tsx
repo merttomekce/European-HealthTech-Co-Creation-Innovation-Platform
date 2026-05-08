@@ -6,7 +6,9 @@ import { ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { updateProfile } from '@/lib/actions/profile';
 import { resolveAuthFlowClient } from '@/lib/auth-flow-client';
+import { isProfessionalEmail } from '@/lib/constants/emails';
 import SearchableSelect from '@/components/SearchableSelect';
+
 import '../auth.css';
 import '../auth-v2.css';
 
@@ -148,7 +150,17 @@ function RegisterForm() {
         return;
       }
 
+      // Block generic domains (safety net)
+      if (!isProfessionalEmail(email)) {
+        setBanner({ 
+          type: 'error', 
+          text: 'Institutional email required. Please return to login and use your work address.' 
+        });
+        return;
+      }
+
       document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password: formData.password,

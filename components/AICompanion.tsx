@@ -3,7 +3,8 @@
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { useRef, useEffect, useMemo, useState } from 'react';
-import { Bot, Send, Zap } from 'lucide-react';
+import { Bot, Send, Zap, Check, Edit3, MapPin, Tag, Briefcase } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import './AICompanion.css';
 
 interface AICompanionProps {
@@ -12,9 +13,10 @@ interface AICompanionProps {
 }
 
 export default function AICompanion({ open, onOpenChange }: AICompanionProps) {
+  const router = useRouter();
   const [input, setInput] = useState('');
   const transport = useMemo(() => new DefaultChatTransport({ api: '/api/chat' }), []);
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error, addToolResult } = useChat({
     transport,
     onError: (chatError) => {
       console.error('Companion client error:', chatError);
@@ -31,11 +33,108 @@ export default function AICompanion({ open, onOpenChange }: AICompanionProps) {
     setInput('');
   };
 
-  const renderMessageText = (message: (typeof messages)[number]) =>
-    message.parts
-      .filter((part): part is Extract<(typeof message.parts)[number], { type: 'text' }> => part.type === 'text')
-      .map((part) => part.text)
-      .join('');
+  // Tool handling logic
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage || lastMessage.role !== 'assistant') return;
+
+    lastMessage.parts.forEach((part) => {
+      if (part.type === 'tool-invocation') {
+        const { toolName, args, toolCallId, state } = part;
+        
+        // Auto-execute UI actions if they are in 'call' state
+        if (toolName === 'requestUIAction' && state === 'call') {
+          const { action } = args as any;
+          
+          if (action === 'OPEN_POST_MODAL') {
+            router.push('/post-project');
+            onOpenChange(false); // Close companion when navigating
+          } else if (action === 'NAVIGATE_TO_BOARD') {
+            router.push('/dashboard');
+            onOpenChange(false);
+          } else if (action === 'NAVIGATE_TO_CHATS') {
+            router.push('/chats');
+            onOpenChange(false);
+          }
+
+          // Confirm the tool was executed
+          addToolResult({
+            toolCallId,
+            result: { status: 'ACTION_EXECUTED', action },
+          });
+        }
+      }
+    });
+  }, [messages, router, onOpenChange, addToolResult]);
+
+  const renderMessagePart = (part: (typeof messages)[number]['parts'][number], messageId: string) => {
+    if (part.type === 'text') {
+      return <div key={`${messageId}-text`} className="text-content">{part.text}</div>;
+    }
+
+    if (part.type === 'tool-invocation') {
+      const { toolCallId, toolName, args, state } = part;
+      const toolArgs = args as any;
+
+      if (toolName === 'showAnnouncementDraft') {
+        const isResult = state === 'result';
+        
+        return (
+          <div key={toolCallId} className="tool-invocation">
+            <div className="draft-card">
+              <div className="draft-card__header">
+                <div className="draft-card__badge">Proposed Announcement</div>
+                {isResult && <div className="draft-card__status-badge">Confirmed</div>}
+              </div>
+
+              <div className="draft-card__body">
+                <h4 className="draft-card__title">{toolArgs.title}</h4>
+                <p className="draft-card__content">{toolArgs.content}</p>
+
+                <div className="draft-card__meta">
+                  <div className="draft-card__meta-item">
+                    <Briefcase size={14} />
+                    <span>{toolArgs.type}</span>
+                  </div>
+                  <div className="draft-card__meta-item">
+                    <Tag size={14} />
+                    <span>{toolArgs.expertiseNeeded}</span>
+                  </div>
+                  {(toolArgs.city || toolArgs.country) && (
+                    <div className="draft-card__meta-item">
+                      <MapPin size={14} />
+                      <span>{toolArgs.city}{toolArgs.city && toolArgs.country ? ', ' : ''}{toolArgs.country}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {!isResult && (
+                <div className="draft-card__actions">
+                  <button 
+                    onClick={() => submitMessage("I'd like to edit the draft.")} 
+                    className="draft-card__btn draft-card__btn--secondary"
+                  >
+                    <Edit3 size={16} />
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => submitMessage(`Perfect. Please post this announcement: "${toolArgs.title}"`)} 
+                    className="draft-card__btn draft-card__btn--primary"
+                  >
+                    <Check size={16} />
+                    Confirm & Post
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    return null;
+  };
 
   // Auto-scroll logic
   useEffect(() => {
@@ -97,7 +196,7 @@ export default function AICompanion({ open, onOpenChange }: AICompanionProps) {
                   {m.role === 'user' ? 'Scientist' : 'HealthAI Core'}
                 </div>
                 <div className={`message-bubble ${m.role === 'user' ? 'message-bubble--user' : 'message-bubble--assistant'}`}>
-                  {renderMessageText(m)}
+                  {m.parts.map((part, i) => renderMessagePart(part, `${m.id}-${i}`))}
                 </div>
               </div>
             ))}

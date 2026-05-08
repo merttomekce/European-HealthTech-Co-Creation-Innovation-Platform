@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_LOGIN, isDemoLogin } from '@/lib/demo-login';
 import { resolveAuthFlowClient } from '@/lib/auth-flow-client';
+import { isProfessionalEmail } from '@/lib/constants/emails';
 import '../auth/auth-v2.css';
+
 
 const trustPoints = [
   {
@@ -56,7 +58,18 @@ function LoginForm() {
         return;
       }
 
+      // 1. Block generic domains
+      if (!isProfessionalEmail(normalized) && !isDemoLogin(normalized, DEMO_LOGIN.password)) {
+        setBanner({ 
+          type: 'error', 
+          text: 'Institutional email required. Please use your work, hospital, or university address.' 
+        });
+        return;
+      }
+
+      // 2. Allow Demo Login bypass
       if (isDemoLogin(normalized, DEMO_LOGIN.password)) {
+
         router.push(`/login/password?email=${encodeURIComponent(normalized)}`);
         return;
       }

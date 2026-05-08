@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { FORBIDDEN_DOMAINS } from './constants/emails';
+
 
 export const profileSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -30,5 +32,15 @@ export const meetingSlotSchema = z.object({
   time: z.string().regex(/^\d{2}:\d{2}$/, 'Invalid time format'),
 });
 
+export const authSchema = z.object({
+  email: z.string().email('Invalid email address').refine((email) => {
+    const domain = email.split('@')[1]?.toLowerCase();
+    return !FORBIDDEN_DOMAINS.includes(domain);
+  }, {
+    message: 'Please use your professional or institutional email address (e.g., @university.edu or @hospital.org).',
+  }),
+});
+
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 export type AnnouncementFormValues = z.infer<typeof announcementSchema>;
+export type AuthFormValues = z.infer<typeof authSchema>;
