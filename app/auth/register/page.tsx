@@ -159,6 +159,28 @@ function RegisterForm() {
         return;
       }
 
+      // Client-side validation
+      if (!formData.fullName || formData.fullName.trim().length < 2) {
+        setBanner({ type: 'error', text: 'Please enter your full name (at least 2 characters).' });
+        return;
+      }
+      if (!formData.institution || formData.institution.trim().length < 2) {
+        setBanner({ type: 'error', text: 'Please enter your institution (at least 2 characters).' });
+        return;
+      }
+      if (!formData.password || formData.password.length < 6) {
+        setBanner({ type: 'error', text: 'Password must be at least 6 characters.' });
+        return;
+      }
+      if (!formData.country) {
+        setBanner({ type: 'error', text: 'Please select your country.' });
+        return;
+      }
+      if (!formData.expertise || formData.expertise.trim().length < 2) {
+        setBanner({ type: 'error', text: 'Please enter at least one expertise tag.' });
+        return;
+      }
+
       document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
 
       const { data, error } = await supabase.auth.signUp({

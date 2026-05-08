@@ -24,18 +24,22 @@
 .create-btn {
   background-color: var(--primary);
   color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 0.8rem 1.8rem; /* Slightly more horizontal padding */
   border-radius: 999px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700; /* Bolder text */
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: opacity 0.2s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.25);
 }
 
 .create-btn:hover {
-  opacity: 0.8;
+  transform: translateY(-2px);
+  background-color: var(--blue-primary);
+  box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.35);
+  opacity: 1; /* Override the 0.8 opacity if any */
 }
 
 .project-list {

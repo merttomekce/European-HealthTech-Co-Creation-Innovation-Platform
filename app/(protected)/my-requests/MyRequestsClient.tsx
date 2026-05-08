@@ -4,14 +4,17 @@ import React from 'react';
 import Link from 'next/link';
 import SchedulingModal from '@/components/SchedulingModal';
 import MeetingStatusPill from '@/components/MeetingStatusPill';
-import { proposeSlots, cancelMeetingRequest } from '@/lib/actions/meetings';
+import { useRouter } from 'next/navigation';
+import { proposeSlots, cancelMeetingRequest, confirmMeetingSlot } from '@/lib/actions/meetings';
 import './requests.css';
 
 export default function MyRequestsClient({ initialRequests }: { initialRequests: any[] }) {
   const [selectedProjectId, setSelectedProjectId] = React.useState<string | null>(null);
   const [selectedRequestId, setSelectedRequestId] = React.useState<string | null>(null);
+  const router = useRouter();
   const [requests, setRequests] = React.useState(initialRequests);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isActionPending, setIsActionPending] = React.useState<Record<string, boolean>>({});
 
   const getProjectTitle = (projectId: string) => {
     const project = requests.find(r => r.announcementId === projectId)?.announcement;
@@ -28,19 +31,39 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
     setIsLoading(true);
 
     try {
-      // Create actual Date objects for the proposed slots
-      // Since it's a demo/test environment, we'll propose slots for the next 3 days at 10 AM, 2 PM, and 4 PM
       const now = new Date();
-      const dateSlots = slotLabels.map((label, idx) => {
+      const dayMap: Record<string, number> = { 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5 };
+
+      const dateSlots = slotLabels.map((label) => {
+        const [dayName, timeStr] = label.split(', ');
+        const targetDay = dayMap[dayName];
+        
         const d = new Date(now);
-        d.setDate(d.getDate() + (idx % 3) + 1); // Spread over next 3 days
-        d.setHours(idx < 3 ? 10 : idx < 6 ? 14 : 16, 0, 0, 0);
-        return { startTime: d, endTime: new Date(d.getTime() + 60 * 60000) }; // 1h meetings
+        const currentDay = d.getDay();
+        
+        let daysToAdd = targetDay - currentDay;
+        if (daysToAdd <= 0) daysToAdd += 7;
+        d.setDate(d.getDate() + daysToAdd);
+        
+        // Parse "10:00 AM"
+        const [hourStr, part] = timeStr.split(' ');
+        let [hours, minutes] = hourStr.split(':').map(Number);
+        
+        if (part === 'PM' && hours !== 12) hours += 12;
+        if (part === 'AM' && hours === 12) hours = 0;
+        
+        d.setHours(hours, minutes, 0, 0);
+        
+        return { 
+          startTime: d, 
+          endTime: new Date(d.getTime() + 30 * 60000) 
+        };
       });
 
       const res = await proposeSlots(selectedRequestId, dateSlots);
       if (res.success) {
         setRequests(prev => prev.map(r => r.id === selectedRequestId ? { ...r, status: 'SLOTS_PROPOSED' } : r));
+        router.refresh(); // Refresh to get the latest slots in the UI
       }
     } catch (e) {
       console.error(e);
@@ -48,6 +71,25 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
       setSelectedProjectId(null);
       setSelectedRequestId(null);
       setIsLoading(false);
+    }
+  };
+
+  const handleConfirmSlot = async (requestId: string, slotId: string) => {
+    const actionKey = `slot-${slotId}`;
+    if (isActionPending[actionKey]) return;
+
+    setIsActionPending(prev => ({ ...prev, [actionKey]: true }));
+    try {
+      const res = await confirmMeetingSlot(requestId, slotId);
+      if (res.success) {
+        router.push(`/chats/${requestId}`);
+      } else {
+        window.alert('Failed to confirm slot.');
+      }
+    } catch (err) {
+      window.alert('Error confirming slot.');
+    } finally {
+      setIsActionPending(prev => ({ ...prev, [actionKey]: false }));
     }
   };
 
@@ -81,7 +123,7 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
           </div>
         ) : (
           requests.map(request => (
-            <div key={request.id} className="request-card">
+            <div key={request.id} id={`req-${request.id}`} className="request-card">
               <div className="request-info">
                 <span className="project-ref">{getProjectDomain(request.announcementId)}</span>
                 <Link href={`/board/${request.announcementId}`} className="project-title-link">
@@ -132,10 +174,34 @@ export default function MyRequestsClient({ initialRequests }: { initialRequests:
                 )}
 
                 {(request.status === 'SLOTS_PROPOSED' || request.status === 'CONFIRMED') && (
-                  <MeetingStatusPill 
-                    status={request.status === 'CONFIRMED' ? 'Scheduled' : 'Negotiation'}
-                    confirmedTime={request.status === 'CONFIRMED' ? 'Confirmed Date' : undefined}
-                  />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+                    <MeetingStatusPill 
+                      status={request.status === 'CONFIRMED' ? 'Scheduled' : 'Negotiation'}
+                      confirmedTime={request.status === 'CONFIRMED' ? 'Confirmed Date' : undefined}
+                    />
+                    
+                    {request.status === 'SLOTS_PROPOSED' && request.proposedSlots?.length > 0 && (
+                      <div className="slots-review-box" style={{ margin: '1rem 0 0 0', width: '100%' }}>
+                        <p className="slots-title" style={{ fontSize: '0.7rem' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>event_note</span>
+                          Confirm Proposed Slot
+                        </p>
+                        <div className="slots-list" style={{ gap: '0.5rem' }}>
+                          {request.proposedSlots.map((slot: any) => (
+                            <button 
+                              key={slot.id} 
+                              className={`slot-confirm-btn ${isActionPending[`slot-${slot.id}`] ? 'selected' : ''}`}
+                              onClick={() => handleConfirmSlot(request.id, slot.id)}
+                              disabled={Object.keys(isActionPending).some(k => k.startsWith('slot-'))}
+                              style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
+                            >
+                              {isActionPending[`slot-${slot.id}`] ? '...' : new Date(slot.startTime).toLocaleString('en-US', { weekday: 'short', hour: '2-digit', minute:'2-digit' })}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

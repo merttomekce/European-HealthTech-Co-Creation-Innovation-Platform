@@ -12,6 +12,9 @@
 
   /* Accents */
   --blue-primary: #2563EB;
+  --blue-primary-rgb: 37, 99, 235;
+  --primary: var(--blue-primary);
+  --primary-rgb: var(--blue-primary-rgb);
   --blue-folder-top: #DBEAFE;
   --blue-folder-bottom: #93C5FD;
 
@@ -41,6 +44,9 @@
 
   /* Accents */
   --blue-primary: #3B82F6; /* Eye-friendly blue */
+  --blue-primary-rgb: 59, 130, 246;
+  --primary: var(--blue-primary);
+  --primary-rgb: var(--blue-primary-rgb);
   --blue-folder-top: #60A5FA;
   --blue-folder-bottom: #2563EB;
 

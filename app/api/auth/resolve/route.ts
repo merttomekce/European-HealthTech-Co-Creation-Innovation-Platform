@@ -9,6 +9,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (error: any) {
+    console.error('Auth Resolve API Error:', error);
     return NextResponse.json(
       { error: error?.message || 'Could not resolve auth flow.' },
       { status: 400 },

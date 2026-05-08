@@ -13,18 +13,22 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
   const router = useRouter();
   const [projects, setProjects] = useState(initialData);
 
-  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
+  const [isActionPending, setIsActionPending] = useState<Record<string, boolean>>({});
 
   const handleToggleStatus = async (id: string, nextStatus: string) => {
-    setIsUpdating(prev => ({ ...prev, [id]: true }));
+    setIsActionPending(prev => ({ ...prev, [id]: true }));
     const res = await toggleAnnouncementStatus(id, nextStatus);
     if (res.success) {
       setProjects(prev => prev.map(p => p.id === id ? { ...p, status: nextStatus } : p));
     }
-    setIsUpdating(prev => ({ ...prev, [id]: false }));
+    setIsActionPending(prev => ({ ...prev, [id]: false }));
   };
 
   const handleInterestStatus = async (projectId: string, requestId: string, status: string) => {
+    const actionKey = `interest-${requestId}`;
+    if (isActionPending[actionKey]) return;
+    
+    setIsActionPending(prev => ({ ...prev, [actionKey]: true }));
     try {
       const res = await updateMeetingRequestStatus(requestId, status);
       if (res.success) {
@@ -49,23 +53,28 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
       }
     } catch (error) {
       window.alert('Something went wrong');
+    } finally {
+      setIsActionPending(prev => ({ ...prev, [actionKey]: false }));
     }
   };
 
   const handleConfirmSlot = async (projectId: string, requestId: string, slotId: string) => {
-    const res = await confirmMeetingSlot(requestId, slotId);
-    if (res.success) {
-      setProjects(prev => prev.map(p => {
-        if (p.id === projectId) {
-          return {
-            ...p,
-            meetingRequests: p.meetingRequests.map((req: any) => 
-              req.id === requestId ? { ...req, status: 'CONFIRMED' } : req
-            )
-          };
-        }
-        return p;
-      }));
+    const actionKey = `slot-${slotId}`;
+    if (isActionPending[actionKey]) return;
+
+    setIsActionPending(prev => ({ ...prev, [actionKey]: true }));
+    try {
+      const res = await confirmMeetingSlot(requestId, slotId);
+      if (res.success) {
+        // Redirect to chat workspace for this request
+        router.push(`/chats/${requestId}`);
+      } else {
+        window.alert('Failed to confirm slot. Please try again.');
+      }
+    } catch (err) {
+      window.alert('Error confirming slot.');
+    } finally {
+      setIsActionPending(prev => ({ ...prev, [actionKey]: false }));
     }
   };
 
@@ -118,29 +127,29 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                     {project.status === 'ACTIVE' && (
                       <button 
                         className="action-btn secondary"
-                        disabled={isUpdating[project.id]}
+                        disabled={isActionPending[project.id]}
                         onClick={() => handleToggleStatus(project.id, 'PARTNER_FOUND')}
                       >
-                        {isUpdating[project.id] ? 'Updating...' : 'Mark as Partnered'}
+                        {isActionPending[project.id] ? 'Updating...' : 'Mark as Partnered'}
                       </button>
                     )}
                     
                     {project.status === 'ARCHIVED' ? (
                       <button 
                         className="action-btn secondary"
-                        disabled={isUpdating[project.id]}
+                        disabled={isActionPending[project.id]}
                         onClick={() => handleToggleStatus(project.id, 'ACTIVE')}
                       >
-                        {isUpdating[project.id] ? 'Updating...' : 'Reactivate'}
+                        {isActionPending[project.id] ? 'Updating...' : 'Reactivate'}
                       </button>
                     ) : (
                       <button 
                         className="action-btn secondary"
-                        disabled={isUpdating[project.id]}
+                        disabled={isActionPending[project.id]}
                         style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', background: 'transparent' }}
                         onClick={() => handleToggleStatus(project.id, 'ARCHIVED')}
                       >
-                        {isUpdating[project.id] ? 'Updating...' : 'Archive'}
+                        {isActionPending[project.id] ? 'Updating...' : 'Archive'}
                       </button>
                     )}
                     
@@ -153,7 +162,7 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                     <h3 className="inbox-title">Expressions of Interest ({projectApplicants.length})</h3>
                     <div className="applicant-list">
                       {projectApplicants.map((app: any) => (
-                        <div key={app.id} className="applicant-row-container">
+                        <div key={app.id} id={`req-${app.id}`} className="applicant-row-container">
                           <div className="applicant-row">
                             <div className="applicant-profile">
                               <div className="applicant-avatar">
@@ -171,8 +180,10 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                                   <button 
                                     className="btn-accept"
                                     onClick={() => handleInterestStatus(project.id, app.id, 'ACCEPTED')}
+                                    disabled={isActionPending[`interest-${app.id}`]}
                                   >
-                                    Accept & Start Chat
+                                    <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>check_circle</span>
+                                    {isActionPending[`interest-${app.id}`] ? 'Processing...' : 'Accept & Start Chat'}
                                   </button>
                                   <button 
                                     className="btn-decline"
@@ -208,10 +219,11 @@ export default function MyAnnouncementsClient({ initialData }: { initialData: an
                                 {app.proposedSlots?.map((slot: any) => (
                                   <button 
                                     key={slot.id} 
-                                    className="slot-confirm-btn"
+                                    className={`slot-confirm-btn ${isActionPending[`slot-${slot.id}`] ? 'selected' : ''}`}
                                     onClick={() => handleConfirmSlot(project.id, app.id, slot.id)}
+                                    disabled={Object.keys(isActionPending).some(k => k.startsWith('slot-'))}
                                   >
-                                    {new Date(slot.startTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute:'2-digit' })}
+                                    {isActionPending[`slot-${slot.id}`] ? 'Confirming...' : new Date(slot.startTime).toLocaleString('en-US', { weekday: 'short', hour: '2-digit', minute:'2-digit' })}
                                   </button>
                                 ))}
                               </div>

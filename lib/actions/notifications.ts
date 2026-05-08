@@ -37,7 +37,8 @@ export async function markAsRead(id: string) {
       data: { isRead: true },
     });
 
-    revalidatePath('/'); // refresh notifications globally
+    revalidatePath('/notifications');
+    revalidatePath('/dashboard'); // in case it shows up in dashboard summaries
     return { success: true, data: notification };
   } catch (error) {
     return { success: false, error: 'Failed' };
@@ -55,7 +56,8 @@ export async function markAllAsRead() {
       where: { userId: user.id, isRead: false },
       data: { isRead: true },
     });
-    revalidatePath('/');
+    revalidatePath('/notifications');
+    revalidatePath('/dashboard');
     return { success: true };
   } catch (error) {
     return { success: false, error: 'Failed' };

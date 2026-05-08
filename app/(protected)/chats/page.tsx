@@ -179,24 +179,6 @@ function Workspace({ threads, selectedId }: { threads: ChatThreadDetail[]; selec
 
   return (
     <div className="chat-shell">
-      <header className="chat-header">
-        <div>
-          <p className="chat-header__eyebrow">Collaboration workspace</p>
-          <h1 className="chat-header__title">Chats</h1>
-          <p className="chat-header__subtitle">Track request history, negotiation state, and project context in one place.</p>
-        </div>
-        <div className="chat-header__stats">
-          <div className="chat-header__stat">
-            <span className="chat-header__stat-label">Threads</span>
-            <strong>{threads.length}</strong>
-          </div>
-          <div className="chat-header__stat">
-            <span className="chat-header__stat-label">Selected</span>
-            <strong>{selected ? selected.threadLabel : 'None'}</strong>
-          </div>
-        </div>
-      </header>
-
       <div className="chat-grid">
         <ChatSidebar threads={threads} selectedId={selected?.id} />
         <ChatWindow thread={selected} />

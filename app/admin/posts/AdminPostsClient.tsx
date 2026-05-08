@@ -215,7 +215,7 @@ export default function AdminPostsClient({ initialPosts }: { initialPosts: Post[
                       <div className="timeline-content">
                         <div className="timeline-header">
                           <span className="timeline-action">{log.actionType.replace(/_/g, ' ')}</span>
-                          <span className="timeline-date">{new Date(log.createdAt).toLocaleString()}</span>
+                          <span className="timeline-date">{new Date(log.createdAt).toLocaleString('en-US')}</span>
                         </div>
                         <div className="timeline-actor">by {log.user?.email || 'System'}</div>
                         {log.metadata && (

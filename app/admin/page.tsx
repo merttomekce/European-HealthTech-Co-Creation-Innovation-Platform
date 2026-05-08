@@ -83,7 +83,7 @@ export default async function AdminDashboardPage() {
                     </td>
                     <td style={{ color: 'var(--on-background-muted)', fontSize: '0.8125rem' }}>{item.actor}</td>
                     <td style={{ color: 'var(--on-background-muted)', fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
-                      {new Date(item.time).toLocaleString()}
+                      {new Date(item.time).toLocaleString('en-US')}
                     </td>
                   </tr>
                 ))

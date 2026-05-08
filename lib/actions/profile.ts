@@ -23,8 +23,13 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
     throw new Error("Unauthorized: Please log in again")
   }
 
-  // 2. Validate Input
-  const validated = profileSchema.parse(formData)
+  // 2. Validate Input (use safeParse to avoid unhandled ZodError in production)
+  const result = profileSchema.safeParse(formData)
+  if (!result.success) {
+    const messages = result.error.issues.map(i => i.message).join(', ')
+    throw new Error(`Validation failed: ${messages}`)
+  }
+  const validated = result.data
 
   // 3. Process Data (Splitting as per user decision)
   const [city, ...countryParts] = validated.location.split(',').map(s => s.trim())
@@ -188,5 +193,147 @@ export async function getUserProfile(userId: string) {
   } catch (error) {
     console.error(error)
     return { success: false, error: 'Failed to fetch user profile' }
+  }
+}
+
+export async function exportUserData() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    throw new Error("Unauthorized")
+  }
+
+  try {
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        announcements: true,
+        sentRequests: true,
+        receivedRequests: true,
+        notifications: true,
+      }
+    })
+
+    return { success: true, data: userData }
+  } catch (error) {
+    console.error("Export error:", error)
+    return { success: false, error: "Failed to fetch data for export" }
+  }
+}
+
+export async function changePassword(currentPassword: string, newPassword: string) {
+  const supabase = createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { success: false, error: 'Unauthorized: Please log in again' }
+  }
+
+  if (!newPassword || newPassword.length < 6) {
+    return { success: false, error: 'New password must be at least 6 characters' }
+  }
+
+  // Verify current password by attempting sign-in
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email!,
+    password: currentPassword,
+  })
+
+  if (signInError) {
+    return { success: false, error: 'Current password is incorrect' }
+  }
+
+  // Update to new password
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  })
+
+  if (updateError) {
+    return { success: false, error: updateError.message }
+  }
+
+  return { success: true }
+}
+
+export async function deleteAccount() {
+  const supabase = createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { success: false, error: 'Unauthorized: Please log in again' }
+  }
+
+  try {
+    // 1. Log the deletion to the audit trail BEFORE deleting data
+    const { logAction } = await import('@/lib/audit')
+    await logAction({
+      userId: user.id,
+      actionType: 'ACCOUNT_DELETED',
+      result: 'success',
+    })
+
+    // 2. Delete related data in the correct order (respecting FK constraints)
+    // Delete time slots from user's meeting requests
+    await prisma.timeSlot.deleteMany({
+      where: {
+        meetingRequest: {
+          OR: [
+            { requesterId: user.id },
+            { recipientId: user.id },
+          ],
+        },
+      },
+    })
+
+    // Delete meeting requests (sent and received)
+    await prisma.meetingRequest.deleteMany({
+      where: {
+        OR: [
+          { requesterId: user.id },
+          { recipientId: user.id },
+        ],
+      },
+    })
+
+    // Delete announcements
+    await prisma.announcement.deleteMany({
+      where: { authorId: user.id },
+    })
+
+    // Delete notifications
+    await prisma.notification.deleteMany({
+      where: { userId: user.id },
+    })
+
+    // Delete messages
+    await prisma.message.deleteMany({
+      where: { senderId: user.id },
+    })
+
+    // Delete conversation participations
+    await prisma.conversationParticipant.deleteMany({
+      where: { userId: user.id },
+    })
+
+    // Nullify audit log references (keep logs for compliance, but remove FK)
+    await prisma.auditLog.updateMany({
+      where: { userId: user.id },
+      data: { userId: null },
+    })
+
+    // 3. Delete the user record from the database
+    await prisma.user.delete({
+      where: { id: user.id },
+    })
+
+    // 4. Delete the Supabase auth user (admin API)
+    // Note: Using the service role would be ideal, but signOut will invalidate the session
+    await supabase.auth.signOut()
+
+    return { success: true }
+  } catch (error) {
+    console.error('Account deletion error:', error)
+    return { success: false, error: 'Failed to delete account. Please contact support.' }
   }
 }

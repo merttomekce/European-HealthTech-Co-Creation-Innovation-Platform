@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { profileSchema } from '@/lib/validations';
 import TagInput from '@/components/TagInput';
 import SearchableSelect from '@/components/SearchableSelect';
-import { updateProfile, getAuthProfile, updateAvatar } from '@/lib/actions/profile';
+import { updateProfile, getAuthProfile, updateAvatar, exportUserData, changePassword, deleteAccount } from '@/lib/actions/profile';
 import { HEALTHCARE_EXPERTISE_PRESETS, ENGINEER_EXPERTISE_PRESETS } from '@/lib/data/options';
 import './profile.css';
 
@@ -22,6 +23,7 @@ const AVATAR_PRESETS = [
 ];
 
 export default function ProfilePage() {
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -41,6 +43,23 @@ export default function ProfilePage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Password change states
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
+
+  // Account deletion states
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   
   // Dynamic location states
   const [countries, setCountries] = useState<any[]>([]);
@@ -195,8 +214,82 @@ export default function ProfilePage() {
     }
   };
 
-  const handleGdprAction = (action: string) => {
-    alert(`Simulation: GDPR ${action} request queued.`);
+  const handleExportData = async () => {
+    try {
+      const res = await exportUserData();
+      if (res.success && res.data) {
+        const dataStr = JSON.stringify(res.data, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `healthai-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        alert("Failed to export data: " + (res.error || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Something went wrong during export.");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    setIsDeleting(true);
+    setDeleteError('');
+    try {
+      const res = await deleteAccount();
+      if (res.success) {
+        router.push('/?deleted=true');
+      } else {
+        setDeleteError(res.error || 'Failed to delete account.');
+      }
+    } catch {
+      setDeleteError('Something went wrong. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess(false);
+
+    if (!passwordData.currentPassword) {
+      setPasswordError('Please enter your current password.');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters.');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+    if (passwordData.currentPassword === passwordData.newPassword) {
+      setPasswordError('New password must be different from current password.');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const res = await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      if (res.success) {
+        setPasswordSuccess(true);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        setPasswordError(res.error || 'Failed to change password.');
+      }
+    } catch {
+      setPasswordError('Something went wrong. Please try again.');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const expertisePresets =
@@ -387,6 +480,100 @@ export default function ProfilePage() {
         </div>
       </form>
 
+      {/* ─── Security: Change Password ─── */}
+      <div className="form-section security-section">
+        <div className="security-header">
+          <span className="material-symbols-outlined">lock</span>
+          <h3>Security</h3>
+        </div>
+        <p className="security-desc">
+          Update your password to keep your account secure. You'll need to enter your current password first.
+        </p>
+        <form onSubmit={handlePasswordChange} className="password-form">
+          <div className="password-field">
+            <label className="form-label">Current Password</label>
+            <div className="password-input-wrapper">
+              <input
+                type={showPasswords.current ? 'text' : 'password'}
+                className="form-input"
+                value={passwordData.currentPassword}
+                onChange={(e) => { setPasswordData(p => ({ ...p, currentPassword: e.target.value })); setPasswordError(''); setPasswordSuccess(false); }}
+                placeholder="Enter current password"
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPasswords(p => ({ ...p, current: !p.current }))}
+                tabIndex={-1}
+              >
+                <span className="material-symbols-outlined">{showPasswords.current ? 'visibility_off' : 'visibility'}</span>
+              </button>
+            </div>
+          </div>
+          <div className="password-field">
+            <label className="form-label">New Password</label>
+            <div className="password-input-wrapper">
+              <input
+                type={showPasswords.new ? 'text' : 'password'}
+                className="form-input"
+                value={passwordData.newPassword}
+                onChange={(e) => { setPasswordData(p => ({ ...p, newPassword: e.target.value })); setPasswordError(''); setPasswordSuccess(false); }}
+                placeholder="Enter new password (min. 6 characters)"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPasswords(p => ({ ...p, new: !p.new }))}
+                tabIndex={-1}
+              >
+                <span className="material-symbols-outlined">{showPasswords.new ? 'visibility_off' : 'visibility'}</span>
+              </button>
+            </div>
+          </div>
+          <div className="password-field">
+            <label className="form-label">Confirm New Password</label>
+            <div className="password-input-wrapper">
+              <input
+                type={showPasswords.confirm ? 'text' : 'password'}
+                className="form-input"
+                value={passwordData.confirmPassword}
+                onChange={(e) => { setPasswordData(p => ({ ...p, confirmPassword: e.target.value })); setPasswordError(''); setPasswordSuccess(false); }}
+                placeholder="Re-enter new password"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPasswords(p => ({ ...p, confirm: !p.confirm }))}
+                tabIndex={-1}
+              >
+                <span className="material-symbols-outlined">{showPasswords.confirm ? 'visibility_off' : 'visibility'}</span>
+              </button>
+            </div>
+          </div>
+
+          {passwordError && (
+            <div className="password-feedback error">
+              <span className="material-symbols-outlined">error</span>
+              {passwordError}
+            </div>
+          )}
+          {passwordSuccess && (
+            <div className="password-feedback success">
+              <span className="material-symbols-outlined">check_circle</span>
+              Password changed successfully!
+            </div>
+          )}
+
+          <button type="submit" className="password-save-btn" disabled={isChangingPassword}>
+            <span className="material-symbols-outlined">{isChangingPassword ? 'sync' : 'lock_reset'}</span>
+            {isChangingPassword ? 'Updating…' : 'Update Password'}
+          </button>
+        </form>
+      </div>
+
       <div className="form-section danger-section">
         <div className="danger-header">
           <span className="material-symbols-outlined">warning</span>
@@ -397,18 +584,72 @@ export default function ProfilePage() {
           account. Deleting your account will remove all your active announcements and break existing requests.
         </p>
         <div className="danger-actions">
-          <button className="danger-btn" onClick={() => handleGdprAction('Data Export')}>
+          <button className="danger-btn" onClick={handleExportData}>
             Export My Data
           </button>
           <button
-            className="danger-btn"
-            onClick={() => handleGdprAction('Account Deletion')}
-            style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}
+            className="danger-btn delete-btn"
+            onClick={() => { setShowDeleteModal(true); setDeleteConfirmText(''); setDeleteError(''); }}
           >
             Delete Account
           </button>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="delete-modal-overlay" onClick={() => !isDeleting && setShowDeleteModal(false)}>
+          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-modal-icon">
+              <span className="material-symbols-outlined">warning</span>
+            </div>
+            <h3>Delete your account?</h3>
+            <p>
+              This action is <strong>permanent and irreversible</strong>. All your data will be removed:
+            </p>
+            <ul className="delete-consequences">
+              <li>Your profile and personal information</li>
+              <li>All announcements you've created</li>
+              <li>Meeting requests and conversations</li>
+              <li>Notifications and activity history</li>
+            </ul>
+            <label className="delete-confirm-label">
+              Type <strong>DELETE</strong> to confirm:
+            </label>
+            <input
+              type="text"
+              className="form-input delete-confirm-input"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              autoFocus
+            />
+            {deleteError && (
+              <div className="password-feedback error" style={{ marginTop: '0.75rem' }}>
+                <span className="material-symbols-outlined">error</span>
+                {deleteError}
+              </div>
+            )}
+            <div className="delete-modal-actions">
+              <button
+                className="delete-cancel-btn"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                className="delete-confirm-btn"
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE' || isDeleting}
+              >
+                <span className="material-symbols-outlined">{isDeleting ? 'sync' : 'delete_forever'}</span>
+                {isDeleting ? 'Deleting…' : 'Permanently Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .profile-page {

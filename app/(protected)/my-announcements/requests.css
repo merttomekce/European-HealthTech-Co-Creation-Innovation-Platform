@@ -138,6 +138,14 @@
   transform: translateY(-2px);
 }
 
+.slot-confirm-btn.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+}
+
 .slots-hint {
   font-size: 0.75rem;
   color: var(--on-background-muted);
@@ -173,12 +181,17 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-accept:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3);
+  background-color: var(--blue-primary); /* Ensure it stays vibrant */
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.35);
 }
 
 .btn-decline {

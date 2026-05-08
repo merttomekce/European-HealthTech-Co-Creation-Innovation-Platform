@@ -102,13 +102,15 @@ export async function proposeSlots(meetingRequestId: string, slots: { startTime:
 
     // Notify the other party
     const recipientId = meetingRequest.requesterId === user.id ? meetingRequest.recipientId : meetingRequest.requesterId;
+    const targetPath = recipientId === meetingRequest.requesterId ? '/my-requests' : '/my-announcements';
+    
     await prisma.notification.create({
       data: {
         userId: recipientId,
         type: 'SLOTS_PROPOSED' as any,
         title: 'Meeting Slots Proposed',
         body: `Time slots have been proposed for "${meetingRequest.announcement.title}".`,
-        linkUrl: `/my-requests/${meetingRequestId}`,
+        linkUrl: `${targetPath}#req-${meetingRequestId}`,
       }
     });
 
@@ -260,21 +262,61 @@ export async function confirmMeetingSlot(meetingRequestId: string, slotId: strin
       return { success: false, error: 'Forbidden' };
     }
 
+    // 1. Fetch slot details for the message
+    const slot = await prisma.timeSlot.findUnique({
+      where: { id: slotId },
+      select: { startTime: true }
+    });
+
+    // 2. Cancel other slots
     await prisma.timeSlot.updateMany({
       where: { meetingRequestId, id: { not: slotId } },
-      data: { status: 'CANCELLED' as any }
+      data: { status: 'REJECTED' as any }
     });
 
+    // 3. Confirm selected slot
     await prisma.timeSlot.update({
       where: { id: slotId },
-      data: { status: 'CONFIRMED' as any }
+      data: { status: 'SELECTED' as any }
     });
 
+    // 4. Update meeting request status
     await prisma.meetingRequest.update({
       where: { id: meetingRequestId },
       data: { status: 'CONFIRMED' as any }
     });
+
+    // 5. Create automated confirmation message
+    if (slot) {
+      const formattedDate = slot.startTime.toLocaleString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      await prisma.message.create({
+        data: {
+          conversationId: meetingRequestId,
+          senderId: user.id,
+          content: `The requested meeting time is: ${formattedDate}`,
+        }
+      });
+    }
     
+    // 6. Notify the other party about confirmation
+    const otherPartyId = request.requesterId === user.id ? request.recipientId : request.requesterId;
+    await prisma.notification.create({
+      data: {
+        userId: otherPartyId,
+        type: 'MEETING_REQUEST' as any,
+        title: 'Meeting Confirmed',
+        body: `The meeting for your project interest has been confirmed!`,
+        linkUrl: `/chats/${meetingRequestId}`,
+      }
+    });
+
     // Log the action
     await logAction({
       userId: user.id,
@@ -285,6 +327,7 @@ export async function confirmMeetingSlot(meetingRequestId: string, slotId: strin
     });
     
     revalidatePath('/my-announcements');
+    revalidatePath(`/chats/${meetingRequestId}`);
     return { success: true };
   } catch (error) {
     return { success: false, error: 'Failed' };
