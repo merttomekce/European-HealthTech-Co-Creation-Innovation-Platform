@@ -2,7 +2,6 @@
   min-height: 100dvh;
   position: relative;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
   isolation: isolate;
   color: #111111;
   background: transparent;
@@ -154,7 +153,12 @@
   flex-direction: column;
   gap: 1rem;
   height: min(46rem, calc(100dvh - 4rem));
-  overflow: hidden;
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: none; /* Hide scrollbar for cleaner look */
+}
+
+.feedShell::-webkit-scrollbar {
+  display: none;
 }
 
 .previewViewport {

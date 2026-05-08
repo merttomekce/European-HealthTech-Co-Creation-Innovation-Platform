@@ -38,7 +38,7 @@ export default function AICompanion({ open, onOpenChange }: AICompanionProps) {
     const lastMessage = messages[messages.length - 1];
     if (!lastMessage || lastMessage.role !== 'assistant') return;
 
-    lastMessage.parts.forEach((part) => {
+    lastMessage.parts.forEach((part: any) => {
       if (part.type === 'tool-invocation') {
         const { toolName, args, toolCallId, state } = part;
         
@@ -60,14 +60,15 @@ export default function AICompanion({ open, onOpenChange }: AICompanionProps) {
           // Confirm the tool was executed
           addToolResult({
             toolCallId,
-            result: { status: 'ACTION_EXECUTED', action },
-          });
+            tool: toolName,
+            output: { status: 'ACTION_EXECUTED', action },
+          } as any);
         }
       }
     });
   }, [messages, router, onOpenChange, addToolResult]);
 
-  const renderMessagePart = (part: (typeof messages)[number]['parts'][number], messageId: string) => {
+  const renderMessagePart = (part: any, messageId: string) => {
     if (part.type === 'text') {
       return <div key={`${messageId}-text`} className="text-content">{part.text}</div>;
     }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { markAllAsRead } from '@/lib/actions/notifications';
+import { markAllAsRead, markAsRead } from '@/lib/actions/notifications';
 import './notifications.css';
 
 export default function NotificationsClient({ initialData }: { initialData: any[] }) {
@@ -22,6 +22,16 @@ export default function NotificationsClient({ initialData }: { initialData: any[
     const res = await markAllAsRead();
     if (res.success) {
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      // Sync the notification bell
+      window.dispatchEvent(new CustomEvent('notifications-updated'));
+    }
+  };
+
+  const handleNotificationClick = async (id: string) => {
+    const res = await markAsRead(id);
+    if (res.success) {
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+      window.dispatchEvent(new CustomEvent('notifications-updated'));
     }
   };
 
@@ -54,6 +64,7 @@ export default function NotificationsClient({ initialData }: { initialData: any[
               key={notification.id} 
               href={notification.linkUrl || '#'} 
               className={`notification-card ${!notification.isRead ? 'unread' : ''}`}
+              onClick={() => handleNotificationClick(notification.id)}
             >
               <div className="notification-icon">
                 <span className="material-symbols-outlined">{getIconForType(notification.type)}</span>

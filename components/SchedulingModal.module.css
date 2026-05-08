@@ -5,7 +5,8 @@
   background: var(--outline);
   border: 1px solid var(--outline);
   border-radius: 12px;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 400px;
   margin: 2rem 0;
 }
 
@@ -28,7 +29,7 @@
 }
 
 .timeLabel {
-  height: 60px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +39,7 @@
 }
 
 .slotCell {
-  height: 60px;
+  height: 48px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;

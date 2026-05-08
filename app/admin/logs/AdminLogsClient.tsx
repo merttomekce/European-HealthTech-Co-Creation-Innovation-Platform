@@ -108,7 +108,7 @@ export default function AdminLogsClient({ initialLogs }: { initialLogs: Log[] })
             {filtered.map(log => (
               <tr key={log.id}>
                 <td style={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
-                    {new Date(log.createdAt).toLocaleString()}
+                    {new Date(log.createdAt).toLocaleString('en-US')}
                 </td>
                 <td>
                     <div style={{ fontWeight: 500 }}>{log.user?.email || 'System'}</div>

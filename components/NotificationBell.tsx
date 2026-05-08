@@ -16,6 +16,9 @@ export default function NotificationBell() {
       setUnreadCount(count);
     }
     load();
+
+    window.addEventListener('notifications-updated', load);
+    return () => window.removeEventListener('notifications-updated', load);
   }, []);
 
   return (
