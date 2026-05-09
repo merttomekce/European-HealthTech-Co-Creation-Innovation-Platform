@@ -22,22 +22,6 @@ async function emailExistsInSupabaseAuth(email: string) {
   }
 }
 
-async function profileExistsInAppDb(email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
-      select: { id: true },
-    });
-
-    return Boolean(user);
-  } catch (error) {
-    console.error('Profile lookup failed', error);
-    return false;
-  }
-}
-
 export async function resolveAuthFlow(email: string) {
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -46,19 +30,12 @@ export async function resolveAuthFlow(email: string) {
   }
 
   const isDemoEmail = normalizedEmail === DEMO_LOGIN.email;
-  const [authUserExists, profileExists] = isDemoEmail
-    ? [true, true]
-    : await Promise.all([
-        emailExistsInSupabaseAuth(normalizedEmail),
-        profileExistsInAppDb(normalizedEmail),
-      ]);
-
-  const registered = authUserExists && profileExists;
+  const authUserExists = isDemoEmail ? true : await emailExistsInSupabaseAuth(normalizedEmail);
 
   return {
     email: normalizedEmail,
-    registered,
-    nextPath: registered
+    registered: Boolean(authUserExists),
+    nextPath: authUserExists
       ? `/login/password?email=${encodeURIComponent(normalizedEmail)}`
       : `/auth/register?email=${encodeURIComponent(normalizedEmail)}`,
   };
