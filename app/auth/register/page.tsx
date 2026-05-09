@@ -34,6 +34,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
+  const verified = searchParams.get('verified') === '1';
   const [formData, setFormData] = React.useState({
     password: '',
     fullName: '',
@@ -52,17 +53,7 @@ function RegisterForm() {
   const [isCheckingEmail, setIsCheckingEmail] = React.useState(true);
 
   const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const supabase = createClient();
-
-  React.useEffect(() => {
-    const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        router.replace('/dashboard');
-      }
-    };
-    checkSession();
-  }, [router, supabase]);
+  const supabase = React.useMemo(() => createClient(), []);
 
   React.useEffect(() => {
     async function loadCountries() {
@@ -125,6 +116,17 @@ function RegisterForm() {
           router.replace(result.nextPath);
           return;
         }
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || user.email?.toLowerCase() !== email.toLowerCase()) {
+          router.replace(`/auth/verify?email=${encodeURIComponent(email)}&next=${encodeURIComponent('/auth/register')}`);
+          return;
+        }
+
+        if (!verified) {
+          router.replace(`/auth/verify?email=${encodeURIComponent(email)}&next=${encodeURIComponent('/auth/register')}`);
+          return;
+        }
       } catch (error) {
         // Let the form load if the lookup backend is unavailable.
       } finally {
@@ -137,7 +139,7 @@ function RegisterForm() {
     return () => {
       isActive = false;
     };
-  }, [email, router]);
+  }, [email, router, supabase, verified]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,23 +185,15 @@ function RegisterForm() {
 
       document.cookie = 'dev_bypass=; path=/; max-age=0; samesite=lax';
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
+      const { error: passwordError } = await supabase.auth.updateUser({
         password: formData.password,
-        options: {
-          data: {
-            role: formData.role,
-          },
+        data: {
+          role: formData.role,
         },
       });
 
-      if (error) {
-        setBanner({ type: 'error', text: error.message });
-        return;
-      }
-
-      if (!data.user) {
-        setBanner({ type: 'error', text: 'Account created, but session not ready yet. Check inbox or try again.' });
+      if (passwordError) {
+        setBanner({ type: 'error', text: passwordError.message });
         return;
       }
 

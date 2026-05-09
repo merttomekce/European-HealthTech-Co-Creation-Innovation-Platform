@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { DEMO_LOGIN, isDemoLogin } from '@/lib/demo-login';
 import { resolveAuthFlowClient } from '@/lib/auth-flow-client';
 import { isProfessionalEmail } from '@/lib/constants/emails';
+import { sendEmailVerificationCode } from '@/lib/auth-email-otp';
 import '../auth/auth-v2.css';
 
 
@@ -33,7 +34,7 @@ function LoginForm() {
   const [banner, setBanner] = React.useState<{ type: 'error' | 'success'; text: string } | null>(null);
 
   const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   React.useEffect(() => {
     const checkSession = async () => {
@@ -80,7 +81,14 @@ function LoginForm() {
       }
 
       const result = await resolveAuthFlowClient(normalized);
-      router.push(result.nextPath);
+
+      if (result.registered) {
+        router.push(result.nextPath);
+        return;
+      }
+
+      await sendEmailVerificationCode(supabase, normalized);
+      router.push(`/auth/verify?email=${encodeURIComponent(normalized)}&next=${encodeURIComponent('/auth/register')}&sent=1`);
     } catch (err: any) {
       setBanner({ type: 'error', text: err?.message || 'Could not continue.' });
     } finally {
