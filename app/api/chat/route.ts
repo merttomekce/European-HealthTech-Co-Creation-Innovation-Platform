@@ -6,8 +6,15 @@ import { getAuthProfile } from '@/lib/actions/profile';
 import { buildMemoryRagContext, searchAnnouncementsByMemory } from '@/lib/vector-memory';
 
 // Sanitize env vars
-const rawBaseURL = (process.env.LOCAL_AI_BASE_URL || 'http://127.0.0.1:8001/v1').trim();
-const rawApiKey = (process.env.LOCAL_AI_API_KEY || '1234').trim();
+const rawBaseURL = (
+  process.env.LOCAL_AI_BASE_URL ||
+  (process.env.NODE_ENV !== 'production' ? 'http://127.0.0.1:8001/v1' : '')
+).trim();
+const rawApiKey = (
+  process.env.LOCAL_AI_API_KEY ||
+  (process.env.NODE_ENV !== 'production' ? '1234' : '')
+).trim();
+const hasLocalAI = Boolean(rawBaseURL && rawApiKey);
 
 function normalizeLocalAIUrl(input: RequestInfo | URL) {
   const inputUrl =
@@ -21,51 +28,60 @@ function normalizeLocalAIUrl(input: RequestInfo | URL) {
 }
 
 // Configure Local AI with a custom fetch wrapper to strip non-standard chunks
-const localAI = createOpenAI({
-  baseURL: rawBaseURL,
-  apiKey: rawApiKey, 
-  fetch: async (input, options) => {
-    const cleanURL = normalizeLocalAIUrl(input);
-    console.log(`Companion Fetching: ${cleanURL}`);
+const localAI = hasLocalAI
+  ? createOpenAI({
+      baseURL: rawBaseURL,
+      apiKey: rawApiKey,
+      fetch: async (input, options) => {
+        const cleanURL = normalizeLocalAIUrl(input);
+        console.log(`Companion Fetching: ${cleanURL}`);
 
-    const response = await fetch(cleanURL, options);
-    if (!response.body || options?.method !== 'POST') return response;
+        const response = await fetch(cleanURL, options);
+        if (!response.body || options?.method !== 'POST') return response;
 
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-    let lineBuffer = '';
+        const decoder = new TextDecoder();
+        const encoder = new TextEncoder();
+        let lineBuffer = '';
 
-    const transformer = new TransformStream({
-      transform(chunk, controller) {
-        lineBuffer += decoder.decode(chunk, { stream: true });
-        const lines = lineBuffer.split('\n');
-        lineBuffer = lines.pop() || '';
+        const transformer = new TransformStream({
+          transform(chunk, controller) {
+            lineBuffer += decoder.decode(chunk, { stream: true });
+            const lines = lineBuffer.split('\n');
+            lineBuffer = lines.pop() || '';
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.includes('stream-start')) {
-            console.log('Companion: Dropping protocol chunk ->', trimmed);
-            continue;
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.includes('stream-start')) {
+                console.log('Companion: Dropping protocol chunk ->', trimmed);
+                continue;
+              }
+              controller.enqueue(encoder.encode(line + '\n'));
+            }
+          },
+          flush(controller) {
+            if (lineBuffer && !lineBuffer.includes('stream-start')) {
+              controller.enqueue(encoder.encode(lineBuffer));
+            }
           }
-          controller.enqueue(encoder.encode(line + '\n'));
-        }
-      },
-      flush(controller) {
-        if (lineBuffer && !lineBuffer.includes('stream-start')) {
-          controller.enqueue(encoder.encode(lineBuffer));
-        }
-      }
-    });
+        });
 
-    const filteredStream = response.body.pipeThrough(transformer);
-    return new Response(filteredStream, response);
-  }
-});
+        const filteredStream = response.body.pipeThrough(transformer);
+        return new Response(filteredStream, response);
+      }
+    })
+  : null;
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
+    if (!localAI) {
+      return new Response(JSON.stringify({ error: 'AI endpoint not configured' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const { messages: uiMessages } = await req.json();
     const messages = await convertToModelMessages(uiMessages);
     const profile = await getAuthProfile();

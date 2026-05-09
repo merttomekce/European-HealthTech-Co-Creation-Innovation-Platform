@@ -2,8 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import prisma from '@/lib/prisma'
-import { Role } from '@prisma/client'
 import { z } from 'zod'
+
+type Role = 'ENGINEER' | 'HEALTHCARE_PROFESSIONAL' | 'ADMIN'
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Name is too short"),
@@ -44,8 +45,8 @@ export async function updateProfile(formData: z.infer<typeof profileSchema>) {
 
   // 4. Map Role
   const prismalRole: Role = validated.role === 'healthcare' 
-    ? Role.HEALTHCARE_PROFESSIONAL 
-    : Role.ENGINEER
+    ? 'HEALTHCARE_PROFESSIONAL' 
+    : 'ENGINEER'
 
   // 5. Update Database
   try {

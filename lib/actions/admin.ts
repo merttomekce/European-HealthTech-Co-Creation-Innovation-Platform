@@ -4,7 +4,6 @@ import prisma from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { logAction } from '@/lib/audit';
-import { Role } from '@prisma/client';
 
 /**
  * Verifies if the current user has the ADMIN role.

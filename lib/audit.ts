@@ -1,5 +1,7 @@
 import prisma from '@/lib/prisma';
-import { AuditAction, Role } from '@prisma/client';
+import { AuditAction } from '@prisma/client';
+
+type Role = 'ENGINEER' | 'HEALTHCARE_PROFESSIONAL' | 'ADMIN';
 
 /**
  * Standard utility for logging actions to the AuditLog table.

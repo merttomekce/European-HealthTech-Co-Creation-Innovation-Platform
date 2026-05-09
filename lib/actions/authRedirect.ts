@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import prisma from '@/lib/prisma'
-import { Role } from '@prisma/client'
+
+type Role = 'ENGINEER' | 'HEALTHCARE_PROFESSIONAL' | 'ADMIN'
 
 export async function getAuthRedirect(): Promise<string> {
   const supabase = createClient()
@@ -19,14 +20,14 @@ export async function getAuthRedirect(): Promise<string> {
 
   // If user doesn't exist in Prisma (e.g., just signed up), create them
   if (!dbUser) {
-    const defaultRole = Role.HEALTHCARE_PROFESSIONAL;
+    const defaultRole: Role = 'HEALTHCARE_PROFESSIONAL';
     let selectedRole: Role = defaultRole;
 
     const metaRole = user.user_metadata?.role;
     if (metaRole === 'engineer') {
-      selectedRole = Role.ENGINEER;
+      selectedRole = 'ENGINEER';
     } else if (metaRole === 'healthcare') {
-      selectedRole = Role.HEALTHCARE_PROFESSIONAL;
+      selectedRole = 'HEALTHCARE_PROFESSIONAL';
     }
 
     dbUser = await prisma.user.create({
@@ -40,11 +41,11 @@ export async function getAuthRedirect(): Promise<string> {
 
   // Determine redirection route based on DB role
   switch (dbUser.role) {
-    case Role.ADMIN:
+    case 'ADMIN':
       return '/admin'
-    case Role.ENGINEER:
+    case 'ENGINEER':
       return '/engineer/dashboard'
-    case Role.HEALTHCARE_PROFESSIONAL:
+    case 'HEALTHCARE_PROFESSIONAL':
     default:
       return '/doctor/dashboard'
   }
