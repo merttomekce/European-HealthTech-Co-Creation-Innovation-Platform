@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
@@ -14,8 +15,11 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import AICompanion from '@/components/AICompanion';
 import './protected.css';
+
+const AICompanion = dynamic(() => import('@/components/AICompanion'), {
+  ssr: false,
+});
 
 export default function ProtectedLayout({
   children,
