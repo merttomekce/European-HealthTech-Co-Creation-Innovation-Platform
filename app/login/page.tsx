@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import { DEMO_LOGIN, isDemoLogin } from '@/lib/demo-login';
 import { resolveAuthFlowClient } from '@/lib/auth-flow-client';
 import { isProfessionalEmail } from '@/lib/constants/emails';
-import { sendEmailVerificationCode } from '@/lib/auth-email-otp';
 import '../auth/auth-v2.css';
 
 
@@ -87,8 +86,7 @@ function LoginForm() {
         return;
       }
 
-      await sendEmailVerificationCode(supabase, normalized);
-      router.push(`/auth/verify?email=${encodeURIComponent(normalized)}&next=${encodeURIComponent('/auth/register')}&sent=1`);
+      router.push(result.nextPath);
     } catch (err: any) {
       setBanner({ type: 'error', text: err?.message || 'Could not continue.' });
     } finally {

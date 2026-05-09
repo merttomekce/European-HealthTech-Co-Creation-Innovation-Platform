@@ -4,8 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get('next') ?? '/dashboard';
+  const next = searchParams.get('next') ?? '/auth/register';
+  const email = searchParams.get('email') ?? '';
 
   if (code) {
     const supabase = createClient();
@@ -21,6 +21,15 @@ export async function GET(request: Request) {
           actionType: 'LOGIN',
           result: 'success',
         });
+      }
+
+      if (next === '/auth/register') {
+        const redirectUrl = new URL(`${origin}/auth/register`);
+        if (email) {
+          redirectUrl.searchParams.set('email', email);
+        }
+        redirectUrl.searchParams.set('verified', '1');
+        return NextResponse.redirect(redirectUrl.toString());
       }
 
       if (next === '/dashboard') {
@@ -39,5 +48,5 @@ export async function GET(request: Request) {
   }
 
   // Redirect to the login page if there's no code or an error occurred during exchange
-  return NextResponse.redirect(`${origin}/?error=auth_callback_failed`);
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
 }
