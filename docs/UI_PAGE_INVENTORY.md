@@ -29,8 +29,10 @@
 | 9 | `/my-announcements` | **My Announcements** | ✅ Built | Author's view of own posts (Active/Closed/Expired). |
 | 10 | `/my-requests` | **My Requests** | ✅ Built | Request management: Sent vs Received tabs. |
 | 11 | `/my-requests/[id]` | **Request Detail** | ✅ Built | Negotiation timeline + TimeSlotPicker workflow. |
-| 12 | `/profile` | **My Profile** | ✅ Built | Editable profile with Zod validation + GDPR actions. |
-| 13 | `/notifications` | **Notifications** | ✅ Built | Full list of notifications with unread indicators. |
+| 12 | `/chats` | **Collaboration Chats** | ✅ Built | Messaging hub for all active project negotiations. |
+| 13 | `/chats/[id]` | **Chat Thread** | ✅ Built | Individual conversation view with message history. |
+| 14 | `/profile` | **My Profile** | ✅ Built | Editable profile with Zod validation + GDPR actions. |
+| 15 | `/notifications` | **Notifications** | ✅ Built | Full list of notifications with unread indicators. |
 
 ---
 
@@ -38,11 +40,11 @@
 
 | # | Route | Name | Status | Description |
 |---|---|---|---|---|
-| 14 | `/admin` | **Admin Dashboard** | ✅ Built | KPI tiles and platform performance metrics. |
-| 15 | `/admin/users` | **User Management** | ✅ Built | Table with filtering and suspend/reactivate actions. |
-| 16 | `/admin/posts` | **Post Management** | ✅ Built | Lifecycle management table for all user submissions. |
-| 17 | `/admin/logs` | **Audit Logs** | ✅ Built | Tamper-evident record with CSV export capability. |
-| 18 | `/admin/settings` | **Platform Settings** | ✅ Built | Global configuration (Maintenance, NDA, Timeouts). |
+| 16 | `/admin` | **Admin Dashboard** | ✅ Built | KPI tiles and platform performance metrics. |
+| 17 | `/admin/users` | **User Management** | ✅ Built | Table with filtering and suspend/reactivate actions. |
+| 18 | `/admin/posts` | **Post Management** | ✅ Built | Lifecycle management table for all user submissions. |
+| 19 | `/admin/logs` | **Audit Logs** | ✅ Built | Tamper-evident record with CSV export capability. |
+| 20 | `/admin/settings` | **Platform Settings** | ✅ Built | Global configuration (Maintenance, NDA, Timeouts). |
 
 ---
 
@@ -50,8 +52,8 @@
 
 | # | Route | Name | Status | Description |
 |---|---|---|---|---|
-| 19 | `404` | **Signal Lost** | ✅ Built | Custom Digital Void themed not-found page. |
-| 20 | `Global Error` | **System Malfunction** | ✅ Built | Catch-all Error Boundary with retry action. |
+| 21 | `404` | **Signal Lost** | ✅ Built | Custom Digital Void themed not-found page. |
+| 22 | `Global Error` | **System Malfunction** | ✅ Built | Catch-all Error Boundary with retry action. |
 
 ---
 

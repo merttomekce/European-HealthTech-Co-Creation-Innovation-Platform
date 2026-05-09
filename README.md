@@ -55,5 +55,6 @@ npm run dev
 The app should now be running on [http://localhost:3000](http://localhost:3000).
 
 ## Project Documentation
-- **Architecture**: See `ARCHITECTURE.md`
-- **Design Guidelines**: See `DESIGN.md` and `CLAUDE.md`
+- **SRS**: See `docs/SRS.md`
+- **Architecture**: See `docs/ARCHITECTURE.md`
+- **Design Guidelines**: See `docs/DESIGN.md` and `docs/CLAUDE.md`
