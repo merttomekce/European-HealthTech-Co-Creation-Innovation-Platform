@@ -115,13 +115,6 @@ npm run dev
 
 The application will be available at [http://localhost:3000](http://localhost:3000)
 
-## 📚 Project Documentation
-
-- **System Requirements Specification (SRS)**: See [`docs/SRS.md`](docs/SRS.md)
-- **System Architecture**: See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-- **Design Guidelines**: See [`docs/DESIGN.md`](docs/DESIGN.md)
-- **AI/Claude Integration**: See [`docs/CLAUDE.md`](docs/CLAUDE.md)
-
 ## 🏗️ Project Structure
 
 ```
