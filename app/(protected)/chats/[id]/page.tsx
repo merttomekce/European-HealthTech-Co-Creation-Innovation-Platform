@@ -136,7 +136,9 @@ async function buildThreadSummary(userId: string, request: any): Promise<ChatThr
         tone: message.senderId === userId ? 'outgoing' : 'incoming',
       })),
     ],
-    canSendMessages: Boolean(conversation) && !['CANCELLED', 'DECLINED'].includes(status),
+    canSendMessages:
+      !['CANCELLED', 'DECLINED'].includes(status) &&
+      (Boolean(conversation) || (!isOutgoing && status === 'PENDING')),
     signal: isOutgoing ? 'Waiting for reply' : status === 'PENDING' ? 'Needs review' : 'In progress',
   } as ChatThreadDetail & ChatThreadSummary;
 }
