@@ -1,7 +1,28 @@
 import prisma from '@/lib/prisma';
-import { AuditAction } from '@prisma/client';
 
 type Role = 'ENGINEER' | 'HEALTHCARE_PROFESSIONAL' | 'ADMIN';
+type AuditAction =
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'LOGIN_FAILED'
+  | 'REGISTER'
+  | 'EMAIL_VERIFIED'
+  | 'POST_CREATED'
+  | 'POST_EDITED'
+  | 'POST_CLOSED'
+  | 'POST_EXPIRED'
+  | 'POST_ARCHIVED'
+  | 'POST_REMOVED_BY_ADMIN'
+  | 'MEETING_REQUEST_SENT'
+  | 'MEETING_REQUEST_ACKNOWLEDGED'
+  | 'MEETING_REQUEST_CONFIRMED'
+  | 'MEETING_REQUEST_DECLINED'
+  | 'MEETING_REQUEST_CANCELLED'
+  | 'PARTNER_FOUND_MARKED'
+  | 'ADMIN_USER_SUSPENDED'
+  | 'ADMIN_USER_REACTIVATED'
+  | 'DATA_EXPORT_REQUESTED'
+  | 'ACCOUNT_DELETED';
 
 /**
  * Standard utility for logging actions to the AuditLog table.
