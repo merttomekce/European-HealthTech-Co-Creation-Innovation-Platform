@@ -35,6 +35,8 @@ export async function getAuthRedirect(): Promise<string> {
         id: user.id,
         email: user.email!,
         role: selectedRole
+        ,
+        expertise: [],
       }
     })
   }
